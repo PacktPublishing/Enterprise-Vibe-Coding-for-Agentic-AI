@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HVE Maturity Assessment — Hypervelocity Engineering Readiness</title>
+    <script>
+      (() => {
+        const param = new URLSearchParams(window.location.search).get("clawpilotTheme");
+        const theme =
+          param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f7f4ef;
+            --surface: #ffffff;
+            --surface-raised: #f5f5f5;
+            --border: #dedede;
+            --border-strong: #919191;
+            --text: #242424;
+            --text-muted: #5c5c5c;
+            --accent: #b11f4b;
+            --accent-hover: #9a1a41;
+            --accent-glow: rgba(177, 31, 75, 0.08);
+            --accent-fg: #ffffff;
+            --green: #16a34a;
+            --yellow: #f59e0b;
+            --orange: #ea580c;
+            --red: #dc2626;
+            --purple: #9333ea;
+            --level1: #dc2626;
+            --level2: #ea580c;
+            --level3: #f59e0b;
+            --level4: #0078d4;
+            --level5: #16a34a;
+            --radius: 0.625rem;
+            --shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+            --panel-strong: rgba(255, 255, 255, 0.96);
+        }
+        html[data-theme="dark"] {
+            color-scheme: dark;
+            --bg: #3d3b3a;
+            --surface: #292929;
+            --surface-raised: #2e2e2e;
+            --border: #474747;
+            --border-strong: #5f5f5f;
+            --text: #dedede;
+            --text-muted: #919191;
+            --accent: #fd8ea1;
+            --accent-hover: #fb7b91;
+            --accent-glow: rgba(253, 142, 161, 0.14);
+            --accent-fg: #1a1a1a;
+            --green: #4ade80;
+            --yellow: #fbbf24;
+            --orange: #fb923c;
+            --red: #f87171;
+            --purple: #c084fc;
+            --level1: #f87171;
+            --level2: #fb923c;
+            --level3: #fbbf24;
+            --level4: #4da6ff;
+            --level5: #4ade80;
+            --radius: 0.625rem;
+            --shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+            --panel-strong: rgba(41, 41, 41, 0.96);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Theme Toggle */
+        #theme-toggle {
+            position: fixed;
+            top: 12px;
+            right: 16px;
+            background: var(--panel-strong);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 6px 12px;
+            font-size: 1rem;
+            cursor: pointer;
+            z-index: 999;
+            color: var(--text);
+            backdrop-filter: blur(8px);
+            box-shadow: var(--shadow);
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* ---- HEADER ---- */
+        header {
+            text-align: center;
+            padding: 3rem 0 2rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 2.5rem;
+        }
+        header .badge {
+            display: inline-block;
+            background: var(--accent-glow);
+            color: var(--accent);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0.3em 1em;
+            border-radius: var(--radius);
+            border: 1px solid var(--accent-glow);
+            margin-bottom: 1rem;
+        }
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+        header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ---- MATURITY MODEL OVERVIEW ---- */
+        .model-overview {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: var(--shadow);
+        }
+        .model-overview h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1.25rem;
+        }
+        .level-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .level-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--surface-raised);
+            border-radius: var(--radius);
+            border-left: 4px solid;
+            border: 1px solid var(--border);
+            border-left: 4px solid;
+        }
+        .level-card[data-level="1"] { border-left-color: var(--level1); }
+        .level-card[data-level="2"] { border-left-color: var(--level2); }
+        .level-card[data-level="3"] { border-left-color: var(--level3); }
+        .level-card[data-level="4"] { border-left-color: var(--level4); }
+        .level-card[data-level="5"] { border-left-color: var(--level5); }
+        .level-num {
+            flex-shrink: 0;
+            width: 2.2rem;
+            height: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--accent-fg);
+        }
+        .level-card[data-level="1"] .level-num { background: var(--level1); }
+        .level-card[data-level="2"] .level-num { background: var(--level2); }
+        .level-card[data-level="3"] .level-num { background: var(--level3); }
+        .level-card[data-level="4"] .level-num { background: var(--level4); }
+        .level-card[data-level="5"] .level-num { background: var(--level5); }
+        .level-info h3 { font-size: 1rem; margin-bottom: 0.2rem; }
+        .level-info p { font-size: 0.875rem; color: var(--text-muted); }
+
+        /* ---- ASSESSMENT ---- */
+        .assessment-section {
+            margin-bottom: 2.5rem;
+        }
+        .assessment-section h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        .assessment-section > p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* (dimension card already defined above) */
+        .dimension-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s;
+        }
+        .dimension-header:hover {
+            background: var(--surface-raised);
+        }
+        .dimension-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            width: 2rem;
+            text-align: center;
+        }
+        .dimension-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            flex: 1;
+        }
+        .dimension-score {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            padding: 0.2em 0.6em;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            min-width: 3rem;
+            text-align: center;
+        }
+        .dimension-chevron {
+            color: var(--text-muted);
+            transition: transform 0.2s;
+            font-size: 0.8rem;
+        }
+        .dimension.open .dimension-chevron {
+            transform: rotate(180deg);
+        }
+        .dimension-body {
+            display: none;
+            padding: 0 1.25rem 1.25rem;
+        }
+        .dimension.open .dimension-body {
+            display: block;
+        }
+
+        .question {
+            margin-bottom: 1.25rem;
+        }
+        .question:last-child { margin-bottom: 0; }
+        .question label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--surface-raised);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+            border: 1px solid transparent;
+            font-size: 0.85rem;
+        }
+        .option:hover {
+            background: var(--accent-glow);
+            border-color: var(--accent);
+        }
+        .option.selected {
+            background: var(--accent-glow);
+            border-color: var(--accent);
+        }
+        .option input[type="radio"] {
+            accent-color: var(--accent);
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        /* ---- CARDS (consistent border-radius) ---- */
+        .dimension {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        .progress-bar-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+            box-shadow: var(--shadow);
+        }
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+        .progress-label span:first-child { color: var(--text-muted); }
+        .progress-label span:last-child { color: var(--accent); font-weight: 600; }
+        .progress-track {
+            height: 6px;
+            background: var(--surface-raised);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        /* ---- BUTTON ---- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: var(--accent-fg);
+        }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-secondary {
+            background: var(--surface-raised);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover { border-color: var(--accent); }
+        .btn-center { display: flex; justify-content: center; margin-top: 1.5rem; }
+
+        /* ---- RESULTS ---- */
+        #results {
+            display: none;
+        }
+
+        .result-hero {
+            text-align: center;
+            padding: 2.5rem 2rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .result-hero .score-ring {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+        }
+        .result-hero .score-ring svg {
+            transform: rotate(-90deg);
+        }
+        .result-hero .score-ring .score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .result-hero .score-ring .score-text .num {
+            font-size: 2.5rem;
+            font-weight: 700;
+            display: block;
+            line-height: 1;
+        }
+        .result-hero .score-ring .score-text .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .result-level-name {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+        }
+        .result-level-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Dimension Breakdown */
+        .breakdown {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .breakdown h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+        .breakdown-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        .breakdown-row:last-child { margin-bottom: 0; }
+        .breakdown-label {
+            font-size: 0.85rem;
+            width: 200px;
+            flex-shrink: 0;
+        }
+        .breakdown-bar-track {
+            flex: 1;
+            height: 10px;
+            background: var(--surface-raised);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .breakdown-bar-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.6s ease;
+        }
+        .breakdown-val {
+            font-size: 0.85rem;
+            font-weight: 600;
+            width: 3rem;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* Level Detail Card */
+        .result-detail {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .result-detail h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+        .result-detail p, .result-detail li {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+        .result-detail ul {
+            padding-left: 1.25rem;
+            margin-top: 0.5rem;
+        }
+        .result-detail li {
+            margin-bottom: 0.3rem;
+        }
+
+        /* Prompt Box */
+        .prompt-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .prompt-box h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+        .prompt-box .hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+        .prompt-textarea {
+            width: 100%;
+            min-height: 260px;
+            background: var(--surface-raised);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: Consolas, "Courier New", Courier, monospace;
+            font-size: 0.8rem;
+            padding: 1rem;
+            resize: vertical;
+            line-height: 1.6;
+        }
+        .prompt-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .copy-btn-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0.75rem;
+            gap: 0.5rem;
+        }
+        .copy-toast {
+            display: none;
+            color: var(--green);
+            font-size: 0.85rem;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .copy-toast.show {
+            display: flex;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        footer a { color: var(--accent); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            header h1 { font-size: 1.6rem; }
+            .breakdown-label { width: 120px; font-size: 0.8rem; }
+            .container { padding: 1rem; }
+            .level-card { flex-direction: column; gap: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+<button id="theme-toggle" onclick="toggleTheme()">🌓</button>
+<div class="container">
+
+    <!-- HEADER -->
+    <header>
+        <div class="badge">From the book: Agentic Development in Practice</div>
+        <h1>HVE Maturity Assessment</h1>
+        <p>Discover where your organisation sits on the journey from traditional development to Hypervelocity Engineering — and what to do next.</p>
+    </header>
+
+    <!-- MATURITY MODEL OVERVIEW -->
+    <section class="model-overview">
+        <h2>The Five Levels of Engineering Velocity</h2>
+        <div class="level-cards">
+            <div class="level-card" data-level="1">
+                <div class="level-num">1</div>
+                <div class="level-info">
+                    <h3>Traditional Development</h3>
+                    <p>No meaningful AI integration. Engineering relies entirely on human throughput, manual processes, and conventional tooling.</p>
+                </div>
+            </div>
+            <div class="level-card" data-level="2">
+                <div class="level-num">2</div>
+                <div class="level-info">
+                    <h3>AI-Assisted (Autocomplete Era)</h3>
+                    <p>Individual developers use AI for code completion and snippets. Adoption is ad hoc — no shared standards, no governance, no methodology.</p>
+                </div>
+            </div>
+            <div class="level-card" data-level="3">
+                <div class="level-num">3</div>
+                <div class="level-info">
+                    <h3>Vibe Coding</h3>
+                    <p>Teams actively use AI for generation, but without discipline. Fast first drafts, growing hidden debt. Prompt strategies are personal, not institutional.</p>
+                </div>
+            </div>
+            <div class="level-card" data-level="4">
+                <div class="level-num">4</div>
+                <div class="level-info">
+                    <h3>Structured Agentic Development</h3>
+                    <p>Emerging HVE practices. Primitives are being adopted — instructions, reusable prompts, defined agents. The RPI loop is forming. Governance is catching up.</p>
+                </div>
+            </div>
+            <div class="level-card" data-level="5">
+                <div class="level-num">5</div>
+                <div class="level-info">
+                    <h3>Hypervelocity Engineering</h3>
+                    <p>Full HVE methodology. Primitives are codified, auditable, and version-controlled. Small teams operate at 10× capacity. Business value is measured continuously.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ASSESSMENT -->
+    <section id="assessment" class="assessment-section">
+        <h2>Take the Assessment</h2>
+        <p>Answer one question per dimension. Select the option that best describes your organisation's <strong>current</strong> state — not where you aspire to be.</p>
+
+        <div class="progress-bar-container">
+            <div class="progress-label">
+                <span>Progress</span>
+                <span id="progress-text">0 / 7</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <form id="quiz-form"></form>
+
+        <div class="btn-center">
+            <button type="button" class="btn btn-primary" id="submit-btn" disabled onclick="showResults()">
+                View My Results
+            </button>
+        </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section id="results">
+        <div class="result-hero" id="result-hero"></div>
+        <div class="breakdown" id="breakdown"></div>
+        <div class="result-detail" id="result-detail"></div>
+        <div class="prompt-box" id="prompt-box"></div>
+        <div class="btn-center">
+            <button type="button" class="btn btn-secondary" onclick="resetAssessment()">Retake Assessment</button>
+        </div>
+    </section>
+
+    <footer>
+        <p>Companion resource for <em>Agentic Development in Practice: A Hypervelocity Engineering Playbook</em><br>
+        &copy; 2026 &mdash; Chapter 1: The HVE Manifesto</p>
+    </footer>
+</div>
+
+<script>
+// =============================================
+// DATA MODEL
+// =============================================
+const DIMENSIONS = [
+    {
+        id: "ai_adoption",
+        icon: "🤖",
+        title: "AI Tool Adoption & Integration",
+        question: "How are AI coding tools used across your engineering organisation?",
+        options: [
+            { score: 1, text: "We don't use AI coding tools in any meaningful way." },
+            { score: 2, text: "Some individuals use autocomplete tools (e.g., Copilot suggestions), but there is no organisational policy or standard." },
+            { score: 3, text: "Most developers use AI for code generation actively, but each person has their own approach. There are no shared prompts or conventions." },
+            { score: 4, text: "We have standardised AI tooling across teams with shared configurations, but agentic workflows (multi-step, autonomous tasks) are still emerging." },
+            { score: 5, text: "AI agents operate as constrained, accountable collaborators within our workflows — with defined scope, tools, and review boundaries." }
+        ]
+    },
+    {
+        id: "primitive_stack",
+        icon: "🧱",
+        title: "Primitive Stack Maturity",
+        question: "To what extent has your organisation codified its engineering methodology into reusable AI primitives (instructions, agents, prompts, skills, hooks)?",
+        options: [
+            { score: 1, text: "We have no codified primitives. Standards exist in documentation or tribal knowledge." },
+            { score: 2, text: "We have some coding standards documented, but they are not consumed by AI tools automatically." },
+            { score: 3, text: "Individual engineers have personal prompt libraries or instruction files, but nothing is shared or version-controlled at the team level." },
+            { score: 4, text: "We maintain shared instruction files and some reusable prompts in our repositories. Agent definitions are emerging but not yet standardised." },
+            { score: 5, text: "Our full primitive stack — instructions, agents, prompts, skills, and hooks — is codified, version-controlled, and applied automatically across all repositories." }
+        ]
+    },
+    {
+        id: "dev_methodology",
+        icon: "🔄",
+        title: "Development Methodology (RPI Loop)",
+        question: "How does your team structure the workflow when using AI for development tasks?",
+        options: [
+            { score: 1, text: "We follow a traditional SDLC. AI is not part of our development process." },
+            { score: 2, text: "Developers occasionally ask AI for help mid-task, but there is no structured approach to when or how." },
+            { score: 3, text: "We 'ask the AI and see what happens' — generation is fast, but planning and research phases are informal or skipped." },
+            { score: 4, text: "We follow a structured loop: research the domain and constraints first, plan the work explicitly, then implement against that plan. But adherence varies across teams." },
+            { score: 5, text: "The Research → Plan → Implement loop is our standard methodology. AI-generated plans are reviewed and approved before implementation. Every task follows this discipline." }
+        ]
+    },
+    {
+        id: "governance",
+        icon: "🛡️",
+        title: "Governance & Security",
+        question: "How does your organisation govern AI-generated code and enforce security policies in agentic workflows?",
+        options: [
+            { score: 1, text: "We have no specific governance for AI-generated code. Standard code review applies, if it applies at all." },
+            { score: 2, text: "We rely on existing code review to catch AI-generated issues, but reviewers don't specifically audit for AI artefacts or hallucinations." },
+            { score: 3, text: "We are aware of the risks of AI-generated code (hallucinated dependencies, insecure defaults) but do not have automated guardrails in place." },
+            { score: 4, text: "Instruction primitives encode security policies and architectural guardrails. Some automated checks exist, but coverage is incomplete." },
+            { score: 5, text: "Security and governance policies are embedded in our primitive stack and enforced continuously — via instructions, hooks, and automated review. AI output is auditable and traceable." }
+        ]
+    },
+    {
+        id: "business_value",
+        icon: "📊",
+        title: "Business Value Measurement",
+        question: "How does your organisation measure and communicate the business impact of AI-assisted development?",
+        options: [
+            { score: 1, text: "We don't measure the impact of AI tooling on engineering outcomes." },
+            { score: 2, text: "We track licence adoption (e.g., 'X% of developers have Copilot'), but not productivity or quality outcomes." },
+            { score: 3, text: "We have anecdotal evidence of productivity gains ('it feels faster') but no structured measurement framework." },
+            { score: 4, text: "We measure some outcomes (time-to-delivery, defect rates) and can correlate them with AI adoption, but there is no formal Business Value Assessment." },
+            { score: 5, text: "Business Value Assessments are first-class artefacts. We measure time-to-value, effort multipliers, error surface impact, and strategic optionality for every agentic capability." }
+        ]
+    },
+    {
+        id: "team_structure",
+        icon: "👥",
+        title: "Team Structure & Capacity Model",
+        question: "How has AI adoption influenced your team structure, hiring, and capacity planning?",
+        options: [
+            { score: 1, text: "Team structure and hiring are unchanged. We plan capacity based on headcount and story points as before." },
+            { score: 2, text: "We acknowledge that AI makes individuals faster, but team sizes, roles, and estimation methods are the same." },
+            { score: 3, text: "Some teams are informally smaller or more productive due to AI, but the organisational model hasn't adapted. Estimation is increasingly unreliable." },
+            { score: 4, text: "We are experimenting with smaller, expert teams that leverage AI as a force multiplier. Estimation is shifting from human-throughput to constraint-and-scope models." },
+            { score: 5, text: "Small, expert teams (3–5 engineers) operate at the effective capacity of much larger teams. Capacity planning is based on primitive stack quality, not headcount." }
+        ]
+    },
+    {
+        id: "human_in_loop",
+        icon: "🧑‍⚖️",
+        title: "Human-in-the-Loop Design",
+        question: "How deliberately does your organisation design the boundary between AI autonomy and human decision-making?",
+        options: [
+            { score: 1, text: "There is no explicit design for human–AI boundaries. Developers use AI freely, or don't use it at all." },
+            { score: 2, text: "We trust code review to catch AI mistakes, but there is no defined model for where AI should or shouldn't act autonomously." },
+            { score: 3, text: "We are aware that some tasks require human judgment, but the boundaries are informal and differ across teams." },
+            { score: 4, text: "We define human decision points for high-stakes workflows (e.g., deployment, security, architecture). Agent primitives include escalation conditions." },
+            { score: 5, text: "Every agentic workflow has explicitly designed human-in-the-loop gates. Agents have defined autonomy boundaries, escalation triggers, and audit trails. Humans own decisions; AI owns execution." }
+        ]
+    }
+];
+
+const LEVEL_META = {
+    1: {
+        name: "Level 1 — Traditional Development",
+        color: "var(--level1)",
+        summary: "Your organisation operates under the traditional rules of software development. AI is not yet a meaningful part of your engineering practice.",
+        detail: "This is where most of the industry was two years ago — and where a decreasing number of competitive organisations remain today. The risk is not that you are doing something wrong. It is that the cost structure and velocity of organisations at higher levels will create a compounding gap that becomes harder to close over time.",
+        nextSteps: [
+            "Begin with controlled pilots: equip 2–3 teams with AI coding assistants and measure output",
+            "Establish a baseline: document current delivery velocity, defect rates, and time-to-value before introducing AI",
+            "Read Chapter 1 of the book to understand the HVE framework before scaling adoption",
+            "Identify one low-risk, high-repetition workflow as your first AI-assisted use case"
+        ]
+    },
+    2: {
+        name: "Level 2 — AI-Assisted (Autocomplete Era)",
+        color: "var(--level2)",
+        summary: "Your developers use AI for code suggestions and completions, but adoption is individual and ungoverned. You are capturing some value, but leaving most of it on the table.",
+        detail: "The autocomplete era is a necessary starting point, but it is not a destination. Individual productivity gains are real but modest — and they come with hidden risks when there are no shared standards for how AI output is reviewed, governed, or measured.",
+        nextSteps: [
+            "Standardise AI tooling configuration across teams — start with a shared instructions file in your repositories",
+            "Begin building a shared prompt library for common tasks (code review, test generation, documentation)",
+            "Introduce governance awareness: train reviewers to identify AI-generated code artefacts",
+            "Define your first Business Value Assessment to move from anecdotal to measurable impact"
+        ]
+    },
+    3: {
+        name: "Level 3 — Vibe Coding",
+        color: "var(--level3)",
+        summary: "Your teams actively use AI for code generation, and velocity feels impressive. But discipline is missing — prompt strategies are personal, quality is inconsistent, and technical debt is accumulating invisibly.",
+        detail: "Vibe coding is the most dangerous level to stay at. The speed is seductive, but the debt is real: hallucinated architecture, unownable output, prompt drift, and invisible assumptions baked into generated code. The organisations that get stuck here will spend the next two years paying down debt they didn't know they were creating.",
+        nextSteps: [
+            "Introduce the Research → Plan → Implement loop as your standard AI-assisted workflow",
+            "Begin codifying your top 5 engineering standards as instruction primitives",
+            "Establish a shared agent definition for your most common development task",
+            "Audit existing AI-generated code for hidden debt: hallucinated dependencies, insecure defaults, undocumented assumptions",
+            "Move from 'ask and see' to 'plan and execute' — this single shift changes everything"
+        ]
+    },
+    4: {
+        name: "Level 4 — Structured Agentic Development",
+        color: "var(--level4)",
+        summary: "Your organisation is adopting HVE practices. Primitives are emerging, the RPI loop is forming, and governance is catching up. You are on the right trajectory — now it's about consistency and completeness.",
+        detail: "This is the inflection point. You have the conceptual framework and the early practices in place. The challenge now is moving from 'some teams do this well' to 'this is how we operate.' The primitive stack needs to be complete, the methodology needs to be universal, and business value measurement needs to become a first-class practice.",
+        nextSteps: [
+            "Complete your primitive stack: ensure instructions, agents, prompts, skills, and hooks are all defined and version-controlled",
+            "Make the RPI loop non-negotiable: every AI-assisted task follows Research → Plan → Implement",
+            "Implement Business Value Assessments as a standard artefact for every new agentic capability",
+            "Begin measuring team capacity in terms of primitive stack quality, not headcount",
+            "Cross-pollinate: share primitive libraries across teams to accelerate adoption"
+        ]
+    },
+    5: {
+        name: "Level 5 — Hypervelocity Engineering",
+        color: "var(--level5)",
+        summary: "Your organisation operates at the frontier of AI-native software development. Small, expert teams deliver at the effective capacity of much larger groups. Methodology is codified, governance is continuous, and business value is measured systematically.",
+        detail: "You are operating where the book describes the destination. The competitive moat you have built is real: your primitive stack, your methodology, and your team model create a compounding advantage that is difficult for competitors to replicate. The opportunity now is to deepen, share, and extend — making your HVE practice a strategic asset.",
+        nextSteps: [
+            "Contribute to the broader HVE community: share anonymised primitive patterns and methodology insights",
+            "Explore cross-domain primitive reuse: the compliance monitoring stack may be 70% reusable for due diligence",
+            "Invest in primitive observability: measure not just outcomes, but the quality and effectiveness of individual primitives",
+            "Mentor other teams and organisations — your experience is rare and valuable",
+            "Push the frontier: experiment with multi-agent orchestration, autonomous CI/CD governance, and self-improving primitive stacks"
+        ]
+    }
+};
+
+// =============================================
+// RENDER QUIZ
+// =============================================
+function renderQuiz() {
+    const form = document.getElementById('quiz-form');
+    form.innerHTML = DIMENSIONS.map((dim, di) => {
+        const optionsHtml = dim.options.map((opt, oi) => `
+            <label class="option" data-dim="${di}" data-score="${opt.score}">
+                <input type="radio" name="dim_${di}" value="${opt.score}">
+                <span>${opt.text}</span>
+            </label>
+        `).join('');
+        return `
+        <div class="dimension" id="dim-${di}">
+            <div class="dimension-header" onclick="toggleDimension(${di})">
+                <span class="dimension-icon">${dim.icon}</span>
+                <span class="dimension-title">${dim.title}</span>
+                <span class="dimension-score" id="dim-score-${di}">—</span>
+                <span class="dimension-chevron">▼</span>
+            </div>
+            <div class="dimension-body">
+                <div class="question">
+                    <label>${dim.question}</label>
+                    <div class="options">${optionsHtml}</div>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+
+    // Open first dimension by default
+    document.getElementById('dim-0').classList.add('open');
+
+    // Attach click handlers
+    document.querySelectorAll('.option').forEach(opt => {
+        opt.addEventListener('click', function() {
+            const radio = this.querySelector('input[type="radio"]');
+            radio.checked = true;
+            const dimIdx = parseInt(this.dataset.dim);
+            const score = parseInt(this.dataset.score);
+
+            // Update selection visual
+            this.closest('.options').querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+            this.classList.add('selected');
+
+            // Update score badge
+            document.getElementById(`dim-score-${dimIdx}`).textContent = `${score}/5`;
+
+            // Auto-open next unanswered dimension
+            const nextUnanswered = findNextUnanswered(dimIdx);
+            if (nextUnanswered !== null) {
+                document.getElementById(`dim-${dimIdx}`).classList.remove('open');
+                const nextEl = document.getElementById(`dim-${nextUnanswered}`);
+                nextEl.classList.add('open');
+                nextEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            updateProgress();
+        });
+    });
+}
+
+function findNextUnanswered(currentIdx) {
+    for (let i = currentIdx + 1; i < DIMENSIONS.length; i++) {
+        if (!document.querySelector(`input[name="dim_${i}"]:checked`)) return i;
+    }
+    for (let i = 0; i < currentIdx; i++) {
+        if (!document.querySelector(`input[name="dim_${i}"]:checked`)) return i;
+    }
+    return null;
+}
+
+function toggleDimension(idx) {
+    document.getElementById(`dim-${idx}`).classList.toggle('open');
+}
+
+function updateProgress() {
+    const answered = DIMENSIONS.filter((_, i) => document.querySelector(`input[name="dim_${i}"]:checked`)).length;
+    const total = DIMENSIONS.length;
+    document.getElementById('progress-text').textContent = `${answered} / ${total}`;
+    document.getElementById('progress-fill').style.width = `${(answered / total) * 100}%`;
+    document.getElementById('submit-btn').disabled = answered < total;
+}
+
+// =============================================
+// RESULTS
+// =============================================
+function getScores() {
+    return DIMENSIONS.map((dim, i) => {
+        const checked = document.querySelector(`input[name="dim_${i}"]:checked`);
+        return { dim, score: checked ? parseInt(checked.value) : 0 };
+    });
+}
+
+function computeLevel(avg) {
+    if (avg < 1.5) return 1;
+    if (avg < 2.5) return 2;
+    if (avg < 3.5) return 3;
+    if (avg < 4.5) return 4;
+    return 5;
+}
+
+function getLevelColor(level) {
+    return `var(--level${level})`;
+}
+
+function showResults() {
+    const scores = getScores();
+    const total = scores.reduce((s, r) => s + r.score, 0);
+    const avg = total / scores.length;
+    const level = computeLevel(avg);
+    const meta = LEVEL_META[level];
+
+    // Hide assessment, show results
+    document.getElementById('assessment').style.display = 'none';
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+
+    // Hero
+    const pct = (avg / 5) * 100;
+    const circumference = 2 * Math.PI * 65;
+    const offset = circumference - (pct / 100) * circumference;
+    document.getElementById('result-hero').innerHTML = `
+        <div class="score-ring">
+            <svg width="160" height="160">
+                <circle cx="80" cy="80" r="65" stroke="var(--surface-raised)" stroke-width="10" fill="none"/>
+                <circle cx="80" cy="80" r="65" stroke="${meta.color}" stroke-width="10" fill="none"
+                    stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round"
+                    style="transition: stroke-dashoffset 1s ease;"/>
+            </svg>
+            <div class="score-text">
+                <span class="num" style="color:${meta.color}">${avg.toFixed(1)}</span>
+                <span class="label">of 5.0</span>
+            </div>
+        </div>
+        <div class="result-level-name" style="color:${meta.color}">${meta.name}</div>
+        <div class="result-level-desc">${meta.summary}</div>
+    `;
+
+    // Breakdown
+    let brows = scores.map(r => {
+        const c = getLevelColor(r.score);
+        return `<div class="breakdown-row">
+            <span class="breakdown-label">${r.dim.icon} ${r.dim.title}</span>
+            <div class="breakdown-bar-track">
+                <div class="breakdown-bar-fill" style="width:${(r.score/5)*100}%;background:${c};"></div>
+            </div>
+            <span class="breakdown-val" style="color:${c}">${r.score}/5</span>
+        </div>`;
+    }).join('');
+    document.getElementById('breakdown').innerHTML = `<h3>Dimension Breakdown</h3>${brows}`;
+
+    // Detail
+    const stepsHtml = meta.nextSteps.map(s => `<li>${s}</li>`).join('');
+    document.getElementById('result-detail').innerHTML = `
+        <h3>What This Means</h3>
+        <p>${meta.detail}</p>
+        <h3 style="margin-top:1rem;">Recommended Next Steps</h3>
+        <ul>${stepsHtml}</ul>
+    `;
+
+    // Build the LLM prompt
+    const dimLines = scores.map(r => `  - ${r.dim.title}: ${r.score}/5`).join('\n');
+    const prompt = `I just completed the Hypervelocity Engineering (HVE) Maturity Assessment from the book "Agentic Development in Practice: A Hypervelocity Engineering Playbook."
+
+Here are my results:
+
+Overall Score: ${avg.toFixed(1)} / 5.0
+Overall Level: ${meta.name}
+
+Dimension Scores:
+${dimLines}
+
+Context about HVE:
+- Hypervelocity Engineering is the practice of small, expert teams leveraging AI to ship at the pace of innovation without sacrificing quality, security, or scalability.
+- The HVE Primitive Stack consists of: Instructions (always-loaded rules), Agents (specialised AI collaborators), Prompts (reusable task templates), Skills (portable capability packages), Hooks (automated workflow triggers), and Business Value Primitives (impact measurement).
+- The RPI Development Loop: Research → Plan → Implement — a disciplined alternative to "vibe coding."
+- The maturity spectrum: Traditional → Autocomplete → Vibe Coding → Structured Agentic Development → Hypervelocity Engineering.
+
+Based on my scores, please provide:
+1. A candid assessment of my organisation's strengths and weaknesses across these dimensions.
+2. The top 3 highest-impact actions I should take in the next 30 days to move up one maturity level.
+3. For each of my lowest-scoring dimensions, a concrete playbook (3–5 steps) to improve that specific area.
+4. Common pitfalls organisations at my level fall into, and how to avoid them.
+5. A suggested 90-day roadmap to reach the next maturity level.
+
+Be specific, actionable, and grounded in engineering practice — not generic. Assume I am a technology leader who can influence tooling, process, and team structure.`;
+
+    document.getElementById('prompt-box').innerHTML = `
+        <h3>🚀 Get Personalised Recommendations from Any LLM</h3>
+        <p class="hint">Copy this prompt and paste it into ChatGPT, Claude, Gemini, or any LLM to receive a tailored improvement roadmap based on your results.</p>
+        <textarea class="prompt-textarea" id="llm-prompt" readonly>${escapeHtml(prompt)}</textarea>
+        <div class="copy-btn-row">
+            <span class="copy-toast" id="copy-toast">✓ Copied to clipboard</span>
+            <button class="btn btn-secondary" onclick="copyPrompt()">📋 Copy Prompt</button>
+        </div>
+    `;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function copyPrompt() {
+    const textarea = document.getElementById('llm-prompt');
+    navigator.clipboard.writeText(textarea.value).then(() => {
+        const toast = document.getElementById('copy-toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+    });
+}
+
+function resetAssessment() {
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('assessment').style.display = 'block';
+    document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+    document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    DIMENSIONS.forEach((_, i) => document.getElementById(`dim-score-${i}`).textContent = '—');
+    document.querySelectorAll('.dimension').forEach(d => d.classList.remove('open'));
+    document.getElementById('dim-0').classList.add('open');
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Theme Toggle
+function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+}
+
+// Init
+renderQuiz();
+</script>
+</body>
+</html>

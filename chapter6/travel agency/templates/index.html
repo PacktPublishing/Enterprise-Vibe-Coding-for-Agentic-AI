@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Travel Agency · MAF Handoff</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --panel-2: #334155;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #6366f1;
+    --accent-2: #8b5cf6;
+    --triage: #10b981;
+    --flight: #3b82f6;
+    --hotel: #f59e0b;
+    --user: #6366f1;
+    --error: #ef4444;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+  }
+  .app {
+    display: flex; flex-direction: column;
+    max-width: 920px; margin: 0 auto; height: 100vh;
+  }
+  header {
+    padding: 18px 24px; border-bottom: 1px solid var(--panel-2);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--panel);
+  }
+  header h1 {
+    margin: 0; font-size: 18px; font-weight: 600;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .agents-strip {
+    display: flex; gap: 8px;
+  }
+  .agent-pill {
+    font-size: 11px; font-weight: 600; padding: 4px 10px;
+    border-radius: 999px; border: 1px solid transparent;
+    background: var(--panel-2); color: var(--muted);
+    transition: all 0.2s ease;
+  }
+  .agent-pill.active {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: var(--accent); color: var(--text);
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+  }
+  .agent-pill.triage.active { background: rgba(16, 185, 129, 0.15); border-color: var(--triage); }
+  .agent-pill.flight.active { background: rgba(59, 130, 246, 0.15); border-color: var(--flight); }
+  .agent-pill.hotel.active  { background: rgba(245, 158, 11, 0.15); border-color: var(--hotel);  }
+
+  #chat {
+    flex: 1; overflow-y: auto; padding: 20px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .msg {
+    max-width: 78%; padding: 10px 14px; border-radius: 14px;
+    line-height: 1.5; font-size: 14px; white-space: pre-wrap; word-wrap: break-word;
+    animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .msg.user {
+    align-self: flex-end; background: var(--user); color: white;
+    border-bottom-right-radius: 4px;
+  }
+  .msg.agent {
+    align-self: flex-start; background: var(--panel);
+    border-bottom-left-radius: 4px; border-left: 3px solid var(--accent);
+  }
+  .msg.agent.triage { border-left-color: var(--triage); }
+  .msg.agent.flight { border-left-color: var(--flight); }
+  .msg.agent.hotel  { border-left-color: var(--hotel);  }
+  .msg .author {
+    display: block; font-size: 11px; font-weight: 600;
+    margin-bottom: 4px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .msg.agent.triage .author { color: var(--triage); }
+  .msg.agent.flight .author { color: var(--flight); }
+  .msg.agent.hotel  .author { color: var(--hotel);  }
+
+  .badge {
+    align-self: center; padding: 5px 12px; border-radius: 999px;
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.6px; background: var(--panel-2); color: var(--muted);
+    display: inline-flex; align-items: center; gap: 6px;
+    animation: fadeIn 0.2s ease;
+  }
+  .badge.handoff {
+    background: rgba(139, 92, 246, 0.15); color: var(--accent-2);
+    border: 1px solid var(--accent-2);
+  }
+  .badge.info { background: rgba(148, 163, 184, 0.1); color: var(--muted); }
+  .badge.error { background: rgba(239, 68, 68, 0.15); color: var(--error); border: 1px solid var(--error); }
+
+  .typing {
+    align-self: flex-start; padding: 10px 14px;
+    display: inline-flex; gap: 4px; align-items: center;
+    background: var(--panel); border-radius: 14px; border-bottom-left-radius: 4px;
+  }
+  .typing span {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--muted);
+    animation: bounce 1.2s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.15s; }
+  .typing span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+    30% { transform: translateY(-4px); opacity: 1; }
+  }
+
+  footer {
+    padding: 14px 24px; border-top: 1px solid var(--panel-2);
+    background: var(--panel); display: flex; gap: 10px;
+  }
+  #input {
+    flex: 1; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--panel-2);
+    background: var(--bg); color: var(--text); font-size: 14px; font-family: inherit;
+    outline: none; transition: border-color 0.2s;
+  }
+  #input:focus { border-color: var(--accent); }
+  #send {
+    padding: 0 20px; border-radius: 10px; border: none; cursor: pointer;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: white; font-weight: 600; font-size: 14px;
+    transition: transform 0.1s, opacity 0.2s;
+  }
+  #send:hover:not(:disabled) { transform: translateY(-1px); }
+  #send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Starter prompts */
+  .starters {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    align-self: center; max-width: 100%; margin-top: 8px;
+  }
+  .starter {
+    padding: 8px 14px; border-radius: 999px; cursor: pointer;
+    background: var(--panel); color: var(--text);
+    border: 1px solid var(--panel-2); font-size: 13px;
+    transition: all 0.15s ease; font-family: inherit;
+  }
+  .starter:hover {
+    border-color: var(--accent); transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+  }
+  .starter:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* Scrollbar */
+  #chat::-webkit-scrollbar { width: 6px; }
+  #chat::-webkit-scrollbar-thumb { background: var(--panel-2); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>✈️ Travel Agency · MAF Handoff</h1>
+    <div class="agents-strip">
+      <span class="agent-pill triage" data-agent="triage_agent">🎯 Triage</span>
+      <span class="agent-pill flight" data-agent="flight_agent">✈️ Flights</span>
+      <span class="agent-pill hotel"  data-agent="hotel_agent">🏨 Hotels</span>
+    </div>
+  </header>
+
+  <div id="chat">
+    <div class="badge info">Ask about flights or hotels to get started</div>
+    <div class="starters" id="starters">
+      <button class="starter" data-prompt="Find flights from NYC to Tokyo on July 10">✈️ Flights NYC → Tokyo (Jul 10)</button>
+      <button class="starter" data-prompt="Find me a hotel in Paris from August 5 to August 9">🏨 Hotels in Paris (Aug 5–9)</button>
+      <button class="starter" data-prompt="I need a flight from London to Rome next Friday and a hotel for 3 nights">🌍 Flight + hotel combo</button>
+    </div>
+  </div>
+
+  <footer>
+    <input id="input" type="text" placeholder="e.g. Find flights from NYC to Tokyo on July 10..." autocomplete="off" />
+    <button id="send">Send</button>
+  </footer>
+</div>
+
+<script>
+const chat     = document.getElementById('chat');
+const input    = document.getElementById('input');
+const send     = document.getElementById('send');
+const pills    = document.querySelectorAll('.agent-pill');
+const starters = document.getElementById('starters');
+
+let sessionId  = null;
+let busy       = false;
+let activeMsg  = null;     // currently-streaming agent message bubble
+let activeAuth = null;     // its author
+let typingEl   = null;
+
+const AGENT_LABELS = {
+  triage_agent: '🎯 Triage Concierge',
+  flight_agent: '✈️ Flight Specialist',
+  hotel_agent:  '🏨 Hotel Specialist',
+};
+const AGENT_KIND = { triage_agent: 'triage', flight_agent: 'flight', hotel_agent: 'hotel' };
+
+function scrollDown() { chat.scrollTop = chat.scrollHeight; }
+
+function setActiveAgent(agent) {
+  pills.forEach(p => p.classList.toggle('active', p.dataset.agent === agent));
+}
+
+function showTyping() {
+  if (typingEl) return;
+  typingEl = document.createElement('div');
+  typingEl.className = 'typing';
+  typingEl.innerHTML = '<span></span><span></span><span></span>';
+  chat.appendChild(typingEl);
+  scrollDown();
+}
+function hideTyping() {
+  if (typingEl) { typingEl.remove(); typingEl = null; }
+}
+
+function addUser(text) {
+  const el = document.createElement('div');
+  el.className = 'msg user';
+  el.textContent = text;
+  chat.appendChild(el);
+  scrollDown();
+}
+
+function addBadge(text, kind = 'info') {
+  const el = document.createElement('div');
+  el.className = `badge ${kind}`;
+  el.textContent = text;
+  chat.appendChild(el);
+  scrollDown();
+}
+
+function addHandoff(from, to) {
+  const fromLabel = AGENT_LABELS[from] || from;
+  const toLabel   = AGENT_LABELS[to]   || to;
+  addBadge(`↪ Handoff: ${fromLabel} → ${toLabel}`, 'handoff');
+}
+
+function appendAgentToken(agent, text) {
+  if (!activeMsg || activeAuth !== agent) {
+    activeMsg  = document.createElement('div');
+    activeAuth = agent;
+    const kind = AGENT_KIND[agent] || '';
+    activeMsg.className = `msg agent ${kind}`;
+    const author = document.createElement('span');
+    author.className = 'author';
+    author.textContent = AGENT_LABELS[agent] || agent;
+    activeMsg.appendChild(author);
+    activeMsg.appendChild(document.createTextNode(''));
+    chat.appendChild(activeMsg);
+  }
+  // Append to the text node (last child)
+  activeMsg.lastChild.nodeValue += text;
+  scrollDown();
+}
+
+function resetActive() { activeMsg = null; activeAuth = null; }
+
+async function sendMessage() {
+  const text = input.value.trim();
+  if (!text || busy) return;
+  busy = true;
+  send.disabled = true;
+  input.disabled = true;
+
+  addUser(text);
+  input.value = '';
+  showTyping();
+  resetActive();
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, session_id: sessionId }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      let idx;
+      while ((idx = buffer.indexOf('\n\n')) !== -1) {
+        const chunk = buffer.slice(0, idx);
+        buffer = buffer.slice(idx + 2);
+        const line = chunk.split('\n').find(l => l.startsWith('data: '));
+        if (!line) continue;
+        try {
+          const ev = JSON.parse(line.slice(6));
+          handleEvent(ev);
+        } catch (e) {
+          console.error('Parse error', e, line);
+        }
+      }
+    }
+  } catch (err) {
+    hideTyping();
+    addBadge(`Error: ${err.message}`, 'error');
+  } finally {
+    hideTyping();
+    busy = false;
+    send.disabled = false;
+    input.disabled = false;
+    input.focus();
+  }
+}
+
+function handleEvent(ev) {
+  switch (ev.type) {
+    case 'session':
+      sessionId = ev.session_id;
+      break;
+    case 'info':
+      hideTyping();
+      addBadge(ev.text, 'info');
+      showTyping();
+      break;
+    case 'agent_active':
+      hideTyping();
+      setActiveAgent(ev.agent);
+      showTyping();
+      break;
+    case 'handoff':
+      hideTyping();
+      resetActive();
+      addHandoff(ev.from_agent, ev.to_agent);
+      setActiveAgent(ev.to_agent);
+      showTyping();
+      break;
+    case 'agent_message':
+      hideTyping();
+      setActiveAgent(ev.agent);
+      appendAgentToken(ev.agent, ev.text);
+      break;
+    case 'waiting_for_input':
+      hideTyping();
+      resetActive();
+      setActiveAgent(ev.agent);
+      break;
+    case 'workflow_complete':
+      hideTyping();
+      resetActive();
+      break;
+    case 'error':
+      hideTyping();
+      resetActive();
+      addBadge(`Error: ${ev.text}`, 'error');
+      break;
+  }
+}
+
+send.addEventListener('click', sendMessage);
+input.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+starters.querySelectorAll('.starter').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (busy) return;
+    input.value = btn.dataset.prompt;
+    starters.remove();   // hide starters after first use
+    sendMessage();
+  });
+});
+input.focus();
+</script>
+</body>
+</html>

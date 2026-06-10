@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 2 — Agentic AI and the New Way We Work</title>
+    <script>
+      (() => {
+        const param = new URLSearchParams(window.location.search).get("clawpilotTheme");
+        const theme =
+          param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
+    <style>
+:root {
+  color-scheme: light;
+  --cp-bg: #f7f4ef;
+  --cp-bg-elevated: #fcfbf8;
+  --cp-surface: #ffffff;
+  --cp-surface-soft: #f5f5f5;
+  --cp-border: #dedede;
+  --cp-border-strong: #919191;
+  --cp-text: #242424;
+  --cp-text-muted: #5c5c5c;
+  --cp-text-soft: #6f6f6f;
+  --cp-accent: #b11f4b;
+  --cp-accent-hover: #9a1a41;
+  --cp-accent-soft: rgba(177, 31, 75, 0.08);
+  --cp-accent-fg: #ffffff;
+  --cp-success: #16a34a;
+  --cp-danger: #dc2626;
+  --cp-warning: #f59e0b;
+  --cp-link: #0078d4;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+  --cp-overlay: rgba(255, 255, 255, 0.8);
+  --cp-panel: rgba(255, 255, 255, 0.86);
+  --cp-panel-strong: rgba(255, 255, 255, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.55);
+  --cp-highlight: rgba(177, 31, 75, 0.12);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --cp-bg: #3d3b3a;
+  --cp-bg-elevated: #343231;
+  --cp-surface: #292929;
+  --cp-surface-soft: #2e2e2e;
+  --cp-border: #474747;
+  --cp-border-strong: #5f5f5f;
+  --cp-text: #dedede;
+  --cp-text-muted: #919191;
+  --cp-text-soft: #b0b0b0;
+  --cp-accent: #fd8ea1;
+  --cp-accent-hover: #fb7b91;
+  --cp-accent-soft: rgba(253, 142, 161, 0.14);
+  --cp-accent-fg: #1a1a1a;
+  --cp-success: #4ade80;
+  --cp-danger: #f87171;
+  --cp-warning: #fbbf24;
+  --cp-link: #4da6ff;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+  --cp-overlay: rgba(41, 41, 41, 0.88);
+  --cp-panel: rgba(41, 41, 41, 0.72);
+  --cp-panel-strong: rgba(41, 41, 41, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.04);
+  --cp-highlight: rgba(253, 142, 161, 0.12);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cp-bg);
+    color: var(--cp-text);
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Progress bar */
+#progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background: var(--cp-accent);
+    z-index: 1000;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+/* XP Counter */
+#xp-counter {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    background: var(--cp-panel-strong);
+    border: 1px solid var(--cp-border);
+    border-radius: 0.625rem;
+    padding: 6px 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+}
+#xp-counter .xp-icon { font-size: 1rem; }
+#xp-counter .xp-value { color: var(--cp-accent); }
+
+/* Theme toggle */
+#theme-toggle {
+    position: fixed;
+    top: 12px;
+    left: 16px;
+    background: var(--cp-panel-strong);
+    border: 1px solid var(--cp-border);
+    border-radius: 0.625rem;
+    padding: 6px 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    z-index: 999;
+    color: var(--cp-text);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+}
+
+/* Container */
+.container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* Hero */
+.hero {
+    text-align: center;
+    padding: 5rem 1rem 3rem;
+}
+.hero-badge {
+    display: inline-block;
+    background: var(--cp-accent-soft);
+    color: var(--cp-accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 4px 12px;
+    border-radius: 0.625rem;
+    margin-bottom: 1rem;
+}
+.hero h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+}
+.hero h1 .accent { color: var(--cp-accent); }
+.hero .subtitle {
+    font-size: 1.1rem;
+    color: var(--cp-text-muted);
+    max-width: 620px;
+    margin: 0 auto 2rem;
+}
+.hero .cta-hint {
+    font-size: 0.85rem;
+    color: var(--cp-text-soft);
+    animation: bounce 2s infinite;
+}
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+}
+
+/* Sections */
+.section {
+    margin: 3rem 0;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.section.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.2rem;
+}
+.section-number {
+    background: var(--cp-accent);
+    color: var(--cp-accent-fg);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.section-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
+/* Cards */
+.card {
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card:hover {
+    border-color: var(--cp-accent);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* Pillars Grid */
+.pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+.pillar-card {
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-border);
+    border-radius: 16px;
+    padding: 1.3rem 1rem;
+    text-align: center;
+    transition: transform 0.2s, border-color 0.2s;
+}
+.pillar-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--cp-accent);
+}
+.pillar-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.pillar-title { font-weight: 700; font-size: 0.88rem; margin-bottom: 0.3rem; }
+.pillar-desc { font-size: 0.78rem; color: var(--cp-text-muted); }
+
+/* Architecture Blocks */
+.arch-blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 1.5rem 0;
+}
+.arch-block {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-border);
+    border-radius: 0.625rem;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+.arch-block::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--cp-accent);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.arch-block.active::before { opacity: 1; }
+.arch-block.active {
+    background: var(--cp-accent-soft);
+    border-color: var(--cp-accent);
+}
+.arch-block .block-icon { font-size: 1.2rem; flex-shrink: 0; }
+.arch-block .block-title { font-size: 0.85rem; font-weight: 600; }
+.arch-detail {
+    font-size: 0.82rem;
+    color: var(--cp-text-muted);
+    padding: 0 0 0 44px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s, padding 0.3s;
+}
+.arch-detail.open {
+    max-height: 200px;
+    padding: 8px 0 8px 44px;
+}
+
+/* Autonomy Slider */
+.autonomy-container {
+    margin: 1.5rem 0;
+}
+.autonomy-slider {
+    position: relative;
+    height: 60px;
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-border);
+    border-radius: 0.625rem;
+    display: flex;
+    overflow: hidden;
+}
+.autonomy-zone {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s;
+    border-right: 1px solid var(--cp-border);
+    padding: 4px;
+}
+.autonomy-zone:last-child { border-right: none; }
+.autonomy-zone.active { background: var(--cp-accent-soft); }
+.autonomy-zone .zone-label { font-size: 0.7rem; font-weight: 600; text-align: center; }
+.autonomy-zone .zone-icon { font-size: 1.1rem; }
+.autonomy-desc {
+    margin-top: 0.8rem;
+    font-size: 0.85rem;
+    color: var(--cp-text-muted);
+    min-height: 40px;
+    transition: opacity 0.3s;
+}
+
+/* Interactive Quiz */
+.quiz-box {
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+.quiz-question {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+.quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.quiz-option {
+    background: var(--cp-surface-soft);
+    border: 1px solid var(--cp-border);
+    border-radius: 0.625rem;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    user-select: none;
+}
+.quiz-option:hover {
+    border-color: var(--cp-accent);
+    background: var(--cp-accent-soft);
+}
+.quiz-option.correct {
+    border-color: var(--cp-success);
+    background: rgba(22, 163, 74, 0.1);
+}
+.quiz-option.wrong {
+    border-color: var(--cp-danger);
+    background: rgba(220, 38, 38, 0.1);
+}
+.quiz-feedback {
+    margin-top: 0.8rem;
+    font-size: 0.85rem;
+    color: var(--cp-text-muted);
+    display: none;
+}
+.quiz-feedback.show { display: block; }
+
+/* Phase Cards */
+.phases-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+.phase-card {
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-border);
+    border-radius: 16px;
+    padding: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+.phase-card:hover { border-color: var(--cp-accent); }
+.phase-card.expanded { border-color: var(--cp-accent); }
+.phase-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.phase-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--cp-accent);
+    color: var(--cp-accent-fg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.phase-title { font-weight: 700; font-size: 0.9rem; }
+.phase-subtitle { font-size: 0.78rem; color: var(--cp-text-muted); margin-left: auto; }
+.phase-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, margin 0.3s;
+    font-size: 0.85rem;
+    color: var(--cp-text-muted);
+}
+.phase-card.expanded .phase-body {
+    max-height: 300px;
+    margin-top: 0.8rem;
+}
+
+/* Shift cards (3 shifts) */
+.shifts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+.shift-card {
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-border);
+    border-radius: 16px;
+    padding: 1.3rem;
+    text-align: center;
+    transition: transform 0.2s, border-color 0.2s;
+}
+.shift-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--cp-accent);
+}
+.shift-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+.shift-title { font-weight: 700; font-size: 0.88rem; margin-bottom: 0.3rem; }
+.shift-desc { font-size: 0.78rem; color: var(--cp-text-muted); }
+
+/* Takeaway */
+.takeaway {
+    background: var(--cp-accent-soft);
+    border: 1px solid var(--cp-accent);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    text-align: center;
+}
+.takeaway h3 {
+    color: var(--cp-accent);
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+.takeaway p {
+    font-size: 0.9rem;
+    color: var(--cp-text-muted);
+}
+
+/* Achievements */
+.achievements {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 1.5rem 0;
+    justify-content: center;
+}
+.achievement {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--cp-surface-soft);
+    border: 1px solid var(--cp-border);
+    border-radius: 0.625rem;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0.4;
+    transition: opacity 0.5s, border-color 0.3s, background 0.3s;
+}
+.achievement.unlocked {
+    opacity: 1;
+    border-color: var(--cp-accent);
+    background: var(--cp-accent-soft);
+}
+.achievement .badge-icon { font-size: 1rem; }
+
+/* Footer nav */
+.footer-nav {
+    text-align: center;
+    padding: 2rem 0 3rem;
+    border-top: 1px solid var(--cp-border);
+    margin-top: 3rem;
+}
+.footer-nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--cp-accent);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 10px 20px;
+    border: 1px solid var(--cp-accent);
+    border-radius: 0.625rem;
+    transition: background 0.2s;
+    margin: 0 6px;
+}
+.footer-nav a:hover { background: var(--cp-accent-soft); }
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--cp-panel-strong);
+    border: 1px solid var(--cp-accent);
+    border-radius: 0.625rem;
+    padding: 10px 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    z-index: 1000;
+    transition: transform 0.4s ease;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 18px 48px rgba(0,0,0,0.12);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* Responsive */
+@media (max-width: 600px) {
+    .container { padding: 1rem; }
+    .hero { padding: 3rem 0.5rem 2rem; }
+    .pillars-grid { grid-template-columns: 1fr 1fr; }
+    .shifts-grid { grid-template-columns: 1fr; }
+}
+    </style>
+</head>
+<body>
+    <div id="progress-bar"></div>
+    <div id="xp-counter"><span class="xp-icon">⚡</span> <span class="xp-value" id="xp-value">0</span> XP</div>
+    <button id="theme-toggle" onclick="toggleTheme()">🌓</button>
+
+    <div class="container">
+        <!-- HERO -->
+        <section class="hero">
+            <div class="hero-badge">Chapter 2 — Interactive Experience</div>
+            <h1><span class="accent">Agentic AI</span> and the New Way We Work</h1>
+            <p class="subtitle">From a single model that replies, to systems of agents that act — and the new human-agent contract that makes it trustworthy.</p>
+            <p class="cta-hint">↓ Scroll to begin your journey</p>
+        </section>
+
+        <!-- SECTION 1: From Models to Agents -->
+        <section class="section" data-section="1">
+            <div class="section-header">
+                <div class="section-number">1</div>
+                <h2 class="section-title">From Models to Agents</h2>
+            </div>
+            <p style="color: var(--cp-text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                An LLM on its own responds. An <strong>agent</strong> is what you get when you wrap a model in the machinery it needs to <em>do work</em> in the real world. Four capabilities make the difference:
+            </p>
+            <div class="pillars-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                <div class="pillar-card">
+                    <div class="pillar-icon">👁️</div>
+                    <div class="pillar-title">Perception</div>
+                    <div class="pillar-desc">Read context beyond the prompt — files, APIs, repos, databases</div>
+                </div>
+                <div class="pillar-card">
+                    <div class="pillar-icon">🧠</div>
+                    <div class="pillar-title">Reasoning</div>
+                    <div class="pillar-desc">Decompose goals into plans, choose between options, revise</div>
+                </div>
+                <div class="pillar-card">
+                    <div class="pillar-icon">🔧</div>
+                    <div class="pillar-title">Tool Use</div>
+                    <div class="pillar-desc">Call APIs, run scripts, open PRs, send messages</div>
+                </div>
+                <div class="pillar-card">
+                    <div class="pillar-icon">💾</div>
+                    <div class="pillar-title">Memory</div>
+                    <div class="pillar-desc">Remember across steps, sessions, and days</div>
+                </div>
+            </div>
+
+            <h3 style="font-size: 1rem; margin: 1.5rem 0 0.8rem;">Agent Architecture — Building Blocks</h3>
+            <p style="color: var(--cp-text-muted); font-size: 0.85rem; margin-bottom: 0.8rem;">Click each block to explore:</p>
+            <div class="arch-blocks" id="arch-blocks">
+                <div class="arch-block" onclick="toggleArch(0)">
+                    <span class="block-icon">💬</span>
+                    <span class="block-title">User Experience / Trigger</span>
+                </div>
+                <div class="arch-detail" id="arch-detail-0">The interaction point: a chat interface, API call, workflow event, or scheduled task that initiates the agent.</div>
+
+                <div class="arch-block" onclick="toggleArch(1)">
+                    <span class="block-icon">📜</span>
+                    <span class="block-title">System Message (Instructions)</span>
+                </div>
+                <div class="arch-detail" id="arch-detail-1">The agent's "job description" — role, behavior, constraints, tone, objectives, and decision boundaries.</div>
+
+                <div class="arch-block" onclick="toggleArch(2)">
+                    <span class="block-icon">🎛️</span>
+                    <span class="block-title">Orchestrator</span>
+                </div>
+                <div class="arch-detail" id="arch-detail-2">Coordinates execution: reasoning steps, tool calls, memory access, retries, routing between sub-agents. Examples: LangGraph, Microsoft Agent Framework, OpenAI SDKs.</div>
+
+                <div class="arch-block" onclick="toggleArch(3)">
+                    <span class="block-icon">📚</span>
+                    <span class="block-title">Knowledge Layer</span>
+                </div>
+                <div class="arch-detail" id="arch-detail-3">Enterprise knowledge, documents, vector databases, conversation history — grounding the agent in relevant context.</div>
+
+                <div class="arch-block" onclick="toggleArch(4)">
+                    <span class="block-icon">⚙️</span>
+                    <span class="block-title">Tools / Actions Layer</span>
+                </div>
+                <div class="arch-detail" id="arch-detail-4">APIs, databases, workflow engines, email, DevOps platforms, MCP-connected services — how the agent interacts with the world.</div>
+
+                <div class="arch-block" onclick="toggleArch(5)">
+                    <span class="block-icon">🛡️</span>
+                    <span class="block-title">Autonomy Layer</span>
+                </div>
+                <div class="arch-detail" id="arch-detail-5">Defines how independently the agent operates: approval boundaries, escalation paths, exception handling, operational trust.</div>
+
+                <div class="arch-block" onclick="toggleArch(6)">
+                    <span class="block-icon">🧬</span>
+                    <span class="block-title">Foundation Models</span>
+                </div>
+                <div class="arch-detail" id="arch-detail-6">The "brain" — LLMs, multimodal models, embedding models, or specialised models depending on the workload.</div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: From Agent to Agentic AI -->
+        <section class="section" data-section="2">
+            <div class="section-header">
+                <div class="section-number">2</div>
+                <h2 class="section-title">From Agent to Agentic AI</h2>
+            </div>
+            <p style="color: var(--cp-text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                If an agent is a single capable worker, <strong>agentic AI</strong> organises several of them into a system — division of labour, coordination, escalation, and clear responsibility.
+            </p>
+            <h3 style="font-size: 1rem; margin-bottom: 0.8rem;">Three Common Patterns</h3>
+            <div class="shifts-grid">
+                <div class="shift-card">
+                    <div class="shift-icon">👥</div>
+                    <div class="shift-title">Specialist Team</div>
+                    <div class="shift-desc">Planner breaks goals into tasks; workers handle research, coding, validation; reviewer checks output</div>
+                </div>
+                <div class="shift-card">
+                    <div class="shift-icon">🧰</div>
+                    <div class="shift-title">Tool-Rich Solo Agent</div>
+                    <div class="shift-desc">One agent with a large, curated toolbox — sophistication in choosing the right tool at the right moment</div>
+                </div>
+                <div class="shift-card">
+                    <div class="shift-icon">🌐</div>
+                    <div class="shift-title">Marketplace of Agents</div>
+                    <div class="shift-desc">Agents from different teams/companies discover, negotiate, and collaborate through shared protocols</div>
+                </div>
+            </div>
+
+            <h3 style="font-size: 1rem; margin: 1.5rem 0 0.8rem;">The Autonomy Gradient</h3>
+            <p style="color: var(--cp-text-muted); font-size: 0.85rem; margin-bottom: 0.8rem;">Autonomy is a gradient, not a switch. Click each zone:</p>
+            <div class="autonomy-container">
+                <div class="autonomy-slider">
+                    <div class="autonomy-zone" onclick="selectAutonomy(0)" id="az-0">
+                        <span class="zone-icon">🤝</span>
+                        <span class="zone-label">Low</span>
+                    </div>
+                    <div class="autonomy-zone" onclick="selectAutonomy(1)" id="az-1">
+                        <span class="zone-icon">⚖️</span>
+                        <span class="zone-label">Medium</span>
+                    </div>
+                    <div class="autonomy-zone" onclick="selectAutonomy(2)" id="az-2">
+                        <span class="zone-icon">🚀</span>
+                        <span class="zone-label">High</span>
+                    </div>
+                </div>
+                <div class="autonomy-desc" id="autonomy-desc">Click a zone to explore the autonomy level.</div>
+            </div>
+
+            <div class="quiz-box" id="quiz1">
+                <div class="quiz-question">🧠 Quick Check: What makes an "agentic system" different from a single AI agent?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this, 'quiz1')">It uses a larger language model</div>
+                    <div class="quiz-option" data-correct="true" onclick="answerQuiz(this, 'quiz1')">It organises multiple agents with division of labour, coordination, and clear responsibility</div>
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this, 'quiz1')">It operates without any human oversight</div>
+                </div>
+                <div class="quiz-feedback" id="quiz1-feedback"></div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Single Surface -->
+        <section class="section" data-section="3">
+            <div class="section-header">
+                <div class="section-number">3</div>
+                <h2 class="section-title">One Surface Changes Everything</h2>
+            </div>
+            <p style="color: var(--cp-text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                For decades, every capability had its own window. Agentic AI decouples the UI from the tools — the user expresses <strong>intent</strong> into a single canvas, and a network of specialists carries out the work.
+            </p>
+            <div class="card" style="text-align: center;">
+                <p style="font-size: 0.9rem; margin-bottom: 1rem;"><strong>The Old Way:</strong> Email app → CRM → Calendar → Docs → Chat → IDE</p>
+                <p style="font-size: 1.4rem; margin-bottom: 1rem;">⬇️</p>
+                <p style="font-size: 0.9rem;"><strong>The New Way:</strong> One intent surface → agents reach into whichever systems are needed</p>
+            </div>
+
+            <h3 style="font-size: 1rem; margin: 1.5rem 0 0.8rem;">The Protocols Making It Possible</h3>
+            <div class="pillars-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="pillar-card">
+                    <div class="pillar-icon">🔌</div>
+                    <div class="pillar-title">MCP</div>
+                    <div class="pillar-desc">Model Context Protocol — tools expose themselves once; any compliant agent can use them. Like HTTPS for AI agents.</div>
+                </div>
+                <div class="pillar-card">
+                    <div class="pillar-icon">🤝</div>
+                    <div class="pillar-title">A2A</div>
+                    <div class="pillar-desc">Agent-to-Agent protocols — agents from different products discover each other and collaborate through shared contracts.</div>
+                </div>
+            </div>
+
+            <div class="card" style="border-left: 4px solid var(--cp-accent);">
+                <p style="font-size: 0.88rem;"><strong>Why it matters:</strong> Users learn one place (not twenty). Capabilities matter more than destinations. Apps become engines one layer below the intent surface.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Vibe Working -->
+        <section class="section" data-section="4">
+            <div class="section-header">
+                <div class="section-number">4</div>
+                <h2 class="section-title">"Vibe Working" — The New Daily Practice</h2>
+            </div>
+            <p style="color: var(--cp-text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                When AI escapes the IDE and enters everyday work, it becomes <strong>vibe working</strong>: expressing what you want in plain language, agents handle the parts, you show up when judgement is needed.
+            </p>
+
+            <h3 style="font-size: 1rem; margin-bottom: 0.8rem;">Three Major Shifts</h3>
+            <div class="shifts-grid">
+                <div class="shift-card">
+                    <div class="shift-icon">⏳</div>
+                    <div class="shift-title">Asynchronicity</div>
+                    <div class="shift-desc">Delegate to agents, execute in background, review later</div>
+                </div>
+                <div class="shift-card">
+                    <div class="shift-icon">🔀</div>
+                    <div class="shift-title">Parallelism</div>
+                    <div class="shift-desc">Multiple agents work simultaneously across different tasks and systems</div>
+                </div>
+                <div class="shift-card">
+                    <div class="shift-icon">🌊</div>
+                    <div class="shift-title">Ambient Intelligence</div>
+                    <div class="shift-desc">Agents monitor triggers continuously, surface only when human input is needed</div>
+                </div>
+            </div>
+
+            <h3 style="font-size: 1rem; margin: 1.5rem 0 0.8rem;">Three New Challenges</h3>
+            <div class="shifts-grid">
+                <div class="shift-card">
+                    <div class="shift-icon">🧭</div>
+                    <div class="shift-title">Tool Selection</div>
+                    <div class="shift-desc">Knowing which agent/system to trust for a given task becomes a skill in itself</div>
+                </div>
+                <div class="shift-card">
+                    <div class="shift-icon">🌀</div>
+                    <div class="shift-title">Cognitive Overload</div>
+                    <div class="shift-desc">Abundance creates paralysis — new models weekly, quality bars rising constantly</div>
+                </div>
+                <div class="shift-card">
+                    <div class="shift-icon">💎</div>
+                    <div class="shift-title">Uniquely Human Value</div>
+                    <div class="shift-desc">Judgement, taste, trust, leadership, creativity — the new scarce resources</div>
+                </div>
+            </div>
+
+            <div class="quiz-box" id="quiz2">
+                <div class="quiz-question">🧠 What does "vibe working" describe?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this, 'quiz2')">Only using AI for coding tasks</div>
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this, 'quiz2')">Working without any structure or governance</div>
+                    <div class="quiz-option" data-correct="true" onclick="answerQuiz(this, 'quiz2')">Expressing intent in natural language, agents handle execution, humans provide judgement</div>
+                </div>
+                <div class="quiz-feedback" id="quiz2-feedback"></div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: Three Phases -->
+        <section class="section" data-section="5">
+            <div class="section-header">
+                <div class="section-number">5</div>
+                <h2 class="section-title">Three Phases of Human-Agent Collaboration</h2>
+            </div>
+            <p style="color: var(--cp-text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                AI agents first <strong>speed it up</strong>, then <strong>make it cheaper</strong>, then <strong>change the operating model</strong>. Click each phase:
+            </p>
+            <div class="phases-container">
+                <div class="phase-card" onclick="togglePhase(this)">
+                    <div class="phase-header">
+                        <div class="phase-num">1</div>
+                        <div class="phase-title">Human-First</div>
+                        <div class="phase-subtitle">Efficiency play</div>
+                    </div>
+                    <div class="phase-body">
+                        <p>The person does almost all the work. AI assists at the edges — accelerating analysis, surfacing recommendations. <strong>In dev:</strong> the developer types code, AI completes the line. Same cost per decision, ~30-40% time saved.</p>
+                    </div>
+                </div>
+                <div class="phase-card" onclick="togglePhase(this)">
+                    <div class="phase-header">
+                        <div class="phase-num">2</div>
+                        <div class="phase-title">Agent-Led, Human-Supervised</div>
+                        <div class="phase-subtitle">Productivity play</div>
+                    </div>
+                    <div class="phase-body">
+                        <p>Agents take over well-defined decisions end-to-end. Humans supervise exceptions and approve edge cases. <strong>In dev:</strong> agents handle tests, scans, docs; developer reviews. Cost per decision drops 60-70%, throughput per person rises 3-4×.</p>
+                    </div>
+                </div>
+                <div class="phase-card" onclick="togglePhase(this)">
+                    <div class="phase-header">
+                        <div class="phase-num">3</div>
+                        <div class="phase-title">Autonomous Agents, Human-Governed</div>
+                        <div class="phase-subtitle">Operating-model play</div>
+                    </div>
+                    <div class="phase-body">
+                        <p>Agents run entire streams within policy guardrails. Humans govern outcomes, set rules, intervene only on flags. <strong>In dev:</strong> multiple delivery streams run in parallel; the developer watches a portfolio view. Structural cost reduction.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-box" id="quiz3">
+                <div class="quiz-question">🧠 In Phase 2, what does the human primarily do?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this, 'quiz3')">Write all the code manually</div>
+                    <div class="quiz-option" data-correct="true" onclick="answerQuiz(this, 'quiz3')">Supervise exceptions and approve edge cases</div>
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this, 'quiz3')">Set policies and watch KPIs at portfolio level</div>
+                </div>
+                <div class="quiz-feedback" id="quiz3-feedback"></div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: The New Contract -->
+        <section class="section" data-section="6">
+            <div class="section-header">
+                <div class="section-number">6</div>
+                <h2 class="section-title">The New Relationship Contract</h2>
+            </div>
+            <p style="color: var(--cp-text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                Not master-and-tool. Not peer-to-peer. It's closer to <strong>manager-and-team</strong> — with all the responsibilities that implies.
+            </p>
+            <div class="pillars-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="pillar-card" style="border-top: 3px solid var(--cp-accent);">
+                    <div class="pillar-icon">👤</div>
+                    <div class="pillar-title">Humans Bring</div>
+                    <div class="pillar-desc">Direction, taste, accountability, risk absorption, the brief, the "not yet"</div>
+                </div>
+                <div class="pillar-card" style="border-top: 3px solid var(--cp-link);">
+                    <div class="pillar-icon">🤖</div>
+                    <div class="pillar-title">Agents Bring</div>
+                    <div class="pillar-desc">Breadth, speed, tirelessness, cross-system operation, execution at scale</div>
+                </div>
+            </div>
+            <div class="card" style="border-left: 4px solid var(--cp-warning);">
+                <p style="font-size: 0.88rem;"><strong>⚠️ Without the contract:</strong> A team of agents without a clear brief, without review, and without an audit trail will reproduce — at higher speed — exactly the problems of Chapter 1.</p>
+            </div>
+            <div class="card" style="border-left: 4px solid var(--cp-success);">
+                <p style="font-size: 0.88rem;"><strong>✅ With the contract:</strong> Humans steer. Agents execute. The relationship is explicit: who decides, who builds, what each side is accountable for, encoded in the daily flow of work.</p>
+            </div>
+        </section>
+
+        <!-- TAKEAWAY -->
+        <section class="section" data-section="7">
+            <div class="takeaway">
+                <h3>💡 Chapter Takeaway</h3>
+                <p>An AI agent = model + perception + reasoning + tools + memory. Agentic AI organises agents into systems with autonomy on a gradient. When the interface is decoupled from the agents and agents from the tools, users express <strong>intent into a single canvas</strong>. Software development is vibe working's earliest expression — and what makes it dependable is the <strong>human relationship contract</strong> layered on top.</p>
+            </div>
+
+            <h3 style="text-align: center; font-size: 1rem; margin-bottom: 1rem;">🏆 Achievements</h3>
+            <div class="achievements">
+                <div class="achievement" id="ach-scroll" title="Scrolled through all sections">
+                    <span class="badge-icon">📜</span> Explorer
+                </div>
+                <div class="achievement" id="ach-quiz" title="Answered all quizzes correctly">
+                    <span class="badge-icon">🧠</span> Knowledge Check
+                </div>
+                <div class="achievement" id="ach-arch" title="Explored all architecture blocks">
+                    <span class="badge-icon">🏗️</span> Architect
+                </div>
+                <div class="achievement" id="ach-phases" title="Expanded all three phases">
+                    <span class="badge-icon">📊</span> Phase Master
+                </div>
+                <div class="achievement" id="ach-all" title="Earned all achievements">
+                    <span class="badge-icon">🏅</span> Chapter Master
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <div class="footer-nav">
+            <a href="../chapter1/chapter1-landing.html">← Chapter 1</a>
+            <a href="../chapter1/index.html">HVE Maturity Assessment →</a>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+    // State
+    let xp = 0;
+    let quizAnswered = { quiz1: false, quiz2: false, quiz3: false };
+    let quizCorrect = { quiz1: false, quiz2: false, quiz3: false };
+    let archExplored = new Set();
+    let phasesExpanded = new Set();
+    let sectionsVisible = new Set();
+
+    // XP System
+    function addXP(amount, reason) {
+        xp += amount;
+        document.getElementById('xp-value').textContent = xp;
+        showToast(`+${amount} XP — ${reason}`);
+        checkAchievements();
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // Theme Toggle
+    function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+    }
+
+    // Progress Bar
+    function updateProgress() {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        document.getElementById('progress-bar').style.width = progress + '%';
+    }
+
+    // Section reveal
+    function revealSections() {
+        document.querySelectorAll('.section').forEach(section => {
+            const rect = section.getBoundingClientRect();
+            if (rect.top < window.innerHeight * 0.85) {
+                section.classList.add('visible');
+                const num = section.dataset.section;
+                if (!sectionsVisible.has(num)) {
+                    sectionsVisible.add(num);
+                    if (sectionsVisible.size === 7) {
+                        addXP(20, 'Explored all sections!');
+                        document.getElementById('ach-scroll').classList.add('unlocked');
+                    }
+                }
+            }
+        });
+    }
+
+    // Architecture Blocks
+    function toggleArch(idx) {
+        const blocks = document.querySelectorAll('.arch-block');
+        const details = document.querySelectorAll('.arch-detail');
+        blocks[idx].classList.toggle('active');
+        details[idx].classList.toggle('open');
+
+        if (!archExplored.has(idx)) {
+            archExplored.add(idx);
+            if (archExplored.size === 1) addXP(5, 'Exploring architecture');
+            if (archExplored.size === 7) {
+                addXP(15, 'Full architecture explored!');
+                document.getElementById('ach-arch').classList.add('unlocked');
+            }
+        }
+    }
+
+    // Autonomy Zones
+    const autonomyDescs = [
+        '🤝 <strong>Low autonomy:</strong> Agent suggests, human accepts every step. Like a very fast assistant.',
+        '⚖️ <strong>Medium autonomy:</strong> Agent acts independently in bounded scope. Asks for approval only at defined thresholds (financial limits, production deployments, customer-facing comms).',
+        '🚀 <strong>High autonomy:</strong> Agent operates with standing authority for an entire class of work. Audited rather than directly supervised.'
+    ];
+    function selectAutonomy(idx) {
+        document.querySelectorAll('.autonomy-zone').forEach((z, i) => {
+            z.classList.toggle('active', i === idx);
+        });
+        document.getElementById('autonomy-desc').innerHTML = autonomyDescs[idx];
+    }
+
+    // Phases
+    function togglePhase(el) {
+        const wasExpanded = el.classList.contains('expanded');
+        el.classList.toggle('expanded');
+        if (!wasExpanded) {
+            const idx = [...document.querySelectorAll('.phase-card')].indexOf(el);
+            if (!phasesExpanded.has(idx)) {
+                phasesExpanded.add(idx);
+                if (phasesExpanded.size === 1) addXP(5, 'Exploring phases');
+                if (phasesExpanded.size === 3) {
+                    addXP(15, 'All phases explored!');
+                    document.getElementById('ach-phases').classList.add('unlocked');
+                }
+            }
+        }
+    }
+
+    // Quiz
+    function answerQuiz(el, quizId) {
+        if (quizAnswered[quizId]) return;
+        quizAnswered[quizId] = true;
+
+        const isCorrect = el.dataset.correct === 'true';
+        const feedback = document.getElementById(quizId + '-feedback');
+
+        if (isCorrect) {
+            el.classList.add('correct');
+            quizCorrect[quizId] = true;
+            feedback.textContent = '✅ Correct! Well done.';
+            addXP(15, 'Correct answer!');
+        } else {
+            el.classList.add('wrong');
+            feedback.textContent = '❌ Not quite. The correct answer is highlighted below.';
+            el.parentElement.querySelectorAll('.quiz-option').forEach(opt => {
+                if (opt.dataset.correct === 'true') opt.classList.add('correct');
+            });
+            addXP(5, 'Quiz attempted');
+        }
+        feedback.classList.add('show');
+
+        if (Object.values(quizCorrect).every(v => v)) {
+            document.getElementById('ach-quiz').classList.add('unlocked');
+        }
+    }
+
+    // Achievements
+    function checkAchievements() {
+        const allUnlocked = ['ach-scroll', 'ach-quiz', 'ach-arch', 'ach-phases']
+            .every(id => document.getElementById(id).classList.contains('unlocked'));
+        if (allUnlocked) {
+            document.getElementById('ach-all').classList.add('unlocked');
+            showToast('🏅 Chapter Master unlocked! You mastered Chapter 2!');
+        }
+    }
+
+    // Event listeners
+    window.addEventListener('scroll', () => {
+        updateProgress();
+        revealSections();
+    });
+    window.addEventListener('load', () => {
+        revealSections();
+        updateProgress();
+    });
+    </script>
+</body>
+</html>

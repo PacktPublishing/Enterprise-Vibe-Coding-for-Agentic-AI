@@ -1,0 +1,13 @@
+{
+  "_comment": "Post-edit guard: validates that any change to code touching the product catalog stays schema-compatible. See ./scripts/catalog_schema_check.py for the rules. Exits 0 (allow) for files unrelated to the catalog, exits 2 (block) and emits decision=block when a breaking schema assumption is detected.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "type": "command",
+        "command": "python .github/hooks/scripts/catalog_schema_check.py",
+        "windows": "python .github\\hooks\\scripts\\catalog_schema_check.py",
+        "timeout": 10
+      }
+    ]
+  }
+}

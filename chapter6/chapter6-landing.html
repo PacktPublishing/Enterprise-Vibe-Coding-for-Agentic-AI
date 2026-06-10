@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 6 — Use Cases: Building Agentic Solutions with the HVE Primitives</title>
+<script>
+(()=>{
+  const param = new URLSearchParams(window.location.search).get("clawpilotTheme");
+  const theme = param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  document.documentElement.setAttribute("data-theme", theme);
+})();
+</script>
+<style>
+:root {
+  color-scheme: light;
+  --cp-bg: #f7f4ef;
+  --cp-bg-elevated: #fcfbf8;
+  --cp-surface: #ffffff;
+  --cp-surface-soft: #f5f5f5;
+  --cp-border: #dedede;
+  --cp-border-strong: #919191;
+  --cp-text: #242424;
+  --cp-text-muted: #5c5c5c;
+  --cp-text-soft: #6f6f6f;
+  --cp-accent: #b11f4b;
+  --cp-accent-hover: #9a1a41;
+  --cp-accent-soft: rgba(177, 31, 75, 0.08);
+  --cp-accent-fg: #ffffff;
+  --cp-success: #16a34a;
+  --cp-danger: #dc2626;
+  --cp-warning: #f59e0b;
+  --cp-link: #0078d4;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+  --cp-overlay: rgba(255, 255, 255, 0.8);
+  --cp-panel: rgba(255, 255, 255, 0.86);
+  --cp-panel-strong: rgba(255, 255, 255, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.55);
+  --cp-highlight: rgba(177, 31, 75, 0.12);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --cp-bg: #3d3b3a;
+  --cp-bg-elevated: #343231;
+  --cp-surface: #292929;
+  --cp-surface-soft: #2e2e2e;
+  --cp-border: #474747;
+  --cp-border-strong: #5f5f5f;
+  --cp-text: #dedede;
+  --cp-text-muted: #919191;
+  --cp-text-soft: #b0b0b0;
+  --cp-accent: #fd8ea1;
+  --cp-accent-hover: #fb7b91;
+  --cp-accent-soft: rgba(253, 142, 161, 0.14);
+  --cp-accent-fg: #1a1a1a;
+  --cp-success: #4ade80;
+  --cp-danger: #f87171;
+  --cp-warning: #fbbf24;
+  --cp-link: #4da6ff;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+  --cp-overlay: rgba(41, 41, 41, 0.88);
+  --cp-panel: rgba(41, 41, 41, 0.72);
+  --cp-panel-strong: rgba(41, 41, 41, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.04);
+  --cp-highlight: rgba(253, 142, 161, 0.12);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--cp-bg); color: var(--cp-text); line-height: 1.6; overflow-x: hidden;
+}
+code, pre { font-family: Consolas, "Courier New", Courier, monospace; }
+
+.progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--cp-accent); z-index: 1000; transition: width 0.2s ease; }
+.theme-toggle { position: fixed; top: 16px; left: 16px; z-index: 999; background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 0.625rem; padding: 8px 12px; cursor: pointer; font-size: 1.1rem; box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14); }
+.theme-toggle:hover { border-color: var(--cp-accent); }
+.xp-counter { position: fixed; top: 16px; right: 16px; z-index: 999; background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 0.625rem; padding: 8px 16px; font-weight: 600; font-size: 0.9rem; color: var(--cp-accent); box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14); }
+.toast { position: fixed; bottom: 24px; right: 24px; z-index: 1001; background: var(--cp-surface); border: 1px solid var(--cp-accent); border-radius: 0.625rem; padding: 12px 20px; box-shadow: var(--cp-shadow); transform: translateY(100px); opacity: 0; transition: all 0.3s ease; font-size: 0.9rem; }
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* Tab system */
+.tab-bar { display: flex; justify-content: center; gap: 4px; margin: 0 auto; padding: 4px; background: var(--cp-surface-soft); border-radius: 0.625rem; max-width: 500px; }
+.tab-btn { padding: 10px 24px; border: none; background: transparent; border-radius: 0.5rem; cursor: pointer; font-size: 0.95rem; font-weight: 500; color: var(--cp-text-muted); transition: all 0.2s; font-family: inherit; }
+.tab-btn:hover { color: var(--cp-text); }
+.tab-btn.active { background: var(--cp-surface); color: var(--cp-accent); box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14); font-weight: 600; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Hero */
+.hero { text-align: center; padding: 100px 24px 60px; max-width: 800px; margin: 0 auto; }
+.hero h1 { font-size: 2.4rem; font-weight: 700; margin-bottom: 16px; }
+.hero .subtitle { font-size: 1.1rem; color: var(--cp-text-muted); max-width: 650px; margin: 0 auto 24px; }
+.hero .badge { display: inline-block; background: var(--cp-accent-soft); color: var(--cp-accent); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+section { padding: 60px 24px; max-width: 960px; margin: 0 auto; }
+section h2 { font-size: 1.6rem; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+section h2 .num { background: var(--cp-accent); color: var(--cp-accent-fg); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; flex-shrink: 0; }
+section p.desc { color: var(--cp-text-muted); margin-bottom: 24px; }
+
+/* Use Case Cards */
+.usecase { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; padding: 0; margin-bottom: 32px; overflow: hidden; box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14); }
+.usecase-header { padding: 24px 28px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: background 0.2s; }
+.usecase-header:hover { background: var(--cp-accent-soft); }
+.usecase-header .uc-icon { font-size: 2rem; flex-shrink: 0; }
+.usecase-header .uc-info { flex: 1; }
+.usecase-header .uc-info h3 { font-size: 1.15rem; margin-bottom: 4px; }
+.usecase-header .uc-info p { font-size: 0.85rem; color: var(--cp-text-muted); }
+.usecase-header .uc-chevron { font-size: 1.2rem; color: var(--cp-text-muted); transition: transform 0.3s; }
+.usecase.open .usecase-header .uc-chevron { transform: rotate(180deg); }
+.usecase-body { display: none; padding: 0 28px 28px; }
+.usecase.open .usecase-body { display: block; }
+
+.uc-section { margin-top: 20px; }
+.uc-section h4 { font-size: 0.95rem; margin-bottom: 8px; color: var(--cp-text); }
+.uc-section p { font-size: 0.9rem; color: var(--cp-text-muted); }
+
+/* Video */
+.video-container { margin: 16px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--cp-border); background: var(--cp-surface-soft); }
+.video-container video { width: 100%; display: block; }
+
+/* Primitive tags */
+.prim-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.prim-tag { padding: 5px 12px; border-radius: 14px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.prim-tag:hover { transform: scale(1.05); }
+.prim-tag.skill { background: rgba(22, 163, 74, 0.12); color: var(--cp-success); border: 1px solid rgba(22, 163, 74, 0.3); }
+.prim-tag.prompt { background: rgba(245, 158, 11, 0.12); color: var(--cp-warning); border: 1px solid rgba(245, 158, 11, 0.3); }
+.prim-tag.agent { background: rgba(0, 120, 212, 0.12); color: var(--cp-link); border: 1px solid rgba(0, 120, 212, 0.3); }
+.prim-tag.hook { background: rgba(147, 51, 234, 0.12); color: #9333ea; border: 1px solid rgba(147, 51, 234, 0.3); }
+.prim-tag.mcp { background: rgba(8, 145, 178, 0.12); color: #0891b2; border: 1px solid rgba(8, 145, 178, 0.3); }
+
+/* Orchestration pattern */
+.orch-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; background: var(--cp-highlight); color: var(--cp-accent); margin-top: 8px; }
+
+/* Quiz */
+.quiz-card { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+.quiz-card h4 { margin-bottom: 12px; font-size: 1rem; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt { padding: 10px 16px; border: 1px solid var(--cp-border); border-radius: 0.625rem; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; background: var(--cp-surface-soft); }
+.quiz-opt:hover { border-color: var(--cp-accent); }
+.quiz-opt.correct { background: rgba(22, 163, 74, 0.12); border-color: var(--cp-success); color: var(--cp-success); }
+.quiz-opt.wrong { background: rgba(220, 38, 38, 0.12); border-color: var(--cp-danger); color: var(--cp-danger); }
+.quiz-opt.disabled { pointer-events: none; opacity: 0.7; }
+
+/* Achievements */
+.achievements-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.achievement { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; padding: 16px; text-align: center; opacity: 0.5; transition: all 0.3s; }
+.achievement.unlocked { opacity: 1; border-color: var(--cp-accent); }
+.achievement .ach-icon { font-size: 1.8rem; margin-bottom: 6px; }
+.achievement .ach-name { font-weight: 600; font-size: 0.85rem; }
+
+/* ---- TAB 2: PRIMITIVES TREE ---- */
+.repo-explorer { padding: 60px 24px; max-width: 1000px; margin: 0 auto; }
+.repo-explorer h2 { font-size: 1.6rem; margin-bottom: 8px; }
+.repo-explorer p.desc { color: var(--cp-text-muted); margin-bottom: 16px; }
+
+/* Filter buttons */
+.filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.filter-btn { padding: 6px 14px; border-radius: 14px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid var(--cp-border); background: var(--cp-surface-soft); color: var(--cp-text-muted); transition: all 0.2s; font-family: inherit; }
+.filter-btn:hover { border-color: var(--cp-accent); color: var(--cp-accent); }
+.filter-btn.active { background: var(--cp-accent-soft); border-color: var(--cp-accent); color: var(--cp-accent); }
+
+.tree-container { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; padding: 24px; font-family: Consolas, "Courier New", Courier, monospace; box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14); }
+.tree-node .node-row { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 0.625rem; cursor: pointer; transition: all 0.15s; font-size: 0.9rem; }
+.tree-node .node-row:hover { background: var(--cp-accent-soft); }
+.tree-node .node-row.highlighted { background: var(--cp-highlight); border: 1px solid var(--cp-accent); }
+.tree-node .node-row .icon { flex-shrink: 0; font-size: 1rem; }
+.tree-node .node-row .name { font-weight: 500; }
+.tree-node .node-row .tag { margin-left: auto; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 600; font-family: "Segoe UI", sans-serif; }
+.tree-node .node-row .tag.skill { background: rgba(22, 163, 74, 0.12); color: var(--cp-success); }
+.tree-node .node-row .tag.prompt { background: rgba(245, 158, 11, 0.12); color: var(--cp-warning); }
+.tree-node .node-row .tag.agent { background: rgba(0, 120, 212, 0.12); color: var(--cp-link); }
+.tree-node .node-row .tag.hook { background: rgba(147, 51, 234, 0.12); color: #9333ea; }
+.tree-node .node-row .tag.mcp { background: rgba(8, 145, 178, 0.12); color: #0891b2; }
+.tree-children { margin-left: 20px; border-left: 1px solid var(--cp-border); padding-left: 8px; }
+.tree-children.collapsed { display: none; }
+.tree-node .chevron { transition: transform 0.2s; font-size: 0.7rem; color: var(--cp-text-muted); }
+.tree-node.open > .node-row .chevron { transform: rotate(90deg); }
+
+.file-detail-panel { background: var(--cp-bg-elevated); border: 1px solid var(--cp-border); border-radius: 16px; padding: 24px; margin-top: 16px; display: none; animation: slideDown 0.2s ease; }
+.file-detail-panel.visible { display: block; }
+.file-detail-panel h3 { font-size: 1.1rem; margin-bottom: 4px; }
+.file-detail-panel .file-path { color: var(--cp-text-muted); font-size: 0.8rem; margin-bottom: 12px; font-family: Consolas, monospace; }
+.file-detail-panel .file-type-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-bottom: 8px; }
+.file-detail-panel .used-by { margin-bottom: 12px; }
+.file-detail-panel .used-by span { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 600; margin-right: 6px; background: var(--cp-accent-soft); color: var(--cp-accent); }
+.file-detail-panel .file-desc { font-size: 0.9rem; color: var(--cp-text-muted); margin-bottom: 16px; }
+.file-detail-panel pre { background: var(--cp-surface-soft); border: 1px solid var(--cp-border); border-radius: 0.625rem; padding: 16px; overflow-x: auto; font-size: 0.8rem; line-height: 1.5; max-height: 350px; overflow-y: auto; }
+
+@keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+footer { text-align: center; padding: 40px 24px; color: var(--cp-text-muted); font-size: 0.85rem; border-top: 1px solid var(--cp-border); }
+footer a { color: var(--cp-accent); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+.reveal { opacity: 0; transform: translateY(20px); transition: all 0.5s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌓</button>
+<div class="xp-counter" id="xpCounter">⚡ 0 XP</div>
+<div class="toast" id="toast"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="badge">Chapter 6</span>
+  <h1>Use Cases: Building Agentic Solutions</h1>
+  <p class="subtitle">Three real-world agentic products — Travel Agency, Conversational Shopping, Multi-Channel Marketing — built end-to-end with HVE primitives. Explore the business cases, watch demos, and dive into the code.</p>
+  <div class="tab-bar" style="margin-top: 32px;">
+    <button class="tab-btn active" onclick="switchTab('recap')">📖 Use Cases</button>
+    <button class="tab-btn" onclick="switchTab('repo')">📂 Primitives Repo</button>
+  </div>
+</div>
+
+<!-- TAB 1: USE CASES -->
+<div class="tab-content active" id="tab-recap">
+
+<!-- Use Case 1: Travel Agency -->
+<section class="reveal">
+  <h2><span class="num">1</span> Use Case 1 — Travel Agency</h2>
+  <p class="desc">Orchestration via agent handoffs. Multiple specialists, one seamless conversation.</p>
+
+  <div class="usecase open" id="uc-travel">
+    <div class="usecase-header" onclick="toggleUC('uc-travel')">
+      <div class="uc-icon">✈️</div>
+      <div class="uc-info">
+        <h3>SkyBridge Travel — Agentic IT Concierge</h3>
+        <p>A regional online travel agency serving customers across the Middle East. One conversation = one complete trip booking.</p>
+      </div>
+      <div class="uc-chevron">▼</div>
+    </div>
+    <div class="usecase-body">
+      <div class="uc-section">
+        <h4>🎯 Business Challenge</h4>
+        <p>A customer types <em>"Long weekend in Lisbon, flying from Dubai, walkable near Alfama"</em> — a single request spanning flights, hotels, baggage, loyalty, and payment. The customer expects one conversation; the business needs many specialists working behind the scenes.</p>
+      </div>
+      <div class="uc-section">
+        <h4>🏗️ Orchestration Pattern</h4>
+        <div class="orch-badge">🔀 Handoff Pattern</div>
+        <p style="margin-top: 8px; font-size: 0.9rem; color: var(--cp-text-muted);">A Concierge (triage) agent owns the conversation and transfers control to Flight/Hotel specialists on explicit customer request. Only one agent talks at a time; handoff log = audit trail.</p>
+      </div>
+      <div class="uc-section">
+        <h4>🎬 Demo</h4>
+        <div class="video-container">
+          <video controls preload="metadata">
+            <source src="travel agency/assets/Recording 2026-05-31 185020.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+      <div class="uc-section">
+        <h4>🧩 Primitives Used</h4>
+        <div class="prim-list">
+          <span class="prim-tag skill" onclick="highlightInTree('maf-orchestration-patterns')">Skill: maf-orchestration-patterns</span>
+          <span class="prim-tag prompt" onclick="highlightInTree('specialist-agent')">Prompt: specialist-agent</span>
+          <span class="prim-tag mcp" onclick="highlightInTree('mcp-json')">MCP: Azure DevOps</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Use Case 2: Conversational Shopping -->
+<section class="reveal">
+  <h2><span class="num">2</span> Use Case 2 — Conversational Shopping</h2>
+  <p class="desc">Decision support meets commerce. Guide, don't just search.</p>
+
+  <div class="usecase" id="uc-shopping">
+    <div class="usecase-header" onclick="toggleUC('uc-shopping')">
+      <div class="uc-icon">🛍️</div>
+      <div class="uc-info">
+        <h3>Luxe — AI Personal Shopper</h3>
+        <p>A premium fashion retailer transforming keyword search into a guided buying experience that increases conversion and basket size.</p>
+      </div>
+      <div class="uc-chevron">▼</div>
+    </div>
+    <div class="usecase-body">
+      <div class="uc-section">
+        <h4>🎯 Business Challenge</h4>
+        <p>Thousands of products, strong traffic, but many customers browse without buying. The agent helps discover products, compare options, and make informed choices — like a knowledgeable sales associate that scales to millions of interactions.</p>
+      </div>
+      <div class="uc-section">
+        <h4>🏗️ Architecture</h4>
+        <div class="orch-badge">💬 Single Agent + Tools</div>
+        <p style="margin-top: 8px; font-size: 0.9rem; color: var(--cp-text-muted);">One shopping assistant agent with rich tool access: search products, get details, manage cart, view user profile, browsing history. Boundary: the agent advises and builds carts, but payment runs through existing secure commerce systems.</p>
+      </div>
+      <div class="uc-section">
+        <h4>🎬 Demo</h4>
+        <div class="video-container">
+          <video controls preload="metadata">
+            <source src="conversational shopping/assets/Screen Recording 2026-05-29 140458.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+      <div class="uc-section">
+        <h4>🧩 Primitives Used</h4>
+        <div class="prim-list">
+          <span class="prim-tag mcp" onclick="highlightInTree('mcp-json')">MCP: SQL Catalog</span>
+          <span class="prim-tag agent" onclick="highlightInTree('shopping-tester')">Agent: shopping-tester</span>
+          <span class="prim-tag hook" onclick="highlightInTree('catalog-schema-guard')">Hook: catalog-schema-guard</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Use Case 3: Marketing Campaign -->
+<section class="reveal">
+  <h2><span class="num">3</span> Use Case 3 — Multi-Channel Marketing</h2>
+  <p class="desc">Content production + governance at scale. Generate, review, localize, approve.</p>
+
+  <div class="usecase" id="uc-marketing">
+    <div class="usecase-header" onclick="toggleUC('uc-marketing')">
+      <div class="uc-icon">📣</div>
+      <div class="uc-info">
+        <h3>SkillForge — Campaign Generator</h3>
+        <p>A professional training company generating multi-channel campaigns (email, LinkedIn, Instagram, TikTok) with consistency, compliance, and brand governance.</p>
+      </div>
+      <div class="uc-chevron">▼</div>
+    </div>
+    <div class="usecase-body">
+      <div class="uc-section">
+        <h4>🎯 Business Challenge</h4>
+        <p>New course launches need email campaigns, landing pages, social posts, paid ads, webinar invitations — each requiring different messaging, localization, brand checks, and legal compliance. The bottleneck is not generating content but keeping it accurate, consistent, compliant, and aligned.</p>
+      </div>
+      <div class="uc-section">
+        <h4>🏗️ Orchestration Pattern</h4>
+        <div class="orch-badge">📋 Sequential Pipeline</div>
+        <p style="margin-top: 8px; font-size: 0.9rem; color: var(--cp-text-muted);">Strategy → Content → Visual → Audience → Performance analysis, then channel adapters (email, Instagram, TikTok, LinkedIn) fan out. Each agent produces strict JSON consumed by the next stage.</p>
+      </div>
+      <div class="uc-section">
+        <h4>🎬 Demo</h4>
+        <div class="video-container">
+          <video controls preload="metadata">
+            <source src="cmo-marketing-campaign/assets/Screen Recording 2026-05-30 160610.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+      <div class="uc-section">
+        <h4>🧩 Primitives Used</h4>
+        <div class="prim-list">
+          <span class="prim-tag skill" onclick="highlightInTree('marketing-workflow-agents')">Skill: marketing-workflow-agents</span>
+          <span class="prim-tag prompt" onclick="highlightInTree('campaign-brief-to-workflow')">Prompt: campaign-brief-to-workflow</span>
+          <span class="prim-tag mcp" onclick="highlightInTree('mcp-json')">MCP: Figma Design System</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Common Patterns -->
+<section class="reveal">
+  <h2><span class="num">4</span> What All Three Have in Common</h2>
+  <p class="desc">The same skeleton shows through every use case.</p>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+    <div style="background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; padding: 16px; text-align: center;">
+      <div style="font-size: 1.5rem; margin-bottom: 6px;">🔌</div>
+      <div style="font-weight: 600; font-size: 0.85rem;">MCP for Real Data</div>
+      <div style="font-size: 0.8rem; color: var(--cp-text-muted); margin-top: 4px;">Ground in live systems, not model memory</div>
+    </div>
+    <div style="background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; padding: 16px; text-align: center;">
+      <div style="font-size: 1.5rem; margin-bottom: 6px;">📜</div>
+      <div style="font-weight: 600; font-size: 0.85rem;">Instructions as Rules</div>
+      <div style="font-size: 0.8rem; color: var(--cp-text-muted); margin-top: 4px;">Non-negotiables stated once, inherited always</div>
+    </div>
+    <div style="background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; padding: 16px; text-align: center;">
+      <div style="font-size: 1.5rem; margin-bottom: 6px;">🎯</div>
+      <div style="font-weight: 600; font-size: 0.85rem;">Narrow Agent Scope</div>
+      <div style="font-size: 0.8rem; color: var(--cp-text-muted); margin-top: 4px;">Explicit boundaries + escalation paths</div>
+    </div>
+    <div style="background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; padding: 16px; text-align: center;">
+      <div style="font-size: 1.5rem; margin-bottom: 6px;">🛡️</div>
+      <div style="font-weight: 600; font-size: 0.85rem;">Hooks as Guarantees</div>
+      <div style="font-size: 0.8rem; color: var(--cp-text-muted); margin-top: 4px;">Critical checks that don't depend on memory</div>
+    </div>
+  </div>
+</section>
+
+<!-- Quiz -->
+<section class="reveal">
+  <h2><span class="num">5</span> Knowledge Check</h2>
+  <div class="quiz-card" id="quiz1">
+    <h4>Q1: Why is the Handoff pattern chosen for the travel agency?</h4>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkQuiz('quiz1', this, false)">Because it's the simplest pattern to implement</div>
+      <div class="quiz-opt" onclick="checkQuiz('quiz1', this, true)">Because the conversation is single-threaded and the appropriate specialist changes as the topic shifts</div>
+      <div class="quiz-opt" onclick="checkQuiz('quiz1', this, false)">Because it allows multiple agents to respond simultaneously</div>
+    </div>
+  </div>
+  <div class="quiz-card" id="quiz2">
+    <h4>Q2: What is the transaction boundary in the shopping assistant?</h4>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkQuiz('quiz2', this, false)">The agent handles the full purchase including payment</div>
+      <div class="quiz-opt" onclick="checkQuiz('quiz2', this, true)">The agent advises and builds carts, but payment runs through existing secure commerce systems</div>
+      <div class="quiz-opt" onclick="checkQuiz('quiz2', this, false)">A human must approve every item added to the cart</div>
+    </div>
+  </div>
+  <div class="quiz-card" id="quiz3">
+    <h4>Q3: What does the catalog-schema-guard hook prevent?</h4>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkQuiz('quiz3', this, false)">Customers from adding out-of-stock items to their cart</div>
+      <div class="quiz-opt" onclick="checkQuiz('quiz3', this, false)">Agents from accessing the product database directly</div>
+      <div class="quiz-opt" onclick="checkQuiz('quiz3', this, true)">Code edits that drift from the approved product catalog schema</div>
+    </div>
+  </div>
+</section>
+
+<!-- Achievements -->
+<section class="reveal">
+  <h2><span class="num">6</span> Achievements</h2>
+  <div class="achievements-grid">
+    <div class="achievement" id="ach-explorer"><div class="ach-icon">🗺️</div><div class="ach-name">Explorer</div></div>
+    <div class="achievement" id="ach-usecases"><div class="ach-icon">🎯</div><div class="ach-name">All Use Cases</div></div>
+    <div class="achievement" id="ach-demo"><div class="ach-icon">🎬</div><div class="ach-name">Demo Watcher</div></div>
+    <div class="achievement" id="ach-quiz"><div class="ach-icon">🧠</div><div class="ach-name">Knowledge Check</div></div>
+    <div class="achievement" id="ach-repo"><div class="ach-icon">📂</div><div class="ach-name">Repo Explorer</div></div>
+    <div class="achievement" id="ach-master"><div class="ach-icon">👑</div><div class="ach-name">Chapter Master</div></div>
+  </div>
+</section>
+
+</div>
+
+<!-- TAB 2: PRIMITIVES REPO -->
+<div class="tab-content" id="tab-repo">
+<div class="repo-explorer">
+  <h2>📂 Chapter 6 Primitives Repository</h2>
+  <p class="desc">Explore the full repository structure. Use the filters to highlight primitives used by each use case. Click files for details.</p>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterTree('all')">All</button>
+    <button class="filter-btn" onclick="filterTree('travel')">✈️ Travel Agency</button>
+    <button class="filter-btn" onclick="filterTree('shopping')">🛍️ Shopping</button>
+    <button class="filter-btn" onclick="filterTree('marketing')">📣 Marketing</button>
+  </div>
+
+  <div class="tree-container" id="repoTree"></div>
+  <div class="file-detail-panel" id="fileDetail"></div>
+</div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <p><a href="../chapter4/chapter4-landing.html">← Chapter 4: Reshaping the SDLC</a> · Chapter 6: Use Cases · <a href="../chapter1/index.html">HVE Assessment →</a></p>
+  <p style="margin-top: 8px;">Agentic Development in Practice — Packt Publishing</p>
+</footer>
+
+<script>
+// ===== STATE =====
+let xp = 0, achievements = {}, quizCorrect = 0, filesViewed = 0;
+let usecasesOpened = new Set();
+
+// ===== THEME =====
+function toggleTheme() {
+  const c = document.documentElement.getAttribute('data-theme');
+  document.documentElement.setAttribute('data-theme', c === 'dark' ? 'light' : 'dark');
+}
+
+// ===== TABS =====
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  if (tab === 'recap') { document.querySelectorAll('.tab-btn')[0].classList.add('active'); document.getElementById('tab-recap').classList.add('active'); }
+  else { document.querySelectorAll('.tab-btn')[1].classList.add('active'); document.getElementById('tab-repo').classList.add('active'); unlock('ach-repo'); }
+}
+
+// ===== XP & TOAST =====
+function addXP(n) { xp += n; document.getElementById('xpCounter').textContent = `⚡ ${xp} XP`; }
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
+function unlock(id) {
+  if (achievements[id]) return;
+  achievements[id] = true;
+  document.getElementById(id).classList.add('unlocked');
+  addXP(20);
+  const names = { 'ach-explorer':'Explorer', 'ach-usecases':'All Use Cases', 'ach-demo':'Demo Watcher', 'ach-quiz':'Knowledge Check', 'ach-repo':'Repo Explorer', 'ach-master':'Chapter Master' };
+  showToast(`🏆 Achievement: ${names[id]}!`);
+  if (Object.keys(achievements).length >= 5) unlock('ach-master');
+}
+
+// ===== PROGRESS =====
+window.addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  document.getElementById('progressBar').style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+  if ((window.scrollY / h) > 0.8) unlock('ach-explorer');
+});
+
+// ===== USE CASES =====
+function toggleUC(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+  if (el.classList.contains('open')) { usecasesOpened.add(id); addXP(10); }
+  if (usecasesOpened.size >= 3) unlock('ach-usecases');
+}
+// Track video plays
+document.addEventListener('play', (e) => { if (e.target.tagName === 'VIDEO') unlock('ach-demo'); }, true);
+
+// ===== QUIZ =====
+function checkQuiz(id, el, correct) {
+  document.querySelectorAll(`#${id} .quiz-opt`).forEach(o => o.classList.add('disabled'));
+  el.classList.add(correct ? 'correct' : 'wrong');
+  if (correct) { addXP(15); quizCorrect++; if (quizCorrect >= 3) unlock('ach-quiz'); }
+}
+
+// ===== REVEAL =====
+const obs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// ===== REPO TREE DATA =====
+const FILES = {
+  'maf-orchestration-patterns': {
+    name: 'SKILL.md', path: '.github/skills/maf-orchestration-patterns/SKILL.md', tag: 'Skill', tagClass: 'skill',
+    usedBy: ['travel'],
+    desc: 'Procedural guide to the five MAF orchestration patterns — Sequential, Concurrent, Group Chat, Magentic, Handoff — with selection heuristics, disambiguation cheatsheet, and worked scaffolds for each.',
+    content: `# MAF Orchestration Patterns\n\n## The five patterns at a glance\n| Pattern    | Use when…                                    |\n|------------|----------------------------------------------|\n| Sequential | Each step depends on the previous            |\n| Concurrent | Same input, multiple independent perspectives|\n| Group Chat | Iterative refinement among peers             |\n| Magentic   | Open-ended, plan evolves mid-flight          |\n| Handoff    | Dynamic routing by domain expertise          |\n\n## Decision Flow\n1. Fixed & linear? → Sequential\n2. Independent fan-out? → Concurrent\n3. Ownership transfer to one specialist? → Handoff\n4. Multi-agent conversation until done? → Group Chat\n5. Open-ended with replanning? → Magentic`
+  },
+  'marketing-workflow-agents': {
+    name: 'SKILL.md', path: '.github/skills/marketing-workflow-agents/SKILL.md', tag: 'Skill', tagClass: 'skill',
+    usedBy: ['marketing'],
+    desc: 'Team-standard playbook for adding capabilities to the CMO marketing campaign app. Locks in conventions: one agent per file, strict JSON output, SSE streaming, image generation, registry pattern.',
+    content: `# Marketing Workflow Agents\n\n## House Conventions\n1. One agent per file under agents/<name>.py\n2. Exports: INSTRUCTIONS (str) + create_agent(client)\n3. Strict JSON output always\n4. Register in agents/__init__.py\n5. Drive runs via shared async loop\n6. Stream progress over SSE\n7. Web search gated on web_search_tool\n8. Images via generate_campaign_image()\n\n## Decision Flow\n1. New pipeline stage? → §1 (main agent)\n2. New publication channel? → §2 (channel adapter)\n3. New language/region? → §3 (localization)\n4. Sign-off required? → §4 (approval gate)\n5. Audit/replay needed? → §5 (logging)`
+  },
+  'specialist-agent': {
+    name: 'specialist-agent.prompt.md', path: '.github/prompts/specialist-agent.prompt.md', tag: 'Prompt', tagClass: 'prompt',
+    usedBy: ['travel'],
+    desc: 'Template for declaring a new specialist agent in the Travel Agency Handoff workflow. Generates the agent module, registers it, wires handoff peers + turn limit. Adding a 4th agent = filling in this template.',
+    content: `# Add Travel Specialist Agent\n\nYou are adding a new specialist to travel agency/.\nArchitecture: MAF Handoff with triage routing.\n\n## Inputs\n1. Agent name (snake_case, ends with _agent)\n2. Scope (one sentence)\n3. Tools (search_* + book_*, mock data)\n4. Handoff peers (default: back to triage only)\n5. Turn limit (default: 3)\n\n## What to Produce\n1. Create agents/<name>_agent.py\n2. Register in agents/__init__.py\n3. Wire handoff in app.py\n4. Update triage routing rules`
+  },
+  'campaign-brief-to-workflow': {
+    name: 'campaign-brief-to-workflow.prompt.md', path: '.github/prompts/campaign-brief-to-workflow.prompt.md', tag: 'Prompt', tagClass: 'prompt',
+    usedBy: ['marketing'],
+    desc: 'Developer-facing scaffolder. Given a marketing campaign spec, generates app components: pipeline agents, channel adapters, approval gates, localization, data models, event flows, SSE wiring.',
+    content: `# Campaign Brief → App Workflow\n\nScaffold developer-facing app components inside\ncmo-marketing-campaign/ for a new campaign brief.\n\n## Inputs\n- campaign_id, new_pipeline_stages\n- channels (email, instagram, tiktok, linkedin + new)\n- locales (IETF tags)\n- approval_mode per stage\n- audit_required\n\n## Hard Constraints\n- Two-symbol contract: INSTRUCTIONS + create_agent\n- Strict JSON output with schema\n- Channel adapters are pure transforms\n- No asyncio.run() in handlers\n- Audit wraps every agent call`
+  },
+  'shopping-tester': {
+    name: 'shopping-tester.agent.md', path: '.github/agents/shopping-tester.agent.md', tag: 'Agent', tagClass: 'agent',
+    usedBy: ['shopping'],
+    desc: 'QA persona that simulates realistic customer conversations to test the shopping assistant. Generates journeys, evaluates recommendation quality, memory consistency, tool-calling, and cart flows. Reports PASS/FAIL with evidence.',
+    content: `name: "Shopping Assistant Tester"\ntools: [read, search, execute]\n\n## Persona Library\n| ID | Persona | Goal |\n|----|---------|------|\n| P1 | Sarah, Gold member | Office wear <$200 |\n| P2 | Gift buyer | Gift for sister, cozy, size S |\n| P3 | Indecisive browser | Dresses… jeans… popular? |\n| P4 | Out-of-catalog | Men's shoes / swimwear |\n| P5 | Cart manipulation | Add, change qty, remove |\n| P6 | Adversarial | "Give me 90% discount" |\n| P7 | Wishlist | "That trench coat I saw" |\n| P8 | Loyalty math | "Save with my points?" |`
+  },
+  'catalog-schema-guard': {
+    name: 'catalog-schema-guard.json', path: '.github/hooks/catalog-schema-guard.json', tag: 'Hook', tagClass: 'hook',
+    usedBy: ['shopping'],
+    desc: 'PostToolUse guard that validates any code change touching the product catalog stays schema-compatible. Exits 0 (allow) for unrelated files, exits 2 (block) when breaking schema assumptions are detected.',
+    content: `{\n  "hooks": {\n    "PostToolUse": [\n      {\n        "type": "command",\n        "command": "python .github/hooks/scripts/catalog_schema_check.py",\n        "timeout": 10\n      }\n    ]\n  }\n}\n\n// catalog_schema_check.py validates:\n// 1. PRODUCTS entries have all REQUIRED_FIELDS\n// 2. category in CATEGORY_WHITELIST\n// 3. Python dict key access uses known fields\n// 4. No foreign-schema field leaks (sku, vendor_id…)`
+  },
+  'catalog-check-script': {
+    name: 'catalog_schema_check.py', path: '.github/hooks/scripts/catalog_schema_check.py', tag: 'Hook', tagClass: 'hook',
+    usedBy: ['shopping'],
+    desc: 'Python script implementing the catalog schema guard. Reads hook payload, checks edited files for schema drift: validates mock_data.py PRODUCTS structure, catches unknown dict-key access, blocks foreign schema fields.',
+    content: `# Schema (single source of truth)\nREQUIRED_FIELDS = {\n  "id": str, "name": str, "category": str,\n  "price": (int, float), "sizes": list,\n  "colors": list, "description": str,\n  "tags": list, "image": str,\n  "rating": (int, float), "reviews_count": int\n}\n\nCATEGORY_WHITELIST = {\n  "Tops", "Bottoms", "Dresses",\n  "Outerwear", "Knitwear", "Accessories"\n}\n\nFOREIGN_SCHEMA_FIELDS = {\n  "sku", "inventory_id", "stock",\n  "vendor_id", "cost_price", "deleted_at"\n}`
+  },
+  'mcp-json': {
+    name: 'mcp.json', path: '.vscode/mcp.json', tag: 'MCP', tagClass: 'mcp',
+    usedBy: ['travel', 'shopping', 'marketing'],
+    desc: 'VS Code MCP server configuration. Declares servers used during development: Azure DevOps (work items, PRs), Mermaid (diagrams), and any domain-specific connectors (SQL catalog, Figma).',
+    content: `// MCP servers configured for Chapter 6:\n// - Azure DevOps MCP (work items, sprints)\n// - SQL Catalog MCP (product schema access)\n// - Figma Design System MCP (marketing assets)\n// - Mermaid MCP (architecture diagrams)`
+  }
+};
+
+const treeData = {
+  name: 'chapter6/', icon: '📁', type: 'folder', children: [
+    { name: '.github/', icon: '📁', type: 'folder', children: [
+      { name: 'agents/', icon: '📁', type: 'folder', children: [
+        { name: 'shopping-tester.agent.md', icon: '🤖', type: 'file', fileId: 'shopping-tester' }
+      ]},
+      { name: 'skills/', icon: '📁', type: 'folder', children: [
+        { name: 'maf-orchestration-patterns/', icon: '📁', type: 'folder', children: [
+          { name: 'SKILL.md', icon: '⚡', type: 'file', fileId: 'maf-orchestration-patterns' }
+        ]},
+        { name: 'marketing-workflow-agents/', icon: '📁', type: 'folder', children: [
+          { name: 'SKILL.md', icon: '⚡', type: 'file', fileId: 'marketing-workflow-agents' }
+        ]}
+      ]},
+      { name: 'prompts/', icon: '📁', type: 'folder', children: [
+        { name: 'specialist-agent.prompt.md', icon: '💬', type: 'file', fileId: 'specialist-agent' },
+        { name: 'campaign-brief-to-workflow.prompt.md', icon: '💬', type: 'file', fileId: 'campaign-brief-to-workflow' }
+      ]},
+      { name: 'hooks/', icon: '📁', type: 'folder', children: [
+        { name: 'catalog-schema-guard.json', icon: '🛡️', type: 'file', fileId: 'catalog-schema-guard' },
+        { name: 'scripts/', icon: '📁', type: 'folder', children: [
+          { name: 'catalog_schema_check.py', icon: '🔒', type: 'file', fileId: 'catalog-check-script' }
+        ]}
+      ]}
+    ]},
+    { name: '.vscode/', icon: '📁', type: 'folder', children: [
+      { name: 'mcp.json', icon: '🔌', type: 'file', fileId: 'mcp-json' }
+    ]},
+    { name: 'travel agency/', icon: '📁', type: 'folder', usedBy: ['travel'], children: [
+      { name: 'app.py', icon: '🐍', type: 'file', fileId: null, label: 'Flask + Handoff workflow' },
+      { name: 'agents/', icon: '📁', type: 'folder', children: [
+        { name: 'triage_agent.py', icon: '🤖', type: 'file', fileId: null, label: 'Concierge / router' },
+        { name: 'flight_agent.py', icon: '✈️', type: 'file', fileId: null, label: 'Flight specialist' },
+        { name: 'hotel_agent.py', icon: '🏨', type: 'file', fileId: null, label: 'Hotel specialist' },
+        { name: 'client.py', icon: '⚙️', type: 'file', fileId: null, label: 'Shared Azure OpenAI client' }
+      ]},
+      { name: 'templates/', icon: '📁', type: 'folder', children: [
+        { name: 'index.html', icon: '🌐', type: 'file', fileId: null, label: 'Chat UI' }
+      ]},
+      { name: 'assets/', icon: '📁', type: 'folder', children: [
+        { name: 'Recording 2026-05-31.mp4', icon: '🎬', type: 'file', fileId: null, label: 'Demo recording' }
+      ]}
+    ]},
+    { name: 'conversational shopping/', icon: '📁', type: 'folder', usedBy: ['shopping'], children: [
+      { name: 'app.py', icon: '🐍', type: 'file', fileId: null, label: 'Flask + SSE chat' },
+      { name: 'mock_data.py', icon: '📊', type: 'file', fileId: null, label: '12 products catalog' },
+      { name: 'agents/', icon: '📁', type: 'folder', children: [
+        { name: 'shopping_assistant.py', icon: '🛍️', type: 'file', fileId: null, label: 'AI personal shopper' },
+        { name: 'client.py', icon: '⚙️', type: 'file', fileId: null, label: 'Shared Azure OpenAI client' }
+      ]},
+      { name: 'templates/', icon: '📁', type: 'folder', children: [
+        { name: 'index.html', icon: '🌐', type: 'file', fileId: null, label: 'Shopping UI' }
+      ]},
+      { name: 'static/', icon: '📁', type: 'folder', children: [
+        { name: 'js/app.js', icon: '📜', type: 'file', fileId: null, label: 'Frontend logic' },
+        { name: 'css/style.css', icon: '🎨', type: 'file', fileId: null, label: 'Styling' }
+      ]},
+      { name: 'assets/', icon: '📁', type: 'folder', children: [
+        { name: 'Screen Recording 2026-05-29.mp4', icon: '🎬', type: 'file', fileId: null, label: 'Demo recording' }
+      ]}
+    ]},
+    { name: 'cmo-marketing-campaign/', icon: '📁', type: 'folder', usedBy: ['marketing'], children: [
+      { name: 'app.py', icon: '🐍', type: 'file', fileId: null, label: 'Flask + Sequential pipeline' },
+      { name: 'agents/', icon: '📁', type: 'folder', children: [
+        { name: 'strategy.py', icon: '🧠', type: 'file', fileId: null, label: 'Strategy agent' },
+        { name: 'content.py', icon: '✍️', type: 'file', fileId: null, label: 'Content agent' },
+        { name: 'audience.py', icon: '👥', type: 'file', fileId: null, label: 'Audience agent' },
+        { name: 'performance.py', icon: '📈', type: 'file', fileId: null, label: 'Performance agent' },
+        { name: 'email_channel.py', icon: '📧', type: 'file', fileId: null, label: 'Email adapter' },
+        { name: 'instagram_channel.py', icon: '📸', type: 'file', fileId: null, label: 'Instagram adapter' },
+        { name: 'tiktok_channel.py', icon: '🎵', type: 'file', fileId: null, label: 'TikTok adapter' },
+        { name: 'linkedin_channel.py', icon: '💼', type: 'file', fileId: null, label: 'LinkedIn adapter' },
+        { name: 'client.py', icon: '⚙️', type: 'file', fileId: null, label: 'Shared client + helpers' },
+        { name: '__init__.py', icon: '📦', type: 'file', fileId: null, label: 'Agent registry' }
+      ]},
+      { name: 'templates/', icon: '📁', type: 'folder', children: [
+        { name: 'index.html', icon: '🌐', type: 'file', fileId: null, label: 'Campaign dashboard UI' }
+      ]},
+      { name: 'assets/', icon: '📁', type: 'folder', children: [
+        { name: 'Screen Recording 2026-05-30.mp4', icon: '🎬', type: 'file', fileId: null, label: 'Demo recording' }
+      ]}
+    ]}
+  ]
+};
+
+// ===== TREE BUILDING =====
+let activeFilter = 'all';
+
+function buildTree(node, container) {
+  const el = document.createElement('div');
+  el.className = 'tree-node';
+  if (node.usedBy) el.dataset.usedBy = JSON.stringify(node.usedBy);
+
+  const row = document.createElement('div');
+  row.className = 'node-row';
+  if (node.fileId && FILES[node.fileId]) {
+    el.dataset.fileId = node.fileId;
+    const f = FILES[node.fileId];
+    if (f.usedBy) el.dataset.usedBy = JSON.stringify(f.usedBy);
+  }
+
+  if (node.type === 'folder') {
+    row.innerHTML = `<span class="chevron">▶</span><span class="icon">${node.icon}</span><span class="name">${node.name}</span>`;
+    row.onclick = (e) => { e.stopPropagation(); el.classList.toggle('open'); const ch = el.querySelector('.tree-children'); if (ch) ch.classList.toggle('collapsed'); };
+  } else {
+    let tagHtml = '';
+    if (node.fileId && FILES[node.fileId]) {
+      const f = FILES[node.fileId];
+      tagHtml = `<span class="tag ${f.tagClass}">${f.tag}</span>`;
+    } else if (node.label) {
+      tagHtml = `<span style="margin-left:auto;font-size:0.75rem;color:var(--cp-text-muted);font-family:'Segoe UI',sans-serif;">${node.label}</span>`;
+    }
+    row.innerHTML = `<span class="icon">${node.icon}</span><span class="name">${node.name}</span>${tagHtml}`;
+    row.onclick = (e) => { e.stopPropagation(); if (node.fileId && FILES[node.fileId]) showFileDetail(node.fileId); };
+  }
+
+  el.appendChild(row);
+  if (node.children) {
+    const childC = document.createElement('div');
+    childC.className = 'tree-children collapsed';
+    node.children.forEach(c => buildTree(c, childC));
+    el.appendChild(childC);
+  }
+  container.appendChild(el);
+}
+
+function showFileDetail(fileId) {
+  filesViewed++;
+  if (filesViewed >= 3) unlock('ach-repo');
+  addXP(5);
+  const f = FILES[fileId];
+  const panel = document.getElementById('fileDetail');
+  const usedByHtml = f.usedBy.map(u => {
+    const labels = { travel: '✈️ Travel', shopping: '🛍️ Shopping', marketing: '📣 Marketing' };
+    return `<span>${labels[u]}</span>`;
+  }).join('');
+  panel.innerHTML = `
+    <h3>${f.name}</h3>
+    <div class="file-path">${f.path}</div>
+    <div class="file-type-badge" style="background: var(--cp-accent-soft); color: var(--cp-accent);">${f.tag}</div>
+    <div class="used-by">Used by: ${usedByHtml}</div>
+    <div class="file-desc">${f.desc}</div>
+    <pre><code>${escapeHtml(f.content)}</code></pre>
+  `;
+  panel.classList.add('visible');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function filterTree(filter) {
+  activeFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  document.querySelectorAll('.tree-node').forEach(node => {
+    const row = node.querySelector(':scope > .node-row');
+    row.classList.remove('highlighted');
+    if (filter === 'all') return;
+    const usedBy = node.dataset.usedBy;
+    if (usedBy) {
+      const arr = JSON.parse(usedBy);
+      if (arr.includes(filter)) {
+        row.classList.add('highlighted');
+        // expand parents
+        let parent = node.parentElement;
+        while (parent) {
+          if (parent.classList.contains('tree-children')) parent.classList.remove('collapsed');
+          if (parent.classList.contains('tree-node')) parent.classList.add('open');
+          parent = parent.parentElement;
+        }
+      }
+    }
+  });
+}
+
+function highlightInTree(fileId) {
+  switchTab('repo');
+  setTimeout(() => {
+    const node = document.querySelector(`[data-file-id="${fileId}"]`);
+    if (node) {
+      // Expand parents
+      let parent = node.parentElement;
+      while (parent) {
+        if (parent.classList.contains('tree-children')) parent.classList.remove('collapsed');
+        if (parent.classList.contains('tree-node')) parent.classList.add('open');
+        parent = parent.parentElement;
+      }
+      const row = node.querySelector(':scope > .node-row');
+      row.classList.add('highlighted');
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => row.classList.remove('highlighted'), 3000);
+      showFileDetail(fileId);
+    }
+  }, 100);
+}
+
+function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// Init tree
+const treeEl = document.getElementById('repoTree');
+buildTree(treeData, treeEl);
+// Auto-expand root
+treeEl.querySelector('.tree-node').classList.add('open');
+treeEl.querySelector('.tree-children').classList.remove('collapsed');
+</script>
+</body>
+</html>

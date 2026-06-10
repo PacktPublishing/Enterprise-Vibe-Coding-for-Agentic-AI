@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3 — Primitives: The Building Blocks of Agentic Development</title>
+    <script>
+      (() => {
+        const param = new URLSearchParams(window.location.search).get("clawpilotTheme");
+        const theme =
+          param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
+    <style>
+:root {
+  color-scheme: light;
+  --cp-bg: #f7f4ef;
+  --cp-bg-elevated: #fcfbf8;
+  --cp-surface: #ffffff;
+  --cp-surface-soft: #f5f5f5;
+  --cp-border: #dedede;
+  --cp-border-strong: #919191;
+  --cp-text: #242424;
+  --cp-text-muted: #5c5c5c;
+  --cp-text-soft: #6f6f6f;
+  --cp-accent: #b11f4b;
+  --cp-accent-hover: #9a1a41;
+  --cp-accent-soft: rgba(177, 31, 75, 0.08);
+  --cp-accent-fg: #ffffff;
+  --cp-success: #16a34a;
+  --cp-danger: #dc2626;
+  --cp-warning: #f59e0b;
+  --cp-link: #0078d4;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+  --cp-overlay: rgba(255, 255, 255, 0.8);
+  --cp-panel: rgba(255, 255, 255, 0.86);
+  --cp-panel-strong: rgba(255, 255, 255, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.55);
+  --cp-highlight: rgba(177, 31, 75, 0.12);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --cp-bg: #3d3b3a;
+  --cp-bg-elevated: #343231;
+  --cp-surface: #292929;
+  --cp-surface-soft: #2e2e2e;
+  --cp-border: #474747;
+  --cp-border-strong: #5f5f5f;
+  --cp-text: #dedede;
+  --cp-text-muted: #919191;
+  --cp-text-soft: #b0b0b0;
+  --cp-accent: #fd8ea1;
+  --cp-accent-hover: #fb7b91;
+  --cp-accent-soft: rgba(253, 142, 161, 0.14);
+  --cp-accent-fg: #1a1a1a;
+  --cp-success: #4ade80;
+  --cp-danger: #f87171;
+  --cp-warning: #fbbf24;
+  --cp-link: #4da6ff;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+  --cp-overlay: rgba(41, 41, 41, 0.88);
+  --cp-panel: rgba(41, 41, 41, 0.72);
+  --cp-panel-strong: rgba(41, 41, 41, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.04);
+  --cp-highlight: rgba(253, 142, 161, 0.12);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cp-bg);
+    color: var(--cp-text);
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+#progress-bar {
+    position: fixed; top: 0; left: 0; height: 4px;
+    background: var(--cp-accent); z-index: 1000;
+    transition: width 0.3s ease; width: 0%;
+}
+#xp-counter {
+    position: fixed; top: 12px; right: 16px;
+    background: var(--cp-panel-strong); border: 1px solid var(--cp-border);
+    border-radius: 0.625rem; padding: 6px 14px; font-size: 0.82rem; font-weight: 600;
+    z-index: 999; display: flex; align-items: center; gap: 6px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+}
+#xp-counter .xp-icon { font-size: 1rem; }
+#xp-counter .xp-value { color: var(--cp-accent); }
+#theme-toggle {
+    position: fixed; top: 12px; left: 16px;
+    background: var(--cp-panel-strong); border: 1px solid var(--cp-border);
+    border-radius: 0.625rem; padding: 6px 12px; font-size: 1rem;
+    cursor: pointer; z-index: 999; color: var(--cp-text);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+}
+
+.container { max-width: 780px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+/* Hero */
+.hero { text-align: center; padding: 5rem 1rem 3rem; }
+.hero-badge {
+    display: inline-block; background: var(--cp-accent-soft); color: var(--cp-accent);
+    font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 4px 12px; border-radius: 0.625rem; margin-bottom: 1rem;
+}
+.hero h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); font-weight: 700; line-height: 1.2; margin-bottom: 1rem; }
+.hero h1 .accent { color: var(--cp-accent); }
+.hero .subtitle { font-size: 1.1rem; color: var(--cp-text-muted); max-width: 620px; margin: 0 auto 2rem; }
+.hero .cta-hint { font-size: 0.85rem; color: var(--cp-text-soft); animation: bounce 2s infinite; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
+
+/* Sections */
+.section { margin: 3rem 0; opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.section.visible { opacity: 1; transform: translateY(0); }
+.section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.2rem; }
+.section-number {
+    background: var(--cp-accent); color: var(--cp-accent-fg);
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700; flex-shrink: 0;
+}
+.section-title { font-size: 1.35rem; font-weight: 700; }
+
+/* Cards */
+.card {
+    background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px;
+    padding: 1.5rem; margin-bottom: 1.2rem;
+    box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card:hover { border-color: var(--cp-accent); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+
+/* Primitive Hex Grid */
+.hex-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 1.5rem 0;
+}
+.hex-card {
+    background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px;
+    padding: 1.2rem 1rem; text-align: center;
+    cursor: pointer; transition: all 0.3s; position: relative;
+}
+.hex-card:hover { transform: translateY(-3px); border-color: var(--cp-accent); }
+.hex-card.explored { border-color: var(--cp-success); }
+.hex-card.explored::after {
+    content: '✓'; position: absolute; top: 8px; right: 10px;
+    font-size: 0.7rem; color: var(--cp-success); font-weight: 700;
+}
+.hex-icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+.hex-title { font-weight: 700; font-size: 0.82rem; }
+.hex-tag { font-size: 0.68rem; color: var(--cp-text-muted); margin-top: 2px; }
+
+/* Primitive Detail Panel */
+.prim-panel {
+    background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px;
+    padding: 0; margin: 1rem 0; overflow: hidden;
+    max-height: 0; transition: max-height 0.5s ease, padding 0.3s ease, border-color 0.3s;
+}
+.prim-panel.open {
+    max-height: 1200px; padding: 1.5rem;
+    border-color: var(--cp-accent);
+}
+.prim-panel h3 { font-size: 1rem; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 8px; }
+.prim-panel p, .prim-panel li { font-size: 0.85rem; color: var(--cp-text-muted); line-height: 1.7; }
+.prim-panel ul { padding-left: 1.2rem; margin: 0.5rem 0; }
+.prim-panel li { margin-bottom: 0.3rem; }
+
+/* Code Block */
+.code-block {
+    background: var(--cp-surface-soft); border: 1px solid var(--cp-border);
+    border-radius: 0.625rem; padding: 1rem; margin: 0.8rem 0;
+    font-family: Consolas, "Courier New", monospace; font-size: 0.78rem;
+    overflow-x: auto; white-space: pre; color: var(--cp-text-muted);
+    line-height: 1.5;
+}
+
+/* Folder tree */
+.folder-tree {
+    background: var(--cp-surface-soft); border: 1px solid var(--cp-border);
+    border-radius: 0.625rem; padding: 1rem 1.2rem; margin: 1rem 0;
+    font-family: Consolas, "Courier New", monospace; font-size: 0.8rem;
+    line-height: 1.8; color: var(--cp-text-muted);
+}
+
+/* Composition Flow */
+.comp-flow {
+    display: flex; flex-direction: column; gap: 0; margin: 1.5rem 0;
+    align-items: center;
+}
+.comp-step {
+    background: var(--cp-surface); border: 1px solid var(--cp-border);
+    border-radius: 0.625rem; padding: 10px 16px; width: 100%; max-width: 520px;
+    display: flex; align-items: center; gap: 10px;
+    transition: border-color 0.3s, background 0.3s;
+    cursor: default;
+}
+.comp-step:hover { border-color: var(--cp-accent); background: var(--cp-accent-soft); }
+.comp-step .step-icon { font-size: 1.1rem; flex-shrink: 0; }
+.comp-step .step-label { font-size: 0.82rem; font-weight: 600; }
+.comp-step .step-prim { font-size: 0.72rem; color: var(--cp-accent); margin-left: auto; font-weight: 600; }
+.comp-arrow { color: var(--cp-text-soft); font-size: 1rem; padding: 2px 0; }
+
+/* Quiz */
+.quiz-box {
+    background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px;
+    padding: 1.5rem; margin: 1.5rem 0;
+}
+.quiz-question { font-weight: 600; margin-bottom: 1rem; font-size: 1rem; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-option {
+    background: var(--cp-surface-soft); border: 1px solid var(--cp-border); border-radius: 0.625rem;
+    padding: 10px 14px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; user-select: none;
+}
+.quiz-option:hover { border-color: var(--cp-accent); background: var(--cp-accent-soft); }
+.quiz-option.correct { border-color: var(--cp-success); background: rgba(22,163,74,0.1); }
+.quiz-option.wrong { border-color: var(--cp-danger); background: rgba(220,38,38,0.1); }
+.quiz-feedback { margin-top: 0.8rem; font-size: 0.85rem; color: var(--cp-text-muted); display: none; }
+.quiz-feedback.show { display: block; }
+
+/* Drag-and-drop match game */
+.match-game { margin: 1.5rem 0; }
+.match-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+    background: var(--cp-surface); border: 1px solid var(--cp-border);
+    border-radius: 0.625rem; padding: 8px 14px;
+}
+.match-label { font-size: 0.85rem; font-weight: 600; min-width: 100px; }
+.match-select {
+    flex: 1; background: var(--cp-surface-soft); border: 1px solid var(--cp-border);
+    border-radius: 0.625rem; padding: 6px 10px; font-size: 0.82rem;
+    color: var(--cp-text); font-family: inherit; cursor: pointer;
+    appearance: auto;
+}
+.match-result { font-size: 0.85rem; min-width: 24px; text-align: center; }
+.match-submit {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--cp-accent); color: var(--cp-accent-fg);
+    border: none; border-radius: 0.625rem; padding: 8px 18px;
+    font-size: 0.85rem; font-weight: 600; cursor: pointer;
+    margin-top: 8px; transition: background 0.2s;
+}
+.match-submit:hover { background: var(--cp-accent-hover); }
+.match-feedback {
+    font-size: 0.85rem; color: var(--cp-text-muted); margin-top: 0.6rem; display: none;
+}
+.match-feedback.show { display: block; }
+
+/* Takeaway */
+.takeaway {
+    background: var(--cp-accent-soft); border: 1px solid var(--cp-accent); border-radius: 16px;
+    padding: 1.5rem; margin: 2rem 0; text-align: center;
+}
+.takeaway h3 { color: var(--cp-accent); font-size: 1rem; margin-bottom: 0.5rem; }
+.takeaway p { font-size: 0.9rem; color: var(--cp-text-muted); }
+
+/* Achievements */
+.achievements { display: flex; flex-wrap: wrap; gap: 8px; margin: 1.5rem 0; justify-content: center; }
+.achievement {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--cp-surface-soft); border: 1px solid var(--cp-border);
+    border-radius: 0.625rem; padding: 6px 12px; font-size: 0.75rem; font-weight: 600;
+    opacity: 0.4; transition: opacity 0.5s, border-color 0.3s, background 0.3s;
+}
+.achievement.unlocked { opacity: 1; border-color: var(--cp-accent); background: var(--cp-accent-soft); }
+.achievement .badge-icon { font-size: 1rem; }
+
+/* Footer nav */
+.footer-nav {
+    text-align: center; padding: 2rem 0 3rem;
+    border-top: 1px solid var(--cp-border); margin-top: 3rem;
+}
+.footer-nav a {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--cp-accent); text-decoration: none; font-weight: 600; font-size: 0.9rem;
+    padding: 10px 20px; border: 1px solid var(--cp-accent); border-radius: 0.625rem;
+    transition: background 0.2s; margin: 0 6px;
+}
+.footer-nav a:hover { background: var(--cp-accent-soft); }
+
+/* Toast */
+.toast {
+    position: fixed; bottom: 20px; left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--cp-panel-strong); border: 1px solid var(--cp-accent);
+    border-radius: 0.625rem; padding: 10px 20px; font-size: 0.82rem; font-weight: 600;
+    z-index: 1000; transition: transform 0.4s ease;
+    backdrop-filter: blur(8px); box-shadow: 0 18px 48px rgba(0,0,0,0.12);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 600px) {
+    .container { padding: 1rem; }
+    .hero { padding: 3rem 0.5rem 2rem; }
+    .hex-grid { grid-template-columns: repeat(2, 1fr); }
+}
+    </style>
+</head>
+<body>
+    <div id="progress-bar"></div>
+    <div id="xp-counter"><span class="xp-icon">⚡</span> <span class="xp-value" id="xp-value">0</span> XP</div>
+    <button id="theme-toggle" onclick="toggleTheme()">🌓</button>
+
+    <div class="container">
+        <!-- HERO -->
+        <section class="hero">
+            <div class="hero-badge">Chapter 3 — Interactive Experience</div>
+            <h1>The Six <span class="accent">Primitives</span> of Agentic Development</h1>
+            <p class="subtitle">From one-off prompts to repeatable engineering — the small, reusable files that encode shared understanding and turn folklore into governance.</p>
+            <p class="cta-hint">↓ Scroll to begin your journey</p>
+        </section>
+
+        <!-- SECTION 1: From Prompts to Engineering -->
+        <section class="section" data-section="1">
+            <div class="section-header">
+                <div class="section-number">1</div>
+                <h2 class="section-title">From One-Off Prompts to Repeatable Engineering</h2>
+            </div>
+            <p style="color: var(--cp-text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                Someone types a prompt and gets a great result. A colleague tries the same prompt — subtly different output. A week later, nobody remembers the exact wording. The output was useful, but the process is <strong>folklore, not engineering</strong>.
+            </p>
+            <div class="card" style="border-left: 4px solid var(--cp-accent);">
+                <p style="font-size: 0.88rem;"><strong>A primitive</strong> is a small, reusable file — typically Markdown or YAML — that tells an agent how to behave, what tools it can touch, what "good" looks like, and when to escalate. Primitives are composable and surface-agnostic.</p>
+            </div>
+
+            <h3 style="font-size: 1rem; margin: 1.2rem 0 0.6rem;">Where They Live in the Repo</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div>
+                    <p style="font-size: 0.78rem; font-weight: 600; margin-bottom: 4px; color: var(--cp-text-muted);">GitHub Copilot</p>
+                    <div class="folder-tree">.github/
+├── copilot-instructions.md
+├── instructions/
+├── prompts/
+├── agents/
+└── …</div>
+                </div>
+                <div>
+                    <p style="font-size: 0.78rem; font-weight: 600; margin-bottom: 4px; color: var(--cp-text-muted);">Claude Code</p>
+                    <div class="folder-tree">.claude/
+├── settings.json
+├── agents/
+└── …
+CLAUDE.md</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: The Six Primitives -->
+        <section class="section" data-section="2">
+            <div class="section-header">
+                <div class="section-number">2</div>
+                <h2 class="section-title">The Six Core Primitives</h2>
+            </div>
+            <p style="color: var(--cp-text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                Click each primitive to explore its anatomy, rules, and role. Collect all six to unlock the <strong>Primitive Collector</strong> achievement!
+            </p>
+
+            <div class="hex-grid">
+                <div class="hex-card" onclick="showPrimitive(0)" id="hex-0">
+                    <div class="hex-icon">📜</div>
+                    <div class="hex-title">Instructions</div>
+                    <div class="hex-tag">Always-on rulebook</div>
+                </div>
+                <div class="hex-card" onclick="showPrimitive(1)" id="hex-1">
+                    <div class="hex-icon">📝</div>
+                    <div class="hex-title">Prompts</div>
+                    <div class="hex-tag">Reusable task templates</div>
+                </div>
+                <div class="hex-card" onclick="showPrimitive(2)" id="hex-2">
+                    <div class="hex-icon">🤖</div>
+                    <div class="hex-title">Agents</div>
+                    <div class="hex-tag">Named collaborators</div>
+                </div>
+                <div class="hex-card" onclick="showPrimitive(3)" id="hex-3">
+                    <div class="hex-icon">📦</div>
+                    <div class="hex-title">Skills</div>
+                    <div class="hex-tag">Packaged domain knowledge</div>
+                </div>
+                <div class="hex-card" onclick="showPrimitive(4)" id="hex-4">
+                    <div class="hex-icon">🪝</div>
+                    <div class="hex-title">Hooks</div>
+                    <div class="hex-tag">Automated guardrails</div>
+                </div>
+                <div class="hex-card" onclick="showPrimitive(5)" id="hex-5">
+                    <div class="hex-icon">🔌</div>
+                    <div class="hex-title">MCP</div>
+                    <div class="hex-tag">Connective tissue</div>
+                </div>
+            </div>
+
+            <div class="prim-panel" id="prim-panel">
+                <div id="prim-content"></div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Match Game -->
+        <section class="section" data-section="3">
+            <div class="section-header">
+                <div class="section-number">3</div>
+                <h2 class="section-title">Primitive Match — Test Your Knowledge</h2>
+            </div>
+            <p style="color: var(--cp-text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                Match each description to the correct primitive type:
+            </p>
+            <div class="match-game" id="match-game">
+                <div class="match-row">
+                    <span class="match-label">"Loaded on every turn, encodes coding standards"</span>
+                    <select class="match-select" data-answer="instructions">
+                        <option value="">Select…</option>
+                        <option value="instructions">Instructions</option>
+                        <option value="prompts">Prompts</option>
+                        <option value="agents">Agents</option>
+                        <option value="skills">Skills</option>
+                        <option value="hooks">Hooks</option>
+                        <option value="mcp">MCP</option>
+                    </select>
+                    <span class="match-result" id="mr-0"></span>
+                </div>
+                <div class="match-row">
+                    <span class="match-label">"A persona with a job and allowed tools"</span>
+                    <select class="match-select" data-answer="agents">
+                        <option value="">Select…</option>
+                        <option value="instructions">Instructions</option>
+                        <option value="prompts">Prompts</option>
+                        <option value="agents">Agents</option>
+                        <option value="skills">Skills</option>
+                        <option value="hooks">Hooks</option>
+                        <option value="mcp">MCP</option>
+                    </select>
+                    <span class="match-result" id="mr-1"></span>
+                </div>
+                <div class="match-row">
+                    <span class="match-label">"Runs a check when a commit or PR happens"</span>
+                    <select class="match-select" data-answer="hooks">
+                        <option value="">Select…</option>
+                        <option value="instructions">Instructions</option>
+                        <option value="prompts">Prompts</option>
+                        <option value="agents">Agents</option>
+                        <option value="skills">Skills</option>
+                        <option value="hooks">Hooks</option>
+                        <option value="mcp">MCP</option>
+                    </select>
+                    <span class="match-result" id="mr-2"></span>
+                </div>
+                <div class="match-row">
+                    <span class="match-label">"Step-by-step how-to for deploying to Azure"</span>
+                    <select class="match-select" data-answer="skills">
+                        <option value="">Select…</option>
+                        <option value="instructions">Instructions</option>
+                        <option value="prompts">Prompts</option>
+                        <option value="agents">Agents</option>
+                        <option value="skills">Skills</option>
+                        <option value="hooks">Hooks</option>
+                        <option value="mcp">MCP</option>
+                    </select>
+                    <span class="match-result" id="mr-3"></span>
+                </div>
+                <div class="match-row">
+                    <span class="match-label">"Open standard for agents to use external tools"</span>
+                    <select class="match-select" data-answer="mcp">
+                        <option value="">Select…</option>
+                        <option value="instructions">Instructions</option>
+                        <option value="prompts">Prompts</option>
+                        <option value="agents">Agents</option>
+                        <option value="skills">Skills</option>
+                        <option value="hooks">Hooks</option>
+                        <option value="mcp">MCP</option>
+                    </select>
+                    <span class="match-result" id="mr-4"></span>
+                </div>
+                <div class="match-row">
+                    <span class="match-label">"Structured template for recurring tasks"</span>
+                    <select class="match-select" data-answer="prompts">
+                        <option value="">Select…</option>
+                        <option value="instructions">Instructions</option>
+                        <option value="prompts">Prompts</option>
+                        <option value="agents">Agents</option>
+                        <option value="skills">Skills</option>
+                        <option value="hooks">Hooks</option>
+                        <option value="mcp">MCP</option>
+                    </select>
+                    <span class="match-result" id="mr-5"></span>
+                </div>
+                <button class="match-submit" onclick="checkMatch()">Check Answers</button>
+                <div class="match-feedback" id="match-feedback"></div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Composition -->
+        <section class="section" data-section="4">
+            <div class="section-header">
+                <div class="section-number">4</div>
+                <h2 class="section-title">Composition — All Six Working Together</h2>
+            </div>
+            <p style="color: var(--cp-text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                A developer types: <strong>"Implement secure user authentication."</strong> Watch how all six primitives activate in seconds:
+            </p>
+
+            <div class="comp-flow" id="comp-flow">
+                <div class="comp-step" id="cs-0">
+                    <span class="step-icon">📜</span>
+                    <span class="step-label">Global rules + OWASP scoped guidance load</span>
+                    <span class="step-prim">Instructions</span>
+                </div>
+                <div class="comp-arrow">↓</div>
+                <div class="comp-step" id="cs-1">
+                    <span class="step-icon">📝</span>
+                    <span class="step-label">implement-from-spec template structures the work</span>
+                    <span class="step-prim">Prompt</span>
+                </div>
+                <div class="comp-arrow">↓</div>
+                <div class="comp-step" id="cs-2">
+                    <span class="step-icon">🤖</span>
+                    <span class="step-label">backend-dev agent takes the task (limited tools)</span>
+                    <span class="step-prim">Agent</span>
+                </div>
+                <div class="comp-arrow">↓</div>
+                <div class="comp-step" id="cs-3">
+                    <span class="step-icon">📦</span>
+                    <span class="step-label">oauth-pkce skill provides procedural guidance</span>
+                    <span class="step-prim">Skill</span>
+                </div>
+                <div class="comp-arrow">↓</div>
+                <div class="comp-step" id="cs-4">
+                    <span class="step-icon">🪝</span>
+                    <span class="step-label">Secrets scanner, SAST, dependency check run on save</span>
+                    <span class="step-prim">Hooks</span>
+                </div>
+                <div class="comp-arrow">↓</div>
+                <div class="comp-step" id="cs-5">
+                    <span class="step-icon">🔌</span>
+                    <span class="step-label">Issue tracker (read) + staging deploy (gated) connect</span>
+                    <span class="step-prim">MCP</span>
+                </div>
+            </div>
+            <div class="card" style="text-align: center; border-color: var(--cp-accent);">
+                <p style="font-size: 0.9rem;"><strong>One sentence typed → six layers of governance activated.</strong></p>
+            </div>
+        </section>
+
+        <!-- SECTION 5: Best Practices Quiz -->
+        <section class="section" data-section="5">
+            <div class="section-header">
+                <div class="section-number">5</div>
+                <h2 class="section-title">Best Practices Check</h2>
+            </div>
+
+            <div class="quiz-box" id="quiz1">
+                <div class="quiz-question">🧠 How many non-negotiables should a global instructions file contain?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this,'quiz1')">As many as possible — be thorough</div>
+                    <div class="quiz-option" data-correct="true" onclick="answerQuiz(this,'quiz1')">10 to 15 — keep it short and focused</div>
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this,'quiz1')">Only 1 or 2 — less is more</div>
+                </div>
+                <div class="quiz-feedback" id="quiz1-feedback"></div>
+            </div>
+
+            <div class="quiz-box" id="quiz2">
+                <div class="quiz-question">🧠 What's the first rule for a new MCP connector?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this,'quiz2')">Give it full read-write access immediately</div>
+                    <div class="quiz-option" data-correct="true" onclick="answerQuiz(this,'quiz2')">Start read-only — promote to write after a successful period</div>
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this,'quiz2')">Deploy it only on weekends</div>
+                </div>
+                <div class="quiz-feedback" id="quiz2-feedback"></div>
+            </div>
+
+            <div class="quiz-box" id="quiz3">
+                <div class="quiz-question">🧠 What's the difference between a Prompt and a Skill?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this,'quiz3')">Skills are faster; Prompts are more accurate</div>
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this,'quiz3')">They are identical — just different naming</div>
+                    <div class="quiz-option" data-correct="true" onclick="answerQuiz(this,'quiz3')">Prompts structure what to produce; Skills describe how to do something hard</div>
+                </div>
+                <div class="quiz-feedback" id="quiz3-feedback"></div>
+            </div>
+        </section>
+
+        <!-- TAKEAWAY -->
+        <section class="section" data-section="6">
+            <div class="takeaway">
+                <h3>💡 Chapter Takeaway</h3>
+                <p>Primitives turn one-off prompting into <strong>repeatable engineering</strong>. Instructions set the rules, Prompts structure the tasks, Agents define who does the work, Skills package the how-to, Hooks enforce guardrails, and MCP connects to the world. They create the most value when composed together — a single request can activate multiple layers of guidance, automation, and control.</p>
+            </div>
+
+            <h3 style="text-align: center; font-size: 1rem; margin-bottom: 1rem;">🏆 Achievements</h3>
+            <div class="achievements">
+                <div class="achievement" id="ach-scroll"><span class="badge-icon">📜</span> Explorer</div>
+                <div class="achievement" id="ach-prims"><span class="badge-icon">🧩</span> Primitive Collector</div>
+                <div class="achievement" id="ach-match"><span class="badge-icon">🎯</span> Perfect Match</div>
+                <div class="achievement" id="ach-quiz"><span class="badge-icon">🧠</span> Knowledge Check</div>
+                <div class="achievement" id="ach-all"><span class="badge-icon">🏅</span> Chapter Master</div>
+            </div>
+        </section>
+
+        <div class="footer-nav">
+            <a href="../chapter2/chapter2-landing.html">← Chapter 2</a>
+            <a href="../chapter1/index.html">HVE Maturity Assessment →</a>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+    // ========== STATE ==========
+    let xp = 0;
+    let primsExplored = new Set();
+    let quizAnswered = { quiz1: false, quiz2: false, quiz3: false };
+    let quizCorrect = { quiz1: false, quiz2: false, quiz3: false };
+    let matchChecked = false;
+    let sectionsVisible = new Set();
+
+    // ========== PRIMITIVE DATA ==========
+    const PRIMS = [
+        {
+            title: '📜 Instructions — The Always-On Rulebook',
+            body: `<p>Instructions are the <strong>gravity</strong> of your repository. Loaded automatically on every interaction, they shape every output silently.</p>
+<ul>
+<li><strong>Global:</strong> <code>.github/copilot-instructions.md</code> or <code>CLAUDE.md</code></li>
+<li><strong>Scoped:</strong> <code>.github/instructions/</code> with <code>applyTo</code> globs</li>
+</ul>
+<p><strong>Key rules:</strong></p>
+<ul>
+<li>Keep it to 10–15 non-negotiables</li>
+<li>Prefer scoped files over conditional language</li>
+<li>Review monthly — instructions rot quickly</li>
+<li>Never put secrets in instructions</li>
+</ul>`
+        },
+        {
+            title: '📝 Prompts — Reusable Task Templates',
+            body: `<p>Prompts are templates for recurring work. They force <strong>structured output</strong> — a spec with named sections, a PR review with a checklist, a test plan with coverage targets.</p>
+<ul>
+<li><strong>Location:</strong> <code>.github/prompts/&lt;name&gt;.prompt.md</code></li>
+<li><strong>Anatomy:</strong> YAML frontmatter (description, argument hints) + Markdown body</li>
+</ul>
+<p><strong>Key rules:</strong></p>
+<ul>
+<li>Prefer fixed outlines over open-ended instructions</li>
+<li>Use context-injection links, not pasted content</li>
+<li>Name by intent: <code>customer-input-to-spec</code>, not <code>gpt4-spec-generator</code></li>
+</ul>`
+        },
+        {
+            title: '🤖 Agents — Named Collaborators with Scope',
+            body: `<p>An agent is a <strong>persona with a job</strong>, a set of allowed tools, and explicit boundaries. Where a prompt is a recipe, an agent is the cook.</p>
+<ul>
+<li><strong>Location:</strong> <code>.github/agents/&lt;name&gt;.agent.md</code></li>
+<li><strong>Anatomy:</strong> Description (trigger), tools list, system prompt with persona + procedure</li>
+</ul>
+<p><strong>Key rules:</strong></p>
+<ul>
+<li>Keep the brief on one page — if it spans three, split it</li>
+<li>Least privilege — only the tools the agent needs</li>
+<li>Make escalation rules explicit</li>
+<li>Start with 3–5 agents: spec-writer, test-author, security-reviewer…</li>
+</ul>`
+        },
+        {
+            title: '📦 Skills — Packaged Domain Knowledge',
+            body: `<p>Skills are the deep <strong>how-to manuals</strong>. An agent says <em>who</em>; a prompt says <em>what</em>; a skill says <strong>how</strong> to do something hard.</p>
+<ul>
+<li><strong>Location:</strong> <code>.github/skills/&lt;name&gt;/SKILL.md</code> + supporting files</li>
+<li><strong>Anatomy:</strong> Procedural guide with steps, templates, pitfalls, and recovery scripts</li>
+</ul>
+<p><strong>Key rules:</strong></p>
+<ul>
+<li>3–5 high-leverage skills beat 50 thin ones</li>
+<li>Include failure modes — often the most valuable section</li>
+<li>Skills = recipes; Instructions = rules</li>
+</ul>`
+        },
+        {
+            title: '🪝 Hooks — Automated Guardrails',
+            body: `<p>Hooks are where governance becomes <strong>executable</strong>. A trigger tied to a commit, PR, save, or deploy that runs a check automatically.</p>
+<ul>
+<li><strong>Location:</strong> <code>.github/hooks/&lt;name&gt;.json</code> or <code>.claude/settings.json</code></li>
+<li><strong>Anatomy:</strong> Event (when) + Action (shell command, script, or agent run)</li>
+</ul>
+<p><strong>Key rules:</strong></p>
+<ul>
+<li>Start with 3: secrets scanner, test runner, policy check</li>
+<li>Hooks must be fast — 30 seconds = disabled by the team</li>
+<li>Make failure messages actionable, not just "Blocked"</li>
+</ul>`
+        },
+        {
+            title: '🔌 MCP — The Connective Tissue',
+            body: `<p>The Model Context Protocol lets agents talk to the outside world through a <strong>standard interface</strong>. Without MCP, every agent invents its own integration.</p>
+<ul>
+<li><strong>Declaration:</strong> <code>.mcp.json</code> or runtime config files</li>
+<li><strong>Governance:</strong> Agents declare which MCP tools they may call in frontmatter</li>
+</ul>
+<p><strong>Key rules:</strong></p>
+<ul>
+<li>Treat every MCP server as a production dependency</li>
+<li>Start read-only — promote to write after success</li>
+<li>Log everything — MCP calls are your audit trail</li>
+<li>Pin versions — "latest" is for hackathons, not enterprise</li>
+</ul>`
+        }
+    ];
+
+    // ========== CORE FUNCTIONS ==========
+    function addXP(amount, reason) {
+        xp += amount;
+        document.getElementById('xp-value').textContent = xp;
+        showToast(`+${amount} XP — ${reason}`);
+        checkAchievements();
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme');
+        document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    }
+
+    function updateProgress() {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        document.getElementById('progress-bar').style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
+    }
+
+    function revealSections() {
+        document.querySelectorAll('.section').forEach(s => {
+            if (s.getBoundingClientRect().top < window.innerHeight * 0.85) {
+                s.classList.add('visible');
+                const num = s.dataset.section;
+                if (!sectionsVisible.has(num)) {
+                    sectionsVisible.add(num);
+                    if (sectionsVisible.size === 6) {
+                        addXP(20, 'Explored all sections!');
+                        document.getElementById('ach-scroll').classList.add('unlocked');
+                    }
+                }
+            }
+        });
+    }
+
+    // ========== PRIMITIVES EXPLORER ==========
+    function showPrimitive(idx) {
+        const panel = document.getElementById('prim-panel');
+        const content = document.getElementById('prim-content');
+        const hex = document.getElementById('hex-' + idx);
+
+        // Toggle if same is clicked
+        if (panel.dataset.current === String(idx) && panel.classList.contains('open')) {
+            panel.classList.remove('open');
+            panel.dataset.current = '';
+            return;
+        }
+
+        content.innerHTML = `<h3>${PRIMS[idx].title}</h3>${PRIMS[idx].body}`;
+        panel.dataset.current = String(idx);
+        panel.classList.add('open');
+
+        if (!primsExplored.has(idx)) {
+            primsExplored.add(idx);
+            hex.classList.add('explored');
+            if (primsExplored.size === 1) addXP(5, 'First primitive explored');
+            if (primsExplored.size === 6) {
+                addXP(20, 'All six primitives collected!');
+                document.getElementById('ach-prims').classList.add('unlocked');
+            }
+        }
+    }
+
+    // ========== MATCH GAME ==========
+    function checkMatch() {
+        if (matchChecked) return;
+        const selects = document.querySelectorAll('.match-select');
+        let correct = 0;
+        selects.forEach((sel, i) => {
+            const result = document.getElementById('mr-' + i);
+            if (sel.value === sel.dataset.answer) {
+                result.textContent = '✅';
+                correct++;
+            } else {
+                result.textContent = '❌';
+            }
+        });
+        matchChecked = true;
+        const fb = document.getElementById('match-feedback');
+        if (correct === 6) {
+            fb.textContent = `🎉 Perfect! 6/6 correct!`;
+            addXP(25, 'Perfect match!');
+            document.getElementById('ach-match').classList.add('unlocked');
+        } else {
+            fb.textContent = `${correct}/6 correct. Nice try!`;
+            addXP(5 + correct * 2, `${correct}/6 matched`);
+        }
+        fb.classList.add('show');
+    }
+
+    // ========== QUIZ ==========
+    function answerQuiz(el, quizId) {
+        if (quizAnswered[quizId]) return;
+        quizAnswered[quizId] = true;
+        const isCorrect = el.dataset.correct === 'true';
+        const feedback = document.getElementById(quizId + '-feedback');
+        if (isCorrect) {
+            el.classList.add('correct');
+            quizCorrect[quizId] = true;
+            feedback.textContent = '✅ Correct!';
+            addXP(15, 'Correct answer!');
+        } else {
+            el.classList.add('wrong');
+            feedback.textContent = '❌ Not quite. The correct answer is highlighted.';
+            el.parentElement.querySelectorAll('.quiz-option').forEach(o => {
+                if (o.dataset.correct === 'true') o.classList.add('correct');
+            });
+            addXP(5, 'Quiz attempted');
+        }
+        feedback.classList.add('show');
+        if (Object.values(quizCorrect).every(v => v)) {
+            document.getElementById('ach-quiz').classList.add('unlocked');
+        }
+    }
+
+    // ========== ACHIEVEMENTS ==========
+    function checkAchievements() {
+        const ids = ['ach-scroll', 'ach-prims', 'ach-match', 'ach-quiz'];
+        if (ids.every(id => document.getElementById(id).classList.contains('unlocked'))) {
+            document.getElementById('ach-all').classList.add('unlocked');
+            showToast('🏅 Chapter Master unlocked! You mastered Chapter 3!');
+        }
+    }
+
+    // ========== EVENTS ==========
+    window.addEventListener('scroll', () => { updateProgress(); revealSections(); });
+    window.addEventListener('load', () => { revealSections(); updateProgress(); });
+    </script>
+</body>
+</html>

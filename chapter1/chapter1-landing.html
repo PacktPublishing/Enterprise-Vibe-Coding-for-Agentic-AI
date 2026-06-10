@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 1 — From Vibe Coding to Steered Agentic Development</title>
+    <script>
+      (() => {
+        const param = new URLSearchParams(window.location.search).get("clawpilotTheme");
+        const theme =
+          param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
+    <style>
+:root {
+  color-scheme: light;
+  --cp-bg: #f7f4ef;
+  --cp-bg-elevated: #fcfbf8;
+  --cp-surface: #ffffff;
+  --cp-surface-soft: #f5f5f5;
+  --cp-border: #dedede;
+  --cp-border-strong: #919191;
+  --cp-text: #242424;
+  --cp-text-muted: #5c5c5c;
+  --cp-text-soft: #6f6f6f;
+  --cp-accent: #b11f4b;
+  --cp-accent-hover: #9a1a41;
+  --cp-accent-soft: rgba(177, 31, 75, 0.08);
+  --cp-accent-fg: #ffffff;
+  --cp-success: #16a34a;
+  --cp-danger: #dc2626;
+  --cp-warning: #f59e0b;
+  --cp-link: #0078d4;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+  --cp-overlay: rgba(255, 255, 255, 0.8);
+  --cp-panel: rgba(255, 255, 255, 0.86);
+  --cp-panel-strong: rgba(255, 255, 255, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.55);
+  --cp-highlight: rgba(177, 31, 75, 0.12);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --cp-bg: #3d3b3a;
+  --cp-bg-elevated: #343231;
+  --cp-surface: #292929;
+  --cp-surface-soft: #2e2e2e;
+  --cp-border: #474747;
+  --cp-border-strong: #5f5f5f;
+  --cp-text: #dedede;
+  --cp-text-muted: #919191;
+  --cp-text-soft: #b0b0b0;
+  --cp-accent: #fd8ea1;
+  --cp-accent-hover: #fb7b91;
+  --cp-accent-soft: rgba(253, 142, 161, 0.14);
+  --cp-accent-fg: #1a1a1a;
+  --cp-success: #4ade80;
+  --cp-danger: #f87171;
+  --cp-warning: #fbbf24;
+  --cp-link: #4da6ff;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+  --cp-overlay: rgba(41, 41, 41, 0.88);
+  --cp-panel: rgba(41, 41, 41, 0.72);
+  --cp-panel-strong: rgba(41, 41, 41, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.04);
+  --cp-highlight: rgba(253, 142, 161, 0.12);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cp-bg);
+    color: var(--cp-text);
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Progress bar */
+#progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background: var(--cp-accent);
+    z-index: 1000;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+/* XP Counter */
+#xp-counter {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    background: var(--cp-panel-strong);
+    border: 1px solid var(--cp-border);
+    border-radius: 0.625rem;
+    padding: 6px 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+}
+#xp-counter .xp-icon { font-size: 1rem; }
+#xp-counter .xp-value { color: var(--cp-accent); }
+
+/* Theme toggle */
+#theme-toggle {
+    position: fixed;
+    top: 12px;
+    left: 16px;
+    background: var(--cp-panel-strong);
+    border: 1px solid var(--cp-border);
+    border-radius: 0.625rem;
+    padding: 6px 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    z-index: 999;
+    color: var(--cp-text);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+}
+
+/* Container */
+.container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* Hero */
+.hero {
+    text-align: center;
+    padding: 5rem 1rem 3rem;
+    position: relative;
+}
+.hero-badge {
+    display: inline-block;
+    background: var(--cp-accent-soft);
+    color: var(--cp-accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 4px 12px;
+    border-radius: 0.625rem;
+    margin-bottom: 1rem;
+}
+.hero h1 {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+}
+.hero h1 .accent { color: var(--cp-accent); }
+.hero .subtitle {
+    font-size: 1.1rem;
+    color: var(--cp-text-muted);
+    max-width: 600px;
+    margin: 0 auto 2rem;
+}
+.hero .cta-hint {
+    font-size: 0.85rem;
+    color: var(--cp-text-soft);
+    animation: bounce 2s infinite;
+}
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+}
+
+/* Sections */
+.section {
+    margin: 3rem 0;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.section.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.2rem;
+}
+.section-number {
+    background: var(--cp-accent);
+    color: var(--cp-accent-fg);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.section-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
+/* Cards */
+.card {
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card:hover {
+    border-color: var(--cp-accent);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+.stat-card {
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-border);
+    border-radius: 0.625rem;
+    padding: 1.2rem;
+    text-align: center;
+    transition: transform 0.2s, border-color 0.2s;
+    cursor: default;
+}
+.stat-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--cp-accent);
+}
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--cp-accent);
+    display: block;
+}
+.stat-label {
+    font-size: 0.78rem;
+    color: var(--cp-text-muted);
+    margin-top: 4px;
+}
+
+/* Timeline */
+.timeline {
+    position: relative;
+    padding-left: 28px;
+    margin: 1.5rem 0;
+}
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--cp-border);
+}
+.timeline-item {
+    position: relative;
+    margin-bottom: 1.2rem;
+    padding-left: 16px;
+}
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 8px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--cp-accent);
+    border: 2px solid var(--cp-bg);
+}
+.timeline-era {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--cp-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.timeline-desc {
+    font-size: 0.9rem;
+    color: var(--cp-text-muted);
+}
+
+/* Interactive Quiz */
+.quiz-box {
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+.quiz-question {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+.quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.quiz-option {
+    background: var(--cp-surface-soft);
+    border: 1px solid var(--cp-border);
+    border-radius: 0.625rem;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    user-select: none;
+}
+.quiz-option:hover {
+    border-color: var(--cp-accent);
+    background: var(--cp-accent-soft);
+}
+.quiz-option.correct {
+    border-color: var(--cp-success);
+    background: rgba(22, 163, 74, 0.1);
+}
+.quiz-option.wrong {
+    border-color: var(--cp-danger);
+    background: rgba(220, 38, 38, 0.1);
+}
+.quiz-feedback {
+    margin-top: 0.8rem;
+    font-size: 0.85rem;
+    color: var(--cp-text-muted);
+    display: none;
+}
+.quiz-feedback.show { display: block; }
+
+/* Collapse Pattern */
+.collapse-stages {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 1rem 0;
+}
+.collapse-stage {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--cp-surface-soft);
+    border: 1px solid var(--cp-border);
+    border-radius: 0.625rem;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+.collapse-stage::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--cp-accent);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.collapse-stage.active::before { opacity: 1; }
+.collapse-stage.active {
+    background: var(--cp-accent-soft);
+    border-color: var(--cp-accent);
+}
+.collapse-stage .stage-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--cp-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: background 0.3s, color 0.3s;
+}
+.collapse-stage.active .stage-num {
+    background: var(--cp-accent);
+    color: var(--cp-accent-fg);
+}
+.collapse-stage .stage-title { font-size: 0.85rem; font-weight: 600; }
+.collapse-detail {
+    font-size: 0.82rem;
+    color: var(--cp-text-muted);
+    padding: 0 0 0 48px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s, padding 0.3s;
+}
+.collapse-detail.open {
+    max-height: 200px;
+    padding: 8px 0 8px 48px;
+}
+
+/* Three Questions */
+.three-questions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+.question-card {
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-border);
+    border-radius: 0.625rem;
+    padding: 1.2rem;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.question-card:hover { border-color: var(--cp-accent); }
+.question-card.checked {
+    border-color: var(--cp-success);
+    background: rgba(22, 163, 74, 0.05);
+}
+.question-card .q-icon {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--cp-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    transition: all 0.3s;
+}
+.question-card.checked .q-icon {
+    border-color: var(--cp-success);
+    background: var(--cp-success);
+    color: white;
+}
+.question-card .q-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    padding-right: 30px;
+}
+.question-card .q-desc {
+    font-size: 0.82rem;
+    color: var(--cp-text-muted);
+}
+
+/* HVE Pillars */
+.pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+.pillar-card {
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-border);
+    border-radius: 16px;
+    padding: 1.5rem 1.2rem;
+    text-align: center;
+    transition: transform 0.2s, border-color 0.2s;
+}
+.pillar-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--cp-accent);
+}
+.pillar-icon {
+    font-size: 2rem;
+    margin-bottom: 0.6rem;
+}
+.pillar-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+}
+.pillar-desc {
+    font-size: 0.8rem;
+    color: var(--cp-text-muted);
+}
+
+/* Maturity Levels */
+.maturity-ladder {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 1.5rem 0;
+}
+.maturity-rung {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    border-radius: 0.625rem;
+    overflow: hidden;
+    border: 1px solid var(--cp-border);
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s;
+}
+.maturity-rung:hover {
+    border-color: var(--cp-accent);
+    transform: translateX(4px);
+}
+.maturity-rung .level-bar {
+    width: 6px;
+    flex-shrink: 0;
+}
+.maturity-rung .level-content {
+    padding: 10px 14px;
+    flex: 1;
+    background: var(--cp-surface);
+}
+.maturity-rung .level-label {
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+.maturity-rung .level-desc {
+    font-size: 0.78rem;
+    color: var(--cp-text-muted);
+    margin-top: 2px;
+}
+.level-1 .level-bar { background: var(--cp-danger); }
+.level-2 .level-bar { background: var(--cp-warning); }
+.level-3 .level-bar { background: #f97316; }
+.level-4 .level-bar { background: var(--cp-link); }
+.level-5 .level-bar { background: var(--cp-success); }
+
+/* Achievements */
+.achievements {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 1.5rem 0;
+    justify-content: center;
+}
+.achievement {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--cp-surface-soft);
+    border: 1px solid var(--cp-border);
+    border-radius: 0.625rem;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0.4;
+    transition: opacity 0.5s, border-color 0.3s, background 0.3s;
+}
+.achievement.unlocked {
+    opacity: 1;
+    border-color: var(--cp-accent);
+    background: var(--cp-accent-soft);
+}
+.achievement .badge-icon { font-size: 1rem; }
+
+/* Key Takeaway */
+.takeaway {
+    background: var(--cp-accent-soft);
+    border: 1px solid var(--cp-accent);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    text-align: center;
+}
+.takeaway h3 {
+    color: var(--cp-accent);
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+.takeaway p {
+    font-size: 0.9rem;
+    color: var(--cp-text-muted);
+}
+
+/* Footer nav */
+.footer-nav {
+    text-align: center;
+    padding: 2rem 0 3rem;
+    border-top: 1px solid var(--cp-border);
+    margin-top: 3rem;
+}
+.footer-nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--cp-accent);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 10px 20px;
+    border: 1px solid var(--cp-accent);
+    border-radius: 0.625rem;
+    transition: background 0.2s;
+}
+.footer-nav a:hover {
+    background: var(--cp-accent-soft);
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--cp-panel-strong);
+    border: 1px solid var(--cp-accent);
+    border-radius: 0.625rem;
+    padding: 10px 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    z-index: 1000;
+    transition: transform 0.4s ease;
+    backdrop-filter: blur(8px);
+    box-shadow: var(--cp-shadow);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* Responsive */
+@media (max-width: 600px) {
+    .container { padding: 1rem; }
+    .hero { padding: 3rem 0.5rem 2rem; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .pillars-grid { grid-template-columns: 1fr; }
+}
+    </style>
+</head>
+<body>
+    <div id="progress-bar"></div>
+    <div id="xp-counter"><span class="xp-icon">⚡</span> <span class="xp-value" id="xp-value">0</span> XP</div>
+    <button id="theme-toggle" onclick="toggleTheme()">🌓</button>
+
+    <div class="container">
+        <!-- HERO -->
+        <section class="hero">
+            <div class="hero-badge">Chapter 1 — Interactive Experience</div>
+            <h1>From <span class="accent">Vibe Coding</span> to Steered Agentic Development</h1>
+            <p class="subtitle">Explore how AI has rewritten the rules of software engineering — and why speed without structure creates debt, not value.</p>
+            <p class="cta-hint">↓ Scroll to begin your journey</p>
+        </section>
+
+        <!-- SECTION 1: New Economics -->
+        <section class="section" data-section="1">
+            <div class="section-header">
+                <div class="section-number">1</div>
+                <h2 class="section-title">The New Economics of Software</h2>
+            </div>
+            <p style="color: var(--cp-text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                Software has reinvented itself every decade. Each era changed what "scale" means — from headcount to AI-powered execution loops.
+            </p>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-era">1960s — Mainframes</div>
+                    <div class="timeline-desc">Small teams, proprietary hardware, tightly coupled systems</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-era">1980s — PCs</div>
+                    <div class="timeline-desc">Packaged products, scale through distribution</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-era">2000s — Cloud & SaaS</div>
+                    <div class="timeline-desc">Elastic infra, continuous deployment, subscription economics</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-era">2020s — Agile & DevOps</div>
+                    <div class="timeline-desc">Velocity as competitive advantage, CI/CD everywhere</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-era">2025+ — Agentic Development</div>
+                    <div class="timeline-desc">Scale through orchestration, not headcount. AI performs research, coding, testing, and operations.</div>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-value">55%</span>
+                    <span class="stat-label">Faster task completion (GitHub + Accenture trial)</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">84%</span>
+                    <span class="stat-label">More successful builds</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">9.6→2.4d</span>
+                    <span class="stat-label">PR lead time reduction</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">+47%</span>
+                    <span class="stat-label">Daily PR volume with AI</span>
+                </div>
+            </div>
+            <div class="card" style="border-left: 4px solid var(--cp-warning);">
+                <p style="font-size: 0.88rem;"><strong>⚠️ The catch:</strong> Review time ballooned 91%. AI-written code surfaces 1.7× more issues per change. 69% of orgs found vulnerabilities from AI-generated code.</p>
+                <p style="font-size: 0.82rem; color: var(--cp-text-muted); margin-top: 0.5rem;"><em>Software generation is cheap. Judgement is not.</em></p>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Vibe Coding -->
+        <section class="section" data-section="2">
+            <div class="section-header">
+                <div class="section-number">2</div>
+                <h2 class="section-title">What Is "Vibe Coding"?</h2>
+            </div>
+            <div class="card">
+                <blockquote style="border-left: 3px solid var(--cp-accent); padding-left: 1rem; font-style: italic; color: var(--cp-text-muted);">
+                    "You fully give in to the vibes, embrace exponentials, and forget that the code even exists."
+                </blockquote>
+                <p style="font-size: 0.82rem; color: var(--cp-text-soft); margin-top: 0.5rem;">— Andrej Karpathy, February 2025</p>
+            </div>
+            <p style="color: var(--cp-text-muted); font-size: 0.9rem; margin: 1rem 0;">
+                Vibe coding closed the loop between prompt and product. Tools like Replit Agent, Lovable, Bolt.new, and Vercel v0 collapsed <strong>prompt → scaffold → run → deploy</strong> into a single conversation.
+            </p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-value">4.5M+</span>
+                    <span class="stat-label">Views on Karpathy's original post</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">$1.8B</span>
+                    <span class="stat-label">Lovable valuation in under a year</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">85%</span>
+                    <span class="stat-label">Devs using AI tools weekly by 2026</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">95%</span>
+                    <span class="stat-label">AI-generated code in 25% of YC W25 batch</span>
+                </div>
+            </div>
+            <div class="quiz-box" id="quiz1">
+                <div class="quiz-question">🧠 Quick Check: What made vibe coding different from earlier AI coding tools?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this, 'quiz1')">It used more powerful language models</div>
+                    <div class="quiz-option" data-correct="true" onclick="answerQuiz(this, 'quiz1')">It collapsed the full prompt→deploy loop into a single conversation</div>
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this, 'quiz1')">It required developers to be more skilled</div>
+                </div>
+                <div class="quiz-feedback" id="quiz1-feedback"></div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Why it breaks -->
+        <section class="section" data-section="3">
+            <div class="section-header">
+                <div class="section-number">3</div>
+                <h2 class="section-title">Why Vibe Coding Breaks at Scale</h2>
+            </div>
+            <p style="color: var(--cp-text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                The same speed that makes prototyping magical creates compounding risk in enterprise systems. Click each stage to see the pattern:
+            </p>
+            <div class="collapse-stages" id="collapse-pattern">
+                <div class="collapse-stage" onclick="toggleStage(0)">
+                    <span class="stage-num">1</span>
+                    <span class="stage-title">🚀 Velocity Spike</span>
+                </div>
+                <div class="collapse-detail" id="stage-detail-0">Features appear in minutes. Delivery metrics soar. Everyone feels incredible.</div>
+
+                <div class="collapse-stage" onclick="toggleStage(1)">
+                    <span class="stage-num">2</span>
+                    <span class="stage-title">🔀 Consistency Erosion</span>
+                </div>
+                <div class="collapse-detail" id="stage-detail-1">Different prompts, different sessions → naming drifts, patterns diverge, duplication spreads.</div>
+
+                <div class="collapse-stage" onclick="toggleStage(2)">
+                    <span class="stage-num">3</span>
+                    <span class="stage-title">😰 Review Fatigue</span>
+                </div>
+                <div class="collapse-detail" id="stage-detail-2">PRs become too large and too frequent for reviewers to properly validate.</div>
+
+                <div class="collapse-stage" onclick="toggleStage(3)">
+                    <span class="stage-num">4</span>
+                    <span class="stage-title">🔥 Incident Acceleration</span>
+                </div>
+                <div class="collapse-detail" id="stage-detail-3">Bugs, vulnerabilities, and architectural inconsistencies increasingly reach production.</div>
+
+                <div class="collapse-stage" onclick="toggleStage(4)">
+                    <span class="stage-num">5</span>
+                    <span class="stage-title">🐢 Velocity Collapse</span>
+                </div>
+                <div class="collapse-detail" id="stage-detail-4">The codebase becomes untrusted. Every change requires rework, debugging, and stabilisation. Speed is gone.</div>
+            </div>
+
+            <div class="quiz-box" id="quiz2">
+                <div class="quiz-question">🧠 Which of these is NOT a typical enterprise risk from vibe coding?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this, 'quiz2')">Ownership gaps — nobody understands the code</div>
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this, 'quiz2')">Security vulnerabilities from unchecked AI output</div>
+                    <div class="quiz-option" data-correct="true" onclick="answerQuiz(this, 'quiz2')">Slower initial prototyping speed</div>
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this, 'quiz2')">Invisible assumptions baked into generated code</div>
+                </div>
+                <div class="quiz-feedback" id="quiz2-feedback"></div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: From Vibe to Steered -->
+        <section class="section" data-section="4">
+            <div class="section-header">
+                <div class="section-number">4</div>
+                <h2 class="section-title">From Vibe to "Steered"</h2>
+            </div>
+            <p style="color: var(--cp-text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                The relationship with AI evolved: <strong>Tools → Assistants → Coworkers</strong>. Steered development puts accountability back without losing speed. It comes down to three shifts:
+            </p>
+            <div class="pillars-grid">
+                <div class="pillar-card">
+                    <div class="pillar-icon">🎯</div>
+                    <div class="pillar-title">Delegation</div>
+                    <div class="pillar-desc">Bounded tasks with explicit inputs, tools, allowed actions, and definition of done</div>
+                </div>
+                <div class="pillar-card">
+                    <div class="pillar-icon">👤</div>
+                    <div class="pillar-title">Accountability</div>
+                    <div class="pillar-desc">A named human owns each decision and signs off on each merge</div>
+                </div>
+                <div class="pillar-card">
+                    <div class="pillar-icon">📋</div>
+                    <div class="pillar-title">Evidence</div>
+                    <div class="pillar-desc">Every change arrives with specs, tests, scans, and recorded rationale</div>
+                </div>
+            </div>
+
+            <h3 style="font-size: 1rem; margin: 1.5rem 0 0.8rem;">The "Steered or Vibed?" Field Test</h3>
+            <p style="color: var(--cp-text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Click each question to check it off. If you can't answer all three for a given change — you're still vibe coding.</p>
+            <div class="three-questions">
+                <div class="question-card" onclick="toggleQuestion(this)">
+                    <div class="q-icon"></div>
+                    <div class="q-title">Who decided this?</div>
+                    <div class="q-desc">A named human with the authority to accept the risk.</div>
+                </div>
+                <div class="question-card" onclick="toggleQuestion(this)">
+                    <div class="q-icon"></div>
+                    <div class="q-title">What were the constraints?</div>
+                    <div class="q-desc">Coding standards, architectural boundaries, security policies — explicit, not tribal.</div>
+                </div>
+                <div class="question-card" onclick="toggleQuestion(this)">
+                    <div class="q-icon"></div>
+                    <div class="q-title">What evidence proves it works?</div>
+                    <div class="q-desc">Tests, scans, traces, and a recorded rationale replayable 6 months from now.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: HVE -->
+        <section class="section" data-section="5">
+            <div class="section-header">
+                <div class="section-number">5</div>
+                <h2 class="section-title">Hypervelocity Engineering (HVE)</h2>
+            </div>
+            <p style="color: var(--cp-text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                HVE is Microsoft's AI-native approach to software delivery. Engineering capacity scales through the quality of the agentic system — not headcount.
+            </p>
+            <div class="pillars-grid">
+                <div class="pillar-card">
+                    <div class="pillar-icon">👥</div>
+                    <div class="pillar-title">Small Teams</div>
+                    <div class="pillar-desc">4-5 people combining engineering, product, and domain expertise. Tight feedback, sharp ownership.</div>
+                </div>
+                <div class="pillar-card">
+                    <div class="pillar-icon">🧩</div>
+                    <div class="pillar-title">Solution Accelerators</div>
+                    <div class="pillar-desc">Curated architectures and reusable building blocks. Patterns inherited, not rediscovered.</div>
+                </div>
+                <div class="pillar-card">
+                    <div class="pillar-icon">🤖</div>
+                    <div class="pillar-title">AI Across SDLC</div>
+                    <div class="pillar-desc">Agents handle tests, docs, checks, and summaries. Humans focus on judgement and design.</div>
+                </div>
+            </div>
+            <div class="card" style="text-align: center; border-color: var(--cp-accent);">
+                <p style="font-size: 0.9rem;"><strong>Result:</strong> Delivery timelines compressed from months → weeks. AT&T and KT Corporation are already using HVE to modernise.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 6: Maturity Model -->
+        <section class="section" data-section="6">
+            <div class="section-header">
+                <div class="section-number">6</div>
+                <h2 class="section-title">The Agentic Maturity Spectrum</h2>
+            </div>
+            <p style="color: var(--cp-text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                Five levels from traditional development to full HVE. Where is your team?
+            </p>
+            <div class="maturity-ladder">
+                <div class="maturity-rung level-5">
+                    <div class="level-bar"></div>
+                    <div class="level-content">
+                        <div class="level-label">Level 5 — Hypervelocity Engineering</div>
+                        <div class="level-desc">Full primitive stack, RPI loop, 3-5 engineers = 10× capacity, continuous governance</div>
+                    </div>
+                </div>
+                <div class="maturity-rung level-4">
+                    <div class="level-bar"></div>
+                    <div class="level-content">
+                        <div class="level-label">Level 4 — Structured Agentic</div>
+                        <div class="level-desc">Instruction files, Research→Plan→Implement loop forming, governance catching up</div>
+                    </div>
+                </div>
+                <div class="maturity-rung level-3">
+                    <div class="level-bar"></div>
+                    <div class="level-content">
+                        <div class="level-label">Level 3 — Vibe Coding</div>
+                        <div class="level-desc">Velocity feels impressive but discipline is missing. Tech debt accumulates invisibly.</div>
+                    </div>
+                </div>
+                <div class="maturity-rung level-2">
+                    <div class="level-bar"></div>
+                    <div class="level-content">
+                        <div class="level-label">Level 2 — AI-Assisted</div>
+                        <div class="level-desc">Ad hoc code completion. Purchased the tool but not adopted the methodology.</div>
+                    </div>
+                </div>
+                <div class="maturity-rung level-1">
+                    <div class="level-bar"></div>
+                    <div class="level-content">
+                        <div class="level-label">Level 1 — Traditional Development</div>
+                        <div class="level-desc">No AI integration. Capacity = headcount. Story points and manual reviews.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-box" id="quiz3">
+                <div class="quiz-question">🧠 Final Check: What's the key difference between Level 3 (Vibe) and Level 4 (Structured)?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this, 'quiz3')">Level 4 uses more expensive AI models</div>
+                    <div class="quiz-option" data-correct="true" onclick="answerQuiz(this, 'quiz3')">Level 4 adds methodology, governance, and the Research→Plan→Implement loop</div>
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this, 'quiz3')">Level 4 generates code faster than Level 3</div>
+                </div>
+                <div class="quiz-feedback" id="quiz3-feedback"></div>
+            </div>
+        </section>
+
+        <!-- TAKEAWAY -->
+        <section class="section" data-section="7">
+            <div class="takeaway">
+                <h3>💡 Chapter Takeaway</h3>
+                <p>AI makes first drafts cheap; the hard part is review, integration, and owning the call. Vibe coding is great for prototypes, but it falls apart once the work has to be maintained, secured, and audited. <strong>Steered agentic development</strong> keeps humans on the hook for decisions and constraints, while agents do the execution with clear evidence.</p>
+            </div>
+
+            <h3 style="text-align: center; font-size: 1rem; margin-bottom: 1rem;">🏆 Achievements</h3>
+            <div class="achievements">
+                <div class="achievement" id="ach-scroll" title="Scrolled through all sections">
+                    <span class="badge-icon">📜</span> Explorer
+                </div>
+                <div class="achievement" id="ach-quiz" title="Answered all quizzes correctly">
+                    <span class="badge-icon">🧠</span> Knowledge Check
+                </div>
+                <div class="achievement" id="ach-stages" title="Explored all collapse stages">
+                    <span class="badge-icon">🔍</span> Pattern Spotter
+                </div>
+                <div class="achievement" id="ach-steered" title="Checked all 3 steered questions">
+                    <span class="badge-icon">✅</span> Steered Thinker
+                </div>
+                <div class="achievement" id="ach-all" title="Earned all achievements">
+                    <span class="badge-icon">🏅</span> Chapter Master
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <div class="footer-nav">
+            <a href="index.html">Take the Full HVE Maturity Assessment →</a>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+    // State
+    let xp = 0;
+    let quizAnswered = { quiz1: false, quiz2: false, quiz3: false };
+    let quizCorrect = { quiz1: false, quiz2: false, quiz3: false };
+    let stagesExplored = new Set();
+    let questionsChecked = 0;
+    let sectionsVisible = new Set();
+
+    // XP System
+    function addXP(amount, reason) {
+        xp += amount;
+        document.getElementById('xp-value').textContent = xp;
+        showToast(`+${amount} XP — ${reason}`);
+        checkAchievements();
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // Theme Toggle
+    function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+    }
+
+    // Progress Bar
+    function updateProgress() {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        document.getElementById('progress-bar').style.width = progress + '%';
+    }
+
+    // Section reveal
+    function revealSections() {
+        document.querySelectorAll('.section').forEach(section => {
+            const rect = section.getBoundingClientRect();
+            if (rect.top < window.innerHeight * 0.85) {
+                section.classList.add('visible');
+                const num = section.dataset.section;
+                if (!sectionsVisible.has(num)) {
+                    sectionsVisible.add(num);
+                    if (sectionsVisible.size === 7) {
+                        addXP(20, 'Explored all sections!');
+                        document.getElementById('ach-scroll').classList.add('unlocked');
+                    }
+                }
+            }
+        });
+    }
+
+    // Quiz
+    function answerQuiz(el, quizId) {
+        if (quizAnswered[quizId]) return;
+        quizAnswered[quizId] = true;
+
+        const isCorrect = el.dataset.correct === 'true';
+        const feedback = document.getElementById(quizId + '-feedback');
+
+        if (isCorrect) {
+            el.classList.add('correct');
+            quizCorrect[quizId] = true;
+            feedback.textContent = '✅ Correct! Well done.';
+            addXP(15, 'Correct answer!');
+        } else {
+            el.classList.add('wrong');
+            feedback.textContent = '❌ Not quite. The correct answer is highlighted below.';
+            el.parentElement.querySelectorAll('.quiz-option').forEach(opt => {
+                if (opt.dataset.correct === 'true') opt.classList.add('correct');
+            });
+            addXP(5, 'Quiz attempted');
+        }
+        feedback.classList.add('show');
+
+        if (Object.values(quizCorrect).every(v => v)) {
+            document.getElementById('ach-quiz').classList.add('unlocked');
+        }
+    }
+
+    // Collapse Stages
+    function toggleStage(idx) {
+        const stages = document.querySelectorAll('.collapse-stage');
+        const details = document.querySelectorAll('.collapse-detail');
+
+        stages[idx].classList.toggle('active');
+        details[idx].classList.toggle('open');
+
+        if (!stagesExplored.has(idx)) {
+            stagesExplored.add(idx);
+            if (stagesExplored.size === 1) addXP(5, 'Exploring the pattern');
+            if (stagesExplored.size === 5) {
+                addXP(15, 'Full pattern explored!');
+                document.getElementById('ach-stages').classList.add('unlocked');
+            }
+        }
+    }
+
+    // Three Questions
+    function toggleQuestion(el) {
+        el.classList.toggle('checked');
+        const icon = el.querySelector('.q-icon');
+        if (el.classList.contains('checked')) {
+            icon.textContent = '✓';
+            questionsChecked++;
+            if (questionsChecked === 3) {
+                addXP(15, 'Steered thinking mastered!');
+                document.getElementById('ach-steered').classList.add('unlocked');
+            }
+        } else {
+            icon.textContent = '';
+            questionsChecked--;
+        }
+    }
+
+    // Achievements
+    function checkAchievements() {
+        const allUnlocked = ['ach-scroll', 'ach-quiz', 'ach-stages', 'ach-steered']
+            .every(id => document.getElementById(id).classList.contains('unlocked'));
+        if (allUnlocked) {
+            document.getElementById('ach-all').classList.add('unlocked');
+            showToast('🏅 Chapter Master unlocked! You mastered Chapter 1!');
+        }
+    }
+
+    // Event listeners
+    window.addEventListener('scroll', () => {
+        updateProgress();
+        revealSections();
+    });
+    window.addEventListener('load', () => {
+        revealSections();
+        updateProgress();
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+flask
+azure-identity
+agent-framework
+openai

@@ -1,0 +1,5 @@
+flask
+azure-identity
+agent-framework[azure]
+python-dotenv
+httpx

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUXE Fashion — Shop the Look</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ===== NAV BAR ===== -->
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="/" class="logo">LUXE</a>
+        <div class="nav-links">
+            <a href="#" class="nav-link active" data-category="">All</a>
+            <a href="#" class="nav-link" data-category="Tops">Tops</a>
+            <a href="#" class="nav-link" data-category="Bottoms">Bottoms</a>
+            <a href="#" class="nav-link" data-category="Dresses">Dresses</a>
+            <a href="#" class="nav-link" data-category="Outerwear">Outerwear</a>
+            <a href="#" class="nav-link" data-category="Knitwear">Knitwear</a>
+            <a href="#" class="nav-link" data-category="Accessories">Accessories</a>
+        </div>
+    </div>
+    <div class="nav-right">
+        <div class="loyalty-badge" id="loyaltyBadge">
+            <span class="loyalty-icon">★</span>
+            <span id="loyaltyTier">Gold</span>
+            <span class="loyalty-points" id="loyaltyPoints">2,340 pts</span>
+        </div>
+        <div class="user-greeting" id="userGreeting">Hi, Sarah</div>
+        <button class="cart-btn" id="cartBtn" onclick="toggleCart()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+            <span class="cart-count" id="cartCount">0</span>
+        </button>
+    </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>New Season Arrivals</h1>
+        <p>Curated fashion pieces for the modern wardrobe. Timeless style, ethically crafted.</p>
+        <button class="btn-primary" onclick="document.getElementById('productsGrid').scrollIntoView({behavior:'smooth'})">Shop Now</button>
+    </div>
+</section>
+
+<!-- ===== PRODUCTS GRID ===== -->
+<section class="products-section">
+    <div class="section-header">
+        <h2 id="sectionTitle">All Products</h2>
+        <p class="product-count" id="productCount"></p>
+    </div>
+    <div class="products-grid" id="productsGrid"></div>
+</section>
+
+<!-- ===== CART SIDEBAR ===== -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<aside class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+        <h3>Shopping Bag</h3>
+        <button class="cart-close" onclick="toggleCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems">
+        <div class="cart-empty">Your bag is empty</div>
+    </div>
+    <div class="cart-footer" id="cartFooter" style="display:none;">
+        <div class="cart-total">
+            <span>Total</span>
+            <span id="cartTotal">$0.00</span>
+        </div>
+        <div class="cart-loyalty-note" id="cartLoyaltyNote"></div>
+        <button class="btn-primary btn-checkout">Checkout</button>
+    </div>
+</aside>
+
+<!-- ===== PRODUCT DETAIL MODAL ===== -->
+<div class="modal-overlay" id="productModal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeProductModal()">✕</button>
+        <div class="modal-body">
+            <div class="modal-image">
+                <img id="modalImage" src="" alt="">
+            </div>
+            <div class="modal-details">
+                <p class="modal-category" id="modalCategory"></p>
+                <h2 id="modalName"></h2>
+                <p class="modal-price" id="modalPrice"></p>
+                <div class="modal-rating" id="modalRating"></div>
+                <p class="modal-description" id="modalDescription"></p>
+                <div class="modal-options">
+                    <div class="option-group">
+                        <label>Color</label>
+                        <div class="color-options" id="modalColors"></div>
+                    </div>
+                    <div class="option-group">
+                        <label>Size</label>
+                        <div class="size-options" id="modalSizes"></div>
+                    </div>
+                </div>
+                <button class="btn-primary btn-add-to-cart" id="modalAddToCart">Add to Bag</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== CHAT WIDGET ===== -->
+<div class="chat-widget" id="chatWidget">
+    <button class="chat-toggle" id="chatToggle" onclick="toggleChat()">
+        <svg class="chat-icon-open" width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/><path d="M7 9h10v2H7zm0-3h10v2H7zm0 6h7v2H7z"/></svg>
+        <svg class="chat-icon-close" width="28" height="28" viewBox="0 0 24 24" fill="white" style="display:none;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        <span class="chat-notification" id="chatNotification">1</span>
+    </button>
+    <div class="chat-panel" id="chatPanel">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <div class="chat-avatar">S</div>
+                <div>
+                    <div class="chat-bot-name">StyleBot</div>
+                    <div class="chat-bot-status">Your personal stylist</div>
+                </div>
+            </div>
+            <button class="chat-minimize" onclick="toggleChat()">—</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-welcome">
+                <p>👋 Hi! I'm <strong>StyleBot</strong>, your personal fashion stylist.</p>
+                <p>I know your style preferences and can help you find the perfect pieces. I can even add items to your bag!</p>
+                <div class="chat-suggestions">
+                    <button class="suggestion-btn" onclick="sendSuggestion('What would you recommend for me?')">What do you recommend?</button>
+                    <button class="suggestion-btn" onclick="sendSuggestion('What are my loyalty points worth?')">My loyalty points</button>
+                    <button class="suggestion-btn" onclick="sendSuggestion('Help me build an outfit for work')">Work outfit</button>
+                </div>
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Ask me anything about fashion..." onkeydown="if(event.key==='Enter')sendMessage()">
+            <button class="chat-send" onclick="sendMessage()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>

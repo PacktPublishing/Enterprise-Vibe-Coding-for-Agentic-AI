@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 4 — Reshaping the SDLC: Agentic DevOps &amp; the RPI Cadence</title>
+<script>
+(()=>{
+  const param = new URLSearchParams(window.location.search).get("clawpilotTheme");
+  const theme = param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  document.documentElement.setAttribute("data-theme", theme);
+})();
+</script>
+<style>
+:root {
+  color-scheme: light;
+  --cp-bg: #f7f4ef;
+  --cp-bg-elevated: #fcfbf8;
+  --cp-surface: #ffffff;
+  --cp-surface-soft: #f5f5f5;
+  --cp-border: #dedede;
+  --cp-border-strong: #919191;
+  --cp-text: #242424;
+  --cp-text-muted: #5c5c5c;
+  --cp-text-soft: #6f6f6f;
+  --cp-accent: #b11f4b;
+  --cp-accent-hover: #9a1a41;
+  --cp-accent-soft: rgba(177, 31, 75, 0.08);
+  --cp-accent-fg: #ffffff;
+  --cp-success: #16a34a;
+  --cp-danger: #dc2626;
+  --cp-warning: #f59e0b;
+  --cp-link: #0078d4;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+  --cp-overlay: rgba(255, 255, 255, 0.8);
+  --cp-panel: rgba(255, 255, 255, 0.86);
+  --cp-panel-strong: rgba(255, 255, 255, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.55);
+  --cp-highlight: rgba(177, 31, 75, 0.12);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --cp-bg: #3d3b3a;
+  --cp-bg-elevated: #343231;
+  --cp-surface: #292929;
+  --cp-surface-soft: #2e2e2e;
+  --cp-border: #474747;
+  --cp-border-strong: #5f5f5f;
+  --cp-text: #dedede;
+  --cp-text-muted: #919191;
+  --cp-text-soft: #b0b0b0;
+  --cp-accent: #fd8ea1;
+  --cp-accent-hover: #fb7b91;
+  --cp-accent-soft: rgba(253, 142, 161, 0.14);
+  --cp-accent-fg: #1a1a1a;
+  --cp-success: #4ade80;
+  --cp-danger: #f87171;
+  --cp-warning: #fbbf24;
+  --cp-link: #4da6ff;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+  --cp-overlay: rgba(41, 41, 41, 0.88);
+  --cp-panel: rgba(41, 41, 41, 0.72);
+  --cp-panel-strong: rgba(41, 41, 41, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.04);
+  --cp-highlight: rgba(253, 142, 161, 0.12);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--cp-bg);
+  color: var(--cp-text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+code, pre {
+  font-family: Consolas, "Courier New", Courier, monospace;
+}
+
+/* Progress bar */
+.progress-bar {
+  position: fixed; top: 0; left: 0; height: 3px;
+  background: var(--cp-accent); z-index: 1000;
+  transition: width 0.2s ease;
+}
+
+/* Theme toggle */
+.theme-toggle {
+  position: fixed; top: 16px; left: 16px; z-index: 999;
+  background: var(--cp-surface); border: 1px solid var(--cp-border);
+  border-radius: 0.625rem; padding: 8px 12px; cursor: pointer;
+  font-size: 1.1rem; box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+}
+.theme-toggle:hover { border-color: var(--cp-accent); }
+
+/* XP counter */
+.xp-counter {
+  position: fixed; top: 16px; right: 16px; z-index: 999;
+  background: var(--cp-surface); border: 1px solid var(--cp-border);
+  border-radius: 0.625rem; padding: 8px 16px;
+  font-weight: 600; font-size: 0.9rem; color: var(--cp-accent);
+  box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+}
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 1001;
+  background: var(--cp-surface); border: 1px solid var(--cp-accent);
+  border-radius: 0.625rem; padding: 12px 20px;
+  box-shadow: var(--cp-shadow); transform: translateY(100px); opacity: 0;
+  transition: all 0.3s ease; font-size: 0.9rem;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* Tab system */
+.tab-bar {
+  display: flex; justify-content: center; gap: 4px;
+  margin: 0 auto; padding: 4px;
+  background: var(--cp-surface-soft); border-radius: 0.625rem;
+  max-width: 500px;
+}
+.tab-btn {
+  padding: 10px 24px; border: none; background: transparent;
+  border-radius: 0.5rem; cursor: pointer; font-size: 0.95rem;
+  font-weight: 500; color: var(--cp-text-muted); transition: all 0.2s;
+  font-family: inherit;
+}
+.tab-btn:hover { color: var(--cp-text); }
+.tab-btn.active {
+  background: var(--cp-surface); color: var(--cp-accent);
+  box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+  font-weight: 600;
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Sections */
+.hero {
+  text-align: center; padding: 100px 24px 60px;
+  max-width: 800px; margin: 0 auto;
+}
+.hero h1 { font-size: 2.4rem; font-weight: 700; margin-bottom: 16px; }
+.hero .subtitle { font-size: 1.1rem; color: var(--cp-text-muted); max-width: 600px; margin: 0 auto 24px; }
+.hero .badge {
+  display: inline-block; background: var(--cp-accent-soft);
+  color: var(--cp-accent); padding: 6px 14px; border-radius: 20px;
+  font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+section { padding: 60px 24px; max-width: 900px; margin: 0 auto; }
+section h2 {
+  font-size: 1.6rem; margin-bottom: 12px; color: var(--cp-text);
+  display: flex; align-items: center; gap: 12px;
+}
+section h2 .num {
+  background: var(--cp-accent); color: var(--cp-accent-fg);
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; font-weight: 700; flex-shrink: 0;
+}
+section p.desc { color: var(--cp-text-muted); margin-bottom: 24px; }
+
+/* Cards */
+.card {
+  background: var(--cp-surface); border: 1px solid var(--cp-border);
+  border-radius: 16px; padding: 24px; margin-bottom: 16px;
+  box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+  transition: border-color 0.2s, transform 0.2s;
+}
+.card:hover { border-color: var(--cp-accent); transform: translateY(-2px); }
+.card h3 { font-size: 1.1rem; margin-bottom: 8px; }
+.card p { color: var(--cp-text-muted); font-size: 0.9rem; }
+
+/* Phase cards */
+.phase-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.phase-card {
+  background: var(--cp-surface); border: 1px solid var(--cp-border);
+  border-radius: 16px; padding: 20px; cursor: pointer;
+  box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+  transition: all 0.2s;
+}
+.phase-card:hover { border-color: var(--cp-accent); transform: translateY(-2px); }
+.phase-card.expanded { grid-column: 1 / -1; }
+.phase-card .phase-icon { font-size: 1.8rem; margin-bottom: 8px; }
+.phase-card h3 { font-size: 1rem; margin-bottom: 6px; }
+.phase-card .phase-summary { color: var(--cp-text-muted); font-size: 0.85rem; }
+.phase-card .phase-detail {
+  display: none; margin-top: 16px; padding-top: 16px;
+  border-top: 1px solid var(--cp-border); font-size: 0.9rem;
+}
+.phase-card.expanded .phase-detail { display: block; }
+.phase-card .primitives-used {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;
+}
+.phase-card .prim-tag {
+  background: var(--cp-accent-soft); color: var(--cp-accent);
+  padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;
+}
+
+/* RPI cadence */
+.rpi-flow {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px; margin: 24px 0; flex-wrap: wrap;
+}
+.rpi-step {
+  background: var(--cp-surface); border: 2px solid var(--cp-border);
+  border-radius: 16px; padding: 16px 24px; text-align: center;
+  min-width: 140px; transition: all 0.3s; cursor: pointer;
+}
+.rpi-step:hover, .rpi-step.active {
+  border-color: var(--cp-accent); background: var(--cp-accent-soft);
+}
+.rpi-step .rpi-icon { font-size: 1.4rem; margin-bottom: 4px; }
+.rpi-step .rpi-label { font-weight: 600; font-size: 0.9rem; }
+.rpi-step .rpi-desc { font-size: 0.8rem; color: var(--cp-text-muted); margin-top: 4px; }
+.rpi-arrow { font-size: 1.4rem; color: var(--cp-accent); }
+
+/* FlowDesk scenario */
+.scenario-box {
+  background: var(--cp-accent-soft); border: 1px solid var(--cp-accent);
+  border-radius: 16px; padding: 24px; margin: 24px 0;
+}
+.scenario-box h3 { color: var(--cp-accent); margin-bottom: 8px; }
+.scenario-box p { font-size: 0.9rem; color: var(--cp-text-muted); }
+
+/* Quiz */
+.quiz-card {
+  background: var(--cp-surface); border: 1px solid var(--cp-border);
+  border-radius: 16px; padding: 24px; margin-bottom: 16px;
+}
+.quiz-card h4 { margin-bottom: 12px; font-size: 1rem; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt {
+  padding: 10px 16px; border: 1px solid var(--cp-border);
+  border-radius: 0.625rem; cursor: pointer; font-size: 0.9rem;
+  transition: all 0.2s; background: var(--cp-surface-soft);
+}
+.quiz-opt:hover { border-color: var(--cp-accent); }
+.quiz-opt.correct { background: rgba(22, 163, 74, 0.12); border-color: var(--cp-success); color: var(--cp-success); }
+.quiz-opt.wrong { background: rgba(220, 38, 38, 0.12); border-color: var(--cp-danger); color: var(--cp-danger); }
+.quiz-opt.disabled { pointer-events: none; opacity: 0.7; }
+
+/* Achievements */
+.achievements-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;
+}
+.achievement {
+  background: var(--cp-surface); border: 1px solid var(--cp-border);
+  border-radius: 16px; padding: 16px; text-align: center;
+  opacity: 0.5; transition: all 0.3s;
+}
+.achievement.unlocked { opacity: 1; border-color: var(--cp-accent); }
+.achievement .ach-icon { font-size: 1.8rem; margin-bottom: 6px; }
+.achievement .ach-name { font-weight: 600; font-size: 0.85rem; }
+
+/* ---- TAB 2: REPO EXPLORER ---- */
+.repo-explorer { padding: 60px 24px; max-width: 1000px; margin: 0 auto; }
+.repo-explorer h2 { font-size: 1.6rem; margin-bottom: 8px; }
+.repo-explorer p.desc { color: var(--cp-text-muted); margin-bottom: 24px; }
+
+.tree-container {
+  background: var(--cp-surface); border: 1px solid var(--cp-border);
+  border-radius: 16px; padding: 24px; font-family: Consolas, "Courier New", Courier, monospace;
+  box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14);
+}
+.tree-node { margin-left: 0; }
+.tree-node .node-row {
+  display: flex; align-items: center; gap: 8px; padding: 6px 8px;
+  border-radius: 0.625rem; cursor: pointer; transition: background 0.15s;
+  font-size: 0.9rem;
+}
+.tree-node .node-row:hover { background: var(--cp-accent-soft); }
+.tree-node .node-row .icon { flex-shrink: 0; font-size: 1rem; }
+.tree-node .node-row .name { font-weight: 500; }
+.tree-node .node-row .tag {
+  margin-left: auto; background: var(--cp-accent-soft); color: var(--cp-accent);
+  padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 600;
+  font-family: "Segoe UI", sans-serif;
+}
+.tree-children { margin-left: 20px; border-left: 1px solid var(--cp-border); padding-left: 8px; }
+.tree-children.collapsed { display: none; }
+.tree-node .chevron {
+  transition: transform 0.2s; font-size: 0.7rem; color: var(--cp-text-muted);
+}
+.tree-node.open > .node-row .chevron { transform: rotate(90deg); }
+
+/* File detail panel */
+.file-detail-panel {
+  background: var(--cp-bg-elevated); border: 1px solid var(--cp-border);
+  border-radius: 16px; padding: 24px; margin-top: 16px;
+  display: none; animation: slideDown 0.2s ease;
+}
+.file-detail-panel.visible { display: block; }
+.file-detail-panel h3 { font-size: 1.1rem; margin-bottom: 4px; }
+.file-detail-panel .file-path { color: var(--cp-text-muted); font-size: 0.8rem; margin-bottom: 12px; font-family: Consolas, monospace; }
+.file-detail-panel .file-type-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem;
+  font-weight: 600; margin-bottom: 12px;
+}
+.file-detail-panel .file-desc { font-size: 0.9rem; color: var(--cp-text-muted); margin-bottom: 16px; }
+.file-detail-panel pre {
+  background: var(--cp-surface-soft); border: 1px solid var(--cp-border);
+  border-radius: 0.625rem; padding: 16px; overflow-x: auto;
+  font-size: 0.8rem; line-height: 1.5; max-height: 400px; overflow-y: auto;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Agentic DevOps principles */
+.principles-list { display: flex; flex-direction: column; gap: 12px; }
+.principle {
+  display: flex; gap: 16px; align-items: flex-start;
+  background: var(--cp-surface); border: 1px solid var(--cp-border);
+  border-radius: 16px; padding: 16px 20px;
+}
+.principle .p-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
+.principle h4 { font-size: 0.95rem; margin-bottom: 4px; }
+.principle p { font-size: 0.85rem; color: var(--cp-text-muted); }
+
+/* Footer */
+footer {
+  text-align: center; padding: 40px 24px; color: var(--cp-text-muted);
+  font-size: 0.85rem; border-top: 1px solid var(--cp-border);
+}
+footer a { color: var(--cp-accent); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+/* Animations */
+.reveal { opacity: 0; transform: translateY(20px); transition: all 0.5s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌓</button>
+<div class="xp-counter" id="xpCounter">⚡ 0 XP</div>
+<div class="toast" id="toast"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="badge">Chapter 4</span>
+  <h1>Reshaping the SDLC: Agentic DevOps &amp; the RPI Cadence</h1>
+  <p class="subtitle">Primitives come alive across Plan → Design → Develop → Test → Release → Maintain. Explore the full lifecycle through FlowDesk, an agentic IT copilot built with HVE.</p>
+  <div class="tab-bar" style="margin-top: 32px;">
+    <button class="tab-btn active" onclick="switchTab('recap')">📖 Chapter Recap</button>
+    <button class="tab-btn" onclick="switchTab('repo')">📂 Primitives Repo</button>
+  </div>
+</div>
+
+<!-- TAB 1: CHAPTER RECAP -->
+<div class="tab-content active" id="tab-recap">
+
+<!-- The Running Scenario -->
+<section class="reveal">
+  <div class="scenario-box">
+    <h3>🏢 The Running Scenario: FlowDesk</h3>
+    <p><strong>FlowDesk</strong> is an agentic IT service copilot for Northwind Logistics (~4,000 employees). It triages tickets, drafts resolutions, escalates with context, and feeds the knowledge base — all inside Microsoft Teams + a custom ITSM backend via MCP.</p>
+  </div>
+</section>
+
+<!-- RPI Cadence -->
+<section class="reveal">
+  <h2><span class="num">1</span> The RPI Cadence</h2>
+  <p class="desc">Inside every SDLC phase, agents follow the same three-beat cadence: Research → Plan → Implement. Humans approve the plan; agents do the work.</p>
+  <div class="rpi-flow">
+    <div class="rpi-step" onclick="activateRPI(this, 0)">
+      <div class="rpi-icon">🔍</div>
+      <div class="rpi-label">Research</div>
+      <div class="rpi-desc">Read context, gather inputs</div>
+    </div>
+    <div class="rpi-arrow">→</div>
+    <div class="rpi-step" onclick="activateRPI(this, 1)">
+      <div class="rpi-icon">📋</div>
+      <div class="rpi-label">Plan</div>
+      <div class="rpi-desc">Propose a reviewable plan</div>
+    </div>
+    <div class="rpi-arrow">→</div>
+    <div class="rpi-step" onclick="activateRPI(this, 2)">
+      <div class="rpi-icon">⚡</div>
+      <div class="rpi-label">Implement</div>
+      <div class="rpi-desc">Execute after human approval</div>
+    </div>
+  </div>
+</section>
+
+<!-- Six Phases -->
+<section class="reveal">
+  <h2><span class="num">2</span> Six SDLC Phases, Reimagined</h2>
+  <p class="desc">Click each phase to see how primitives reshape it. Collect all six to unlock an achievement!</p>
+  <div class="phase-grid" id="phaseGrid">
+
+    <div class="phase-card" onclick="togglePhase(this, 0)">
+      <div class="phase-icon">📝</div>
+      <h3>Phase 1 — Plan</h3>
+      <div class="phase-summary">Meeting notes → Reviewable specs in an afternoon</div>
+      <div class="phase-detail">
+        <p>The kickoff recording becomes a structured specification — and then reviewable user stories — via primitives. The product manager edits rather than writes from scratch.</p>
+        <div class="primitives-used">
+          <span class="prim-tag">Prompt: meeting-to-spec</span>
+          <span class="prim-tag">Prompt: spec-to-stories</span>
+          <span class="prim-tag">MCP: Azure DevOps</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-card" onclick="togglePhase(this, 1)">
+      <div class="phase-icon">🏗️</div>
+      <h3>Phase 2 — Design</h3>
+      <div class="phase-summary">Spec → Architecture diagrams + ADR + cost estimate</div>
+      <div class="phase-detail">
+        <p>The architect agent turns the approved spec into reviewable artifacts: a Mermaid C4 diagram, an ADR, and a BoQ cost estimate — all reviewed through a standard PR.</p>
+        <div class="primitives-used">
+          <span class="prim-tag">Prompt: spec-to-architecture</span>
+          <span class="prim-tag">Prompt: architecture-to-BoQ</span>
+          <span class="prim-tag">MCP: Mermaid</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-card" onclick="togglePhase(this, 2)">
+      <div class="phase-icon">💻</div>
+      <h3>Phase 3 — Develop</h3>
+      <div class="phase-summary">Design → Running code with bounded agents</div>
+      <div class="phase-detail">
+        <p>Development agents read the approved architecture and produce small, reviewable PRs. The backend-dev agent can't deploy; the infra-dev agent can't touch production. Each has scoped permissions.</p>
+        <div class="primitives-used">
+          <span class="prim-tag">Instructions: copilot-instruction</span>
+          <span class="prim-tag">Skill: agent-framework-scaffold</span>
+          <span class="prim-tag">Agent: backend-dev</span>
+          <span class="prim-tag">Agent: infra-dev</span>
+          <span class="prim-tag">Prompt: scaffold-microservice</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-card" onclick="togglePhase(this, 3)">
+      <div class="phase-icon">🧪</div>
+      <h3>Phase 4 — Test</h3>
+      <div class="phase-summary">Backlog-driven test design + agent flow validation</div>
+      <div class="phase-detail">
+        <p>Tests run alongside development. The spec-to-test-plan prompt is the RPI Plan gate — the tech lead reviews it before test code is generated. Specialized agents handle unit tests and agent trace tests.</p>
+        <div class="primitives-used">
+          <span class="prim-tag">Prompt: spec-to-test-plan</span>
+          <span class="prim-tag">Agent: test-dev</span>
+          <span class="prim-tag">Agent: scenario-test-author</span>
+          <span class="prim-tag">MCP: Azure DevOps</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-card" onclick="togglePhase(this, 4)">
+      <div class="phase-icon">🚀</div>
+      <h3>Phase 5 — Release</h3>
+      <div class="phase-summary">CI/CD as an active safety system, not a passive script</div>
+      <div class="phase-detail">
+        <p>The release-captain agent composes release notes, detects anomalies (coverage drops, unusual files, new MCP servers), and halts the pipeline when something looks wrong — requiring explicit human confirmation to proceed.</p>
+        <div class="primitives-used">
+          <span class="prim-tag">Agent: release-captain</span>
+          <span class="prim-tag">Hook: secrets-scanner</span>
+          <span class="prim-tag">Skill: deploy-to-aca</span>
+          <span class="prim-tag">MCP: GitHub</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-card" onclick="togglePhase(this, 5)">
+      <div class="phase-icon">🔧</div>
+      <h3>Phase 6 — Maintain</h3>
+      <div class="phase-summary">Codebase exploration, bug triage, automated PR reviews</div>
+      <div class="phase-detail">
+        <p>Maintenance cost flattens over time. New joiners onboard against a codebase-explorer agent. Every PR is pre-reviewed by an agent before a human arrives. Bugs are triaged and hypothesized automatically.</p>
+        <div class="primitives-used">
+          <span class="prim-tag">Agent: codebase-explorer</span>
+          <span class="prim-tag">Agent: bug-triage</span>
+          <span class="prim-tag">Agent: pr-reviewer</span>
+          <span class="prim-tag">Hook: pr-review-bot</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Agentic DevOps Principles -->
+<section class="reveal">
+  <h2><span class="num">3</span> Agentic DevOps Principles</h2>
+  <p class="desc">The through-line across all six phases.</p>
+  <div class="principles-list">
+    <div class="principle">
+      <div class="p-icon">🎯</div>
+      <div>
+        <h4>Outcome-Driven Execution</h4>
+        <p>Define goals and constraints; agents decide how to achieve them based on context.</p>
+      </div>
+    </div>
+    <div class="principle">
+      <div class="p-icon">🛡️</div>
+      <div>
+        <h4>Autonomous within Guardrails</h4>
+        <p>Agents plan, execute, and optimize independently — but within governance boundaries (policies, approvals, auditability).</p>
+      </div>
+    </div>
+    <div class="principle">
+      <div class="p-icon">🧠</div>
+      <div>
+        <h4>Context-Aware Reasoning</h4>
+        <p>Unlike CI/CD scripts, agents interpret real-time system state, dependencies, and history to adapt dynamically.</p>
+      </div>
+    </div>
+    <div class="principle">
+      <div class="p-icon">🔄</div>
+      <div>
+        <h4>Closed-Loop Learning</h4>
+        <p>Observe → Plan → Act → Learn. Systems improve over time through feedback from deployments and operations.</p>
+      </div>
+    </div>
+    <div class="principle">
+      <div class="p-icon">🤝</div>
+      <div>
+        <h4>Collaborative Systems</h4>
+        <p>Multiple specialized agents coordinate across the SDLC, working alongside humans rather than replacing them.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Quizzes -->
+<section class="reveal">
+  <h2><span class="num">4</span> Knowledge Check</h2>
+  <p class="desc">Test your understanding of the chapter concepts.</p>
+
+  <div class="quiz-card" id="quiz1">
+    <h4>Q1: What does the RPI cadence stand for?</h4>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkQuiz('quiz1', this, false)">Review, Produce, Iterate</div>
+      <div class="quiz-opt" onclick="checkQuiz('quiz1', this, true)">Research, Plan, Implement</div>
+      <div class="quiz-opt" onclick="checkQuiz('quiz1', this, false)">Read, Process, Integrate</div>
+    </div>
+  </div>
+
+  <div class="quiz-card" id="quiz2">
+    <h4>Q2: What happens when the release-captain agent detects an anomaly?</h4>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkQuiz('quiz2', this, false)">It automatically rolls back the deployment</div>
+      <div class="quiz-opt" onclick="checkQuiz('quiz2', this, false)">It skips the anomalous file and continues</div>
+      <div class="quiz-opt" onclick="checkQuiz('quiz2', this, true)">It halts the pipeline and requests explicit human confirmation</div>
+    </div>
+  </div>
+
+  <div class="quiz-card" id="quiz3">
+    <h4>Q3: Why does the backend-dev agent have a "cannot deploy" constraint?</h4>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkQuiz('quiz3', this, true)">To enforce bounded scope — development and deployment are separate concerns with separate approval gates</div>
+      <div class="quiz-opt" onclick="checkQuiz('quiz3', this, false)">Because deployment requires a paid license the team doesn't have</div>
+      <div class="quiz-opt" onclick="checkQuiz('quiz3', this, false)">Because the agent framework doesn't support deployment commands</div>
+    </div>
+  </div>
+</section>
+
+<!-- Achievements -->
+<section class="reveal">
+  <h2><span class="num">5</span> Achievements</h2>
+  <div class="achievements-grid">
+    <div class="achievement" id="ach-explorer"><div class="ach-icon">🗺️</div><div class="ach-name">Explorer</div></div>
+    <div class="achievement" id="ach-phases"><div class="ach-icon">🔄</div><div class="ach-name">Full Cycle</div></div>
+    <div class="achievement" id="ach-rpi"><div class="ach-icon">🎵</div><div class="ach-name">RPI Master</div></div>
+    <div class="achievement" id="ach-quiz"><div class="ach-icon">🧠</div><div class="ach-name">Knowledge Check</div></div>
+    <div class="achievement" id="ach-repo"><div class="ach-icon">📂</div><div class="ach-name">Repo Explorer</div></div>
+    <div class="achievement" id="ach-master"><div class="ach-icon">👑</div><div class="ach-name">Chapter Master</div></div>
+  </div>
+</section>
+
+</div>
+
+<!-- TAB 2: REPO EXPLORER -->
+<div class="tab-content" id="tab-repo">
+<div class="repo-explorer">
+  <h2>📂 Chapter 4 Primitives Repository</h2>
+  <p class="desc">Explore the full repository structure from the chapter. Click folders to expand, click files to see their content, purpose, and key excerpts.</p>
+
+  <div class="tree-container" id="repoTree"></div>
+  <div class="file-detail-panel" id="fileDetail"></div>
+</div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <p><a href="../chapter3/chapter3-landing.html">← Chapter 3: Primitives</a> · Chapter 4: Reshaping the SDLC · <a href="../chapter1/index.html">HVE Assessment →</a></p>
+  <p style="margin-top: 8px;">Agentic Development in Practice — Packt Publishing</p>
+</footer>
+
+<script>
+// ===== STATE =====
+let xp = 0;
+let achievements = {};
+let phasesExplored = new Set();
+let quizCorrect = 0;
+let filesViewed = 0;
+let rpiClicked = false;
+
+// ===== THEME =====
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+}
+
+// ===== TABS =====
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  if (tab === 'recap') {
+    document.querySelectorAll('.tab-btn')[0].classList.add('active');
+    document.getElementById('tab-recap').classList.add('active');
+  } else {
+    document.querySelectorAll('.tab-btn')[1].classList.add('active');
+    document.getElementById('tab-repo').classList.add('active');
+    unlock('ach-repo');
+  }
+}
+
+// ===== XP & TOAST =====
+function addXP(amount) {
+  xp += amount;
+  document.getElementById('xpCounter').textContent = `⚡ ${xp} XP`;
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function unlock(id) {
+  if (achievements[id]) return;
+  achievements[id] = true;
+  document.getElementById(id).classList.add('unlocked');
+  addXP(20);
+  const names = { 'ach-explorer': 'Explorer', 'ach-phases': 'Full Cycle', 'ach-rpi': 'RPI Master', 'ach-quiz': 'Knowledge Check', 'ach-repo': 'Repo Explorer', 'ach-master': 'Chapter Master' };
+  showToast(`🏆 Achievement: ${names[id]}!`);
+  if (Object.keys(achievements).length >= 5) unlock('ach-master');
+}
+
+// ===== PROGRESS BAR =====
+window.addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+  document.getElementById('progressBar').style.width = pct + '%';
+  if (pct > 80) unlock('ach-explorer');
+});
+
+// ===== RPI =====
+function activateRPI(el, idx) {
+  document.querySelectorAll('.rpi-step').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  if (!rpiClicked) { rpiClicked = true; addXP(10); unlock('ach-rpi'); }
+}
+
+// ===== PHASES =====
+function togglePhase(el, idx) {
+  el.classList.toggle('expanded');
+  phasesExplored.add(idx);
+  addXP(5);
+  if (phasesExplored.size >= 6) unlock('ach-phases');
+}
+
+// ===== QUIZ =====
+function checkQuiz(id, el, correct) {
+  const opts = document.querySelectorAll(`#${id} .quiz-opt`);
+  opts.forEach(o => o.classList.add('disabled'));
+  if (correct) {
+    el.classList.add('correct');
+    addXP(15);
+    quizCorrect++;
+    if (quizCorrect >= 3) unlock('ach-quiz');
+  } else {
+    el.classList.add('wrong');
+    opts.forEach(o => { if (!o.classList.contains('wrong')) { /* find correct */ } });
+  }
+}
+
+// ===== REVEAL ON SCROLL =====
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ===== REPO TREE =====
+const repoData = {
+  name: '.github', icon: '📁', type: 'folder', children: [
+    { name: 'copilot-instruction.md', icon: '📄', type: 'file', tag: 'Instructions',
+      desc: 'Repository-wide engineering standards applied to all code generation. Declares the tech stack (Python/FastAPI backend, React frontend), folder structure (frontend/, backend/, infra/), UI guidelines (dark mode mandatory, responsive layouts), and coding rules (async APIs, secrets from env vars, business logic outside routes).',
+      content: `# Copilot Instructions — Engineering Standards
+
+These instructions apply to all code generated or modified
+in this repository.
+
+## Stack
+- Backend: Python with FastAPI
+- Frontend: React
+
+## Repository Structure
+- frontend/ — React application
+- backend/ — FastAPI service
+- infra/ — Infrastructure as code
+
+## UI Guidelines
+- Dark mode is mandatory
+- Use shared design components
+- Prefer responsive layouts
+
+## Coding Rules
+- Prefer async APIs
+- Keep business logic outside routes
+- Never hardcode secrets` },
+    { name: 'agents/', icon: '📁', type: 'folder', children: [
+      { name: 'backend-dev.agent.md', icon: '🤖', type: 'file', tag: 'Agent',
+        desc: 'Backend development specialist scoped to backend/. Can implement endpoints, services, models, run pytest, and build local Docker containers. CANNOT deploy, touch production, modify frontend/infra, or change auth/MCP permissions. Escalates anything outside its scope.',
+        content: `name: "Backend Developer"
+tools: [read, edit, search, execute, todo]
+
+## Responsibilities
+- Implement FastAPI routes, services, Pydantic models
+- Write and update tests alongside code changes
+- Run local builds: pytest, docker build/run
+- Follow repo architecture: thin route handlers
+
+## Hard Limits
+- DO NOT deploy (no azd up, docker push, kubectl apply)
+- DO NOT touch production
+- DO NOT modify files outside backend/
+- DO NOT change auth or MCP permissions
+- DO NOT hardcode secrets` },
+      { name: 'infra-dev.agent.md', icon: '🤖', type: 'file', tag: 'Agent',
+        desc: 'Infrastructure-as-code specialist for Bicep templates under infra/. Can write/refactor Bicep, run az bicep build and lint locally. CANNOT deploy, promote environments, touch production, or change auth/MCP.',
+        content: `name: "Infra Developer"
+tools: [read, edit, search, execute, todo]
+
+## Responsibilities
+- Write and refactor Bicep templates in infra/
+- Run local builds: az bicep build, az bicep lint
+- Follow AVM and repo conventions
+- Read secrets from Key Vault references
+
+## Hard Limits
+- DO NOT deploy (no az deployment create)
+- DO NOT promote environments
+- DO NOT touch production
+- DO NOT modify files outside infra/
+- DO NOT change auth or MCP permissions` },
+      { name: 'test-dev.agent.md', icon: '🤖', type: 'file', tag: 'Agent',
+        desc: 'Validation specialist. Writes/updates test code (unit, integration, contract), runs pytest, spins up local containers, inspects logs, triages failures. CANNOT modify production business logic or infrastructure.',
+        content: `name: "Test Engineer"
+tools: [read, edit, search, execute, todo]
+
+## Responsibilities
+- Author test code only: unit, integration, contract
+- Run test suites: pytest, npm test / vitest
+- Stand up local containers for system under test
+- Inspect logs, generate test reports
+- Triage failures: test bug / product bug / env issue
+
+## Hard Limits
+- DO NOT modify production business logic
+- DO NOT exceed scoped PR
+- DO NOT modify infrastructure
+- DO NOT deploy or touch production
+- DO NOT change auth or MCP permissions` },
+      { name: 'scenario-test-author.agent.md', icon: '🤖', type: 'file', tag: 'Agent',
+        desc: 'Specialized for agent flow validation. Writes trace tests — recorded conversations replayed against the live agent graph — using the Microsoft Agent Framework testing harness. Covers single-agent runs, multi-turn sessions, tool invocations, and handoffs.',
+        content: `name: "Agent Flow Tester"
+tools: [read, edit, search, execute, todo]
+
+## What "Trace Test" Means
+A recorded conversation replayed against the live agent
+graph to confirm behavior is stable across changes.
+
+Asserts on:
+- Structure (which agents ran, tool calls, handoffs)
+- Content predicates (JSON schema, required keys)
+- NOT exact LLM wording (non-deterministic)
+
+## Hard Limits
+- DO NOT modify agent business logic
+- DO NOT change graph topology
+- DO NOT deploy or touch Foundry/production
+- DO NOT assert on exact LLM wording` },
+      { name: 'release-captain.agent.md', icon: '🤖', type: 'file', tag: 'Agent',
+        desc: 'Release coordinator. Composes release notes from PR titles + spec deltas + risk flags. Posts to Teams, tags on-call, and HALTS the pipeline when anomalies are detected (coverage drop, unusual files, new MCP server). Requires explicit human confirmation to proceed.',
+        content: `name: "Release Captain"
+tools: [read, search, execute, todo, web]
+
+## Risk Signals That Trigger a Halt
+1. Coverage drop ≥ 2 percentage points
+2. Unusual file changed (infra, auth, CI/CD, secrets)
+3. New MCP server introduced
+4. Scope mismatch (PR title vs actual changes)
+5. Missing tests for changed code
+
+## Hard Limits
+- DO NOT bypass the halt
+- DO NOT modify code, infra, or workflows
+- DO NOT deploy
+- DO NOT change auth or MCP permissions
+- DO NOT post without on-call mention` },
+    ]},
+    { name: 'skills/', icon: '📁', type: 'folder', children: [
+      { name: 'agent-framework-scaffold/', icon: '📁', type: 'folder', children: [
+        { name: 'SKILL.md', icon: '⚡', type: 'file', tag: 'Skill',
+          desc: 'Complete scaffold for multi-agent AI applications using Microsoft Agent Framework SDK. Includes architecture pattern (Flask + agents/ + data/ + templates/), shared Azure OpenAI client setup, agent roster definition, orchestrator pattern, SSE streaming, and testing harness conventions.',
+          content: `# Build Multi-Agent Apps with Microsoft Agent Framework
+
+## Architecture Pattern
+project/
+├── app.py               # Flask + SSE streaming
+├── agents/
+│   ├── client.py        # Shared Azure OpenAI client
+│   ├── <domain>_agent.py
+│   └── orchestrator_agent.py
+├── data/
+└── templates/
+
+## Agent Roster Pattern
+| Role            | Purpose                          |
+|-----------------|----------------------------------|
+| Domain Analyst  | Analyze one data source          |
+| Comparator      | Cross-cut data                   |
+| Orchestrator    | Synthesize into executive view   |
+
+## Key: Shared Client
+- AzureCliCredential with tenant pinning
+- OpenAIChatClient for all agents
+- parse_agent_json helper for output parsing` },
+      ]},
+    ]},
+    { name: 'prompts/', icon: '📁', type: 'folder', children: [
+      { name: 'meeting-transcript-to-spec.prompt.md', icon: '💬', type: 'file', tag: 'Prompt',
+        desc: 'Parses a customer email, meeting transcript, or BRD into a structured, dev-friendly spec with Mermaid architecture diagram. Enforces a fixed 10-section outline: Executive Summary, Stakeholders, Business Requirements, Functional/Non-Functional Requirements, Target Architecture (Mermaid), Integration Points, Assumptions & Risks, Open Questions, Next Steps.',
+        content: `# Meeting Transcript → Spec
+
+Input: customer email, meeting transcript, or BRD
+
+## Output Structure (mandatory sections)
+1. Executive Summary
+2. Stakeholders
+3. Business Requirements
+4. Functional Requirements
+5. Non-Functional Requirements
+6. Target Architecture (Mermaid diagram)
+7. Key Integration Points
+8. Assumptions & Risks
+9. Open Questions
+10. Suggested Next Steps
+
+## Rules
+- Be opinionated (propose architecture, don't say "it depends")
+- Mermaid is mandatory
+- Dev-friendly language
+- Flag gaps explicitly` },
+      { name: 'scaffold-microservice.prompt.md', icon: '💬', type: 'file', tag: 'Prompt',
+        desc: 'Generates the standard backend service layout — entry point, healthcheck, settings module, telemetry wiring, Dockerfile, unit tests — from a one-line description. Opinionated by design: removes choice where choice has no value.',
+        content: `# Scaffold Backend Microservice
+
+Input: One-line description of the microservice
+
+## Required Deliverables
+1. Entry point — main.py with FastAPI app
+2. Healthcheck — GET /health + GET /health/ready
+3. Settings module — Pydantic BaseSettings from env vars
+4. Telemetry — structured logging + OpenTelemetry
+5. Dockerfile — multi-stage, non-root, HEALTHCHECK
+6. Unit tests — health, settings, route registration
+7. Supporting files — requirements.txt, __init__.py
+
+## Architecture Rules
+- Keep business logic out of route handlers
+- Prefer async def for I/O
+- Never inline secrets` },
+      { name: 'boq-and-cost-estimation.prompt.md', icon: '💬', type: 'file', tag: 'Prompt',
+        desc: 'Generates a Bill of Quantities (BoQ) and cost estimation for Azure deployments. Analyzes an architectural document and produces a resource inventory table and monthly cost breakdown using current Azure Pricing Calculator data.',
+        content: `# BoQ and Cost Estimation Generator
+
+Input: architectural document
+
+## Output Structure
+1. Bill of Quantities table
+   (Resource | Quantity | Description)
+
+2. Cost Estimation table
+   (Resource | Unit Cost | Quantity | Total)
+
+3. Total Estimated Cost: $/month
+
+## Rules
+- Use Azure Pricing Calculator for current prices
+- Flag any missing prices as TBD
+- List all assumptions` },
+      { name: 'spec-to-architecture-diagram.prompt.md', icon: '💬', type: 'file', tag: 'Prompt',
+        desc: 'Converts a technical spec into TWO Mermaid architecture diagrams (prototype + production) via the Mermaid MCP server. Produces a Markdown file with embedded previews and shareable Mermaid Chart links. Covers actors, services, data stores, integrations, and security boundaries.',
+        content: `# Spec → Architecture Diagram
+
+## ALWAYS Produce TWO Diagrams
+1. Prototype — single Flask app, vanilla JS,
+   synthetic data, local processes
+2. Production — managed Azure services,
+   scalability, identity, security boundaries
+
+## Diagram Types
+- flowchart (default) — component topology
+- sequenceDiagram — ordered interactions
+- C4Context — multiple systems/boundaries
+- erDiagram — data model focused
+
+## Quality Rules
+- Label every edge (HTTP POST, SSE, OAuth2, SQL)
+- Group by trust boundary (subgraph)
+- Cap at ~15 nodes per diagram
+- Validate via Mermaid MCP before writing` },
+      { name: 'spec-to-test-plan.prompt.md', icon: '💬', type: 'file', tag: 'Prompt',
+        desc: 'The RPI Plan gate for testing. Given a user story (Azure Boards or GitHub Issue), produces a test plan with exactly 7 cases: 1 happy path + 3 edge cases + 2 failure modes + 1 security case. The tech lead must approve before test code is written.',
+        content: `# Spec → Test Plan (RPI Plan Gate)
+
+Input: Azure Boards URL/ID, GitHub Issue, or pasted story
+
+## Required: Exactly 7 Test Cases
+| # | Type         | Title | Given | When | Then |
+|---|--------------|-------|-------|------|------|
+| 1 | Happy path   | ...   | ...   | ...  | ...  |
+| 2 | Edge case    | ...   | ...   | ...  | ...  |
+| 3 | Edge case    | ...   | ...   | ...  | ...  |
+| 4 | Edge case    | ...   | ...   | ...  | ...  |
+| 5 | Failure mode | ...   | ...   | ...  | ...  |
+| 6 | Failure mode | ...   | ...   | ...  | ...  |
+| 7 | Security     | ...   | ...   | ...  | ...  |
+
+## Hard Rules
+- DO NOT generate test code
+- DO NOT exceed case counts
+- DO NOT invent acceptance criteria` },
+    ]},
+    { name: 'hooks/', icon: '📁', type: 'folder', children: [
+      { name: 'secrets-scanner/', icon: '📁', type: 'folder', children: [
+        { name: 'hooks.json', icon: '⚙️', type: 'file', tag: 'Hook Config',
+          desc: 'Hook configuration file. Triggers the secrets-scanner shell script as a PreToolUse hook, scoped to the release-captain agent only, with a 60-second timeout. Only fires on "execute" tool calls.',
+          content: `{
+  "version": 1,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "execute",
+        "agents": ["release-captain"],
+        "agentFiles": [".github/agents/release-captain.agent.md"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".github/hooks/secrets-scanner/secrets-scanner.sh",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}` },
+        { name: 'secrets-scanner.sh', icon: '🔒', type: 'file', tag: 'Hook Script',
+          desc: 'Bash script that runs Gitleaks against staged files to detect exposed secrets. Scoped to fire only when the release-captain agent is active. Validates agent identity from the hook payload before scanning.',
+          content: `#!/usr/bin/env bash
+# PreToolUse hook: release-captain only.
+
+set -euo pipefail
+
+# 1. Verify this is the release-captain agent
+AGENT_NAME=$(jq -r '.agent.name // empty' <<< "$PAYLOAD")
+if [ "$AGENT_NAME" != "release-captain" ]; then
+  echo "↩︎  skipping — not release-captain"
+  exit 0
+fi
+
+# 2. Get staged files
+FILES=$(git diff --cached --name-only --diff-filter=ACM)
+
+# 3. Scan each file with Gitleaks
+echo "$FILES" | while read -r file; do
+  gitleaks detect --no-git --source "$file" --redact --verbose
+done
+
+echo "✅ Secret scan completed successfully."` },
+      ]},
+    ]},
+  ]
+};
+
+const mcpData = {
+  name: '.vscode', icon: '📁', type: 'folder', children: [
+    { name: 'mcp.json', icon: '🔌', type: 'file', tag: 'MCP Config',
+      desc: 'VS Code MCP server configuration. Declares two MCP servers: (1) Mermaid MCP for generating and validating architecture diagrams via HTTP, and (2) Azure DevOps MCP for work item management, PRs, pipelines, and sprint planning via stdio/npx.',
+      content: `{
+  "servers": {
+    "mermaid-mcp": {
+      "url": "https://mcp.mermaid.ai/mcp",
+      "type": "http",
+      "headers": { "Authorization": "<token>" }
+    },
+    "microsoft/azure-devops-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@azure-devops/mcp@latest",
+               "\${input:ado_org}", "-d", "\${input:ado_domain}"]
+    }
+  }
+}` },
+  ]
+};
+
+// Build the tree
+function buildTree(node, container, depth = 0) {
+  const el = document.createElement('div');
+  el.className = 'tree-node' + (node.type === 'folder' ? '' : '');
+
+  const row = document.createElement('div');
+  row.className = 'node-row';
+  row.style.paddingLeft = (depth * 4) + 'px';
+
+  if (node.type === 'folder') {
+    row.innerHTML = `<span class="chevron">▶</span><span class="icon">${node.icon}</span><span class="name">${node.name}</span>`;
+    row.onclick = (e) => {
+      e.stopPropagation();
+      el.classList.toggle('open');
+      const children = el.querySelector('.tree-children');
+      if (children) children.classList.toggle('collapsed');
+    };
+  } else {
+    const tagHtml = node.tag ? `<span class="tag">${node.tag}</span>` : '';
+    row.innerHTML = `<span class="icon">${node.icon}</span><span class="name">${node.name}</span>${tagHtml}`;
+    row.onclick = (e) => {
+      e.stopPropagation();
+      showFileDetail(node);
+    };
+  }
+
+  el.appendChild(row);
+
+  if (node.children) {
+    const childContainer = document.createElement('div');
+    childContainer.className = 'tree-children collapsed';
+    node.children.forEach(child => buildTree(child, childContainer, depth + 1));
+    el.appendChild(childContainer);
+  }
+
+  container.appendChild(el);
+}
+
+function showFileDetail(node) {
+  filesViewed++;
+  if (filesViewed >= 3) unlock('ach-repo');
+  addXP(5);
+
+  const panel = document.getElementById('fileDetail');
+  const typeColors = {
+    'Instructions': 'var(--cp-accent)',
+    'Agent': '#0078d4',
+    'Skill': 'var(--cp-success)',
+    'Prompt': 'var(--cp-warning)',
+    'Hook Config': '#9333ea',
+    'Hook Script': '#9333ea',
+    'MCP Config': '#0891b2'
+  };
+  const color = typeColors[node.tag] || 'var(--cp-text-muted)';
+
+  panel.innerHTML = `
+    <h3>${node.icon} ${node.name}</h3>
+    <div class="file-type-badge" style="background: ${color}22; color: ${color}; border: 1px solid ${color}44;">${node.tag || 'File'}</div>
+    <div class="file-desc">${node.desc}</div>
+    <pre><code>${escapeHtml(node.content)}</code></pre>
+  `;
+  panel.classList.add('visible');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Initialize tree
+const treeEl = document.getElementById('repoTree');
+buildTree(repoData, treeEl);
+buildTree(mcpData, treeEl);
+</script>
+</body>
+</html>

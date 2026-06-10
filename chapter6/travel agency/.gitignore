@@ -1,0 +1,24 @@
+# Article & architecture docs (not part of the app)
+enterprise-scale-ai-agents.md
+architecture.html
+
+# Environment
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Old experiments
+OLD/

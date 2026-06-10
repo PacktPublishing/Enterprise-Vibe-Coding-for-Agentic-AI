@@ -1,0 +1,21 @@
+{
+  "servers": {
+    "sql-mcp-server": {
+      "type": "stdio",
+      "command": "dab",
+      "args": [
+        "start",
+        "--mcp-stdio",
+        "role:anonymous",
+        "--loglevel",
+        "error",
+        "--config",
+        "${workspaceFolder}/dab-config.json"
+      ]
+    },
+    "figma": {
+       "url": "https://mcp.figma.com/mcp",
+       "type": "http"
+     }
+  }
+}

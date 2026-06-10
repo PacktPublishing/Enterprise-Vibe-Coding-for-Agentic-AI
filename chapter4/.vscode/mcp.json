@@ -1,0 +1,24 @@
+{
+	"servers": {
+		"mermaid-mcp": {
+			"url": "https://mcp.mermaid.ai/mcp",
+			"type": "http",
+			"headers": {
+				"Authorization": "***REMOVED***"
+			},
+        },
+        "microsoft/azure-devops-mcp": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@azure-devops/mcp@latest",
+				"${input:ado_org}",
+				"-d",
+				"${input:ado_domain}"
+			],
+			"gallery": "https://api.mcp.github.com",
+			"version": "1.0.0"
+		},
+    }
+}
