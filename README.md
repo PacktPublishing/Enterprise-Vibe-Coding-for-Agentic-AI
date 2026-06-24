@@ -14,6 +14,7 @@ This book introduces **Hypervelocity Engineering (HVE)** — a methodology for s
 | `chapter2/` | Intelligent Risk & Compliance Monitoring (Financial Services) |
 | `chapter3/` | Clinical Documentation Intelligence (Healthcare) |
 | `chapter4/` | Supply Chain Decision Intelligence (Retail & Logistics) |
+| `chapter5/` | Governance — From Stochastic to Deterministic Agentic Development |
 | `chapter6/` | Multi-Agent Applications with Microsoft Agent Framework |
 
 ## Who This Is For
