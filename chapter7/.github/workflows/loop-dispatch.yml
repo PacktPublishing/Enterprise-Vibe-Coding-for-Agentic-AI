@@ -1,0 +1,84 @@
+name: loop-dispatch
+
+# P0 — Trigger.
+# The loop is "something that runs", not "something you run".
+# A cron backstop makes it resilient to missed webhooks; the issues:assigned
+# fast-path makes it responsive when someone is actively assigning work.
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # backstop: every 15 minutes
+  issues:
+    types: [assigned, labeled]
+
+permissions:
+  issues: write
+  contents: read
+
+env:
+  # Dispatch throttling: cap how many loops start per cycle so a backlog of newly
+  # assigned issues can't spawn dozens of concurrent agents and blow the budget.
+  MAX_STARTS: "3"
+
+concurrency:
+  group: loop-dispatch
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Start ready loops (idempotent + throttled)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const MAX = parseInt(process.env.MAX_STARTS, 10);
+
+            // Find issues that are labeled `loop`, assigned, still open, and
+            // NOT already marked `loop-started` (idempotent triggering).
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              labels: "loop",
+              per_page: 50,
+            });
+
+            const ready = issues.filter(i =>
+              i.assignees.length > 0 &&
+              !i.labels.some(l => (l.name || l) === "loop-started")
+            );
+
+            let started = 0;
+            for (const issue of ready) {
+              if (started >= MAX) break;
+
+              // Mark loop-started BEFORE dispatching, so overlapping cron runs
+              // and the event fast-path never double-start the same work.
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ["loop-started"],
+              });
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: [
+                  "🔁 **Loop started.**",
+                  "",
+                  "Assigning the Copilot coding agent. It will now:",
+                  "1. **P1** — post its understanding (goals, constraints, assumptions, open questions)",
+                  "2. **P2** — post a reviewable plan and **wait for `plan approved`**",
+                  "",
+                  "_Steering happens at exactly two gates: approve the plan, authorize the merge._",
+                ].join("\n"),
+              });
+
+              // In a real repo this hands the issue to the Copilot coding agent
+              // (e.g. via assignment to the coding-agent bot or a workflow_dispatch).
+              started++;
+            }
+
+            core.info(`loop-dispatch: started ${started} loop(s) (cap ${MAX}).`);

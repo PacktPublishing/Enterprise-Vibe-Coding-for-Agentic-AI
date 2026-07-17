@@ -16,6 +16,7 @@ This book introduces **Hypervelocity Engineering (HVE)** — a methodology for s
 | `chapter4/` | Supply Chain Decision Intelligence (Retail & Logistics) |
 | `chapter5/` | Governance — From Stochastic to Deterministic Agentic Development |
 | `chapter6/` | Multi-Agent Applications with Microsoft Agent Framework |
+| `chapter7/` | Loop Engineering — a self-running delivery loop (trigger → governed merge) |
 
 ## Who This Is For
 

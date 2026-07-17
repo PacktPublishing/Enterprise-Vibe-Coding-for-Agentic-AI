@@ -1,0 +1,39 @@
+{
+  "$comment": [
+    "P5 / P7 — least-privilege MCP connector. The loop's runtime capability for",
+    "reading CI logs and writing status back to the issue/PR thread. Treat MCP",
+    "connectors like production dependencies: read-only first, scoped tokens,",
+    "logging on. The loop should be able to read CI logs and write to the thread —",
+    "never hold write access to secrets or production."
+  ],
+  "servers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${input:github_pat}"
+      },
+      "$scopes": [
+        "issues:read",
+        "issues:write",
+        "pull_requests:read",
+        "pull_requests:write",
+        "actions:read"
+      ],
+      "$denied": [
+        "secrets:*",
+        "contents:write:main",
+        "deployments:*",
+        "environments:production"
+      ]
+    }
+  },
+  "inputs": [
+    {
+      "id": "github_pat",
+      "type": "promptString",
+      "description": "Scoped, read-mostly GitHub token (issues/PR read+write, actions read).",
+      "password": true
+    }
+  ]
+}

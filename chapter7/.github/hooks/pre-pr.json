@@ -1,0 +1,18 @@
+{
+  "$comment": [
+    "P6 / bounds — a fast, fail-safe guard that runs in the agent's path before a",
+    "push or PR is created. Guardrails belong in code, not in reminders: this hook",
+    "blocks direct pushes to main and any attempt to bypass required checks.",
+    "Hooks run inline, so this must stay quick (< a few seconds) and fail safe."
+  ],
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "shell",
+        "type": "command",
+        "command": "python .github/hooks/scripts/pre_pr_check.py",
+        "timeout": 5
+      }
+    ]
+  }
+}

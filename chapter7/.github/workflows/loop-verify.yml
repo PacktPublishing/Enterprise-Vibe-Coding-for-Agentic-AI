@@ -1,0 +1,77 @@
+name: loop-verify
+
+# P4 — Verify continuously, and P8 — Enforce the done-condition.
+# Verification is a stage of the loop, not an afterthought. Every acceptance
+# criterion maps to a concrete, machine-checkable signal, and the loop physically
+# cannot declare itself finished while any checkbox remains unchecked.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+  push:
+    branches-ignore: [main]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  verify:
+    name: P4 — lint, unit, integration, contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint
+        run: echo "→ run linters (ruff / eslint / etc.)"
+
+      - name: Unit tests
+        run: echo "→ run unit tests"
+
+      - name: Integration tests
+        # criterion → check mapping is live:
+        #   happy path            → integration scenario A
+        #   invalid-date recovery → integration scenario B
+        run: echo "→ run integration scenarios A + B"
+
+      - name: Contract tests
+        # Guards external adapters (e.g. the fares API): a null fare on a
+        # sold-out leg must be handled, not crash the orchestrator.
+        run: echo "→ run contract tests against external adapters"
+
+      - name: Deterministic-ranking fixture
+        # Ranking is exactly where AI-built features quietly drift between runs.
+        # A fixture-locked test pins the exact ordering for a frozen input, turning
+        # "deterministic" from a hope into a wall the loop cannot climb over.
+        run: echo "→ assert ranking output == frozen fixture"
+
+  done-condition:
+    name: P8 — done-condition (hard gate)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refuse to pass while any acceptance box is unchecked
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || "";
+
+            // Count acceptance checklist boxes in the PR body.
+            const unchecked = (body.match(/- \[ \]/g) || []).length;
+            const checked   = (body.match(/- \[[xX]\]/g) || []).length;
+
+            core.info(`done-condition: ${checked} checked, ${unchecked} unchecked.`);
+
+            if (checked === 0) {
+              core.setFailed(
+                "No acceptance checklist found in the PR body. " +
+                "Add the acceptance criteria (each linking to evidence)."
+              );
+              return;
+            }
+            if (unchecked > 0) {
+              core.setFailed(
+                `Done-condition not met: ${unchecked} acceptance criteria still ` +
+                `unchecked. "PR opened" is not "done" — check each box with a link ` +
+                `to a passing test.`
+              );
+            }

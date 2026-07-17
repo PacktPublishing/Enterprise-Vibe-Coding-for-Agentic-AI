@@ -1,0 +1,66 @@
+name: "🔁 Feature Loop"
+description: "File a feature so it arrives loop-ready — goals, constraints, and machine-checkable acceptance criteria the delivery loop can close on."
+title: "[loop] <short feature title>"
+labels: ["loop"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A loop is only as good as its trigger input. Fill every section so the loop
+        has a checkable contract to close on. "Make it better" is not a feature.
+  - type: input
+    id: goal
+    attributes:
+      label: Goal (one sentence)
+      description: What outcome should this feature deliver, for whom?
+      placeholder: "Help a passenger assemble an itinerary through chat on /book."
+    validations:
+      required: true
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requirements
+      description: The functional behavior. One bullet per requirement.
+      value: |
+        - Chat entry point on /book
+        - Collect origin, destination, dates, passengers, cabin, budget
+        - Call the itinerary + fares APIs; return 3 ranked options with rationale
+        - Guide the passenger when inputs are missing or invalid
+        - Persist in-progress conversation state for 30 minutes
+    validations:
+      required: true
+  - type: textarea
+    id: non_functional
+    attributes:
+      label: Non-functional requirements
+      description: Performance, accessibility, security budgets.
+      value: |
+        - p95 response < 2.5s
+        - Passes accessibility and security checks
+    validations:
+      required: true
+  - type: checkboxes
+    id: acceptance
+    attributes:
+      label: Acceptance criteria (machine-checkable)
+      description: >
+        Each box maps to a concrete test. The done-condition job refuses to pass
+        while any of these remain unchecked. "PR opened" is not "done."
+      options:
+        - label: Happy path works end-to-end in the UI
+        - label: Recovery path works for invalid dates / airports
+        - label: Ranking is deterministic for a fixed input fixture
+        - label: CI green
+  - type: dropdown
+    id: sensitive
+    attributes:
+      label: Touches a sensitive area?
+      description: Auth, payments, PII, or production actions add a hard human gate (Chapter 5).
+      options:
+        - "No"
+        - "Yes — auth / authorization"
+        - "Yes — payments / billing"
+        - "Yes — PII / regulated data"
+        - "Yes — production actions"
+    validations:
+      required: true

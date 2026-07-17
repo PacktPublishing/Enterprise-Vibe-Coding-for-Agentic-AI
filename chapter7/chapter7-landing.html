@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 7 — Loop Engineering: Turning Primitives, RPI, and Governance into a Self-Running Delivery Loop</title>
+<script>
+(()=>{
+  const param = new URLSearchParams(window.location.search).get("clawpilotTheme");
+  const theme = param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  document.documentElement.setAttribute("data-theme", theme);
+})();
+</script>
+<style>
+:root {
+  color-scheme: light;
+  --cp-bg: #f7f4ef;
+  --cp-bg-elevated: #fcfbf8;
+  --cp-surface: #ffffff;
+  --cp-surface-soft: #f5f5f5;
+  --cp-border: #dedede;
+  --cp-border-strong: #919191;
+  --cp-text: #242424;
+  --cp-text-muted: #5c5c5c;
+  --cp-text-soft: #6f6f6f;
+  --cp-accent: #b11f4b;
+  --cp-accent-hover: #9a1a41;
+  --cp-accent-soft: rgba(177, 31, 75, 0.08);
+  --cp-accent-fg: #ffffff;
+  --cp-success: #16a34a;
+  --cp-danger: #dc2626;
+  --cp-warning: #f59e0b;
+  --cp-link: #0078d4;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+  --cp-overlay: rgba(255, 255, 255, 0.8);
+  --cp-panel: rgba(255, 255, 255, 0.86);
+  --cp-panel-strong: rgba(255, 255, 255, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.55);
+  --cp-highlight: rgba(177, 31, 75, 0.12);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --cp-bg: #3d3b3a;
+  --cp-bg-elevated: #343231;
+  --cp-surface: #292929;
+  --cp-surface-soft: #2e2e2e;
+  --cp-border: #474747;
+  --cp-border-strong: #5f5f5f;
+  --cp-text: #dedede;
+  --cp-text-muted: #919191;
+  --cp-text-soft: #b0b0b0;
+  --cp-accent: #fd8ea1;
+  --cp-accent-hover: #fb7b91;
+  --cp-accent-soft: rgba(253, 142, 161, 0.14);
+  --cp-accent-fg: #1a1a1a;
+  --cp-success: #4ade80;
+  --cp-danger: #f87171;
+  --cp-warning: #fbbf24;
+  --cp-link: #4da6ff;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+  --cp-overlay: rgba(41, 41, 41, 0.88);
+  --cp-panel: rgba(41, 41, 41, 0.72);
+  --cp-panel-strong: rgba(41, 41, 41, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.04);
+  --cp-highlight: rgba(253, 142, 161, 0.12);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--cp-bg);
+  color: var(--cp-text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+code, pre { font-family: Consolas, "Courier New", Courier, monospace; }
+
+/* Progress bar */
+.progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--cp-accent); z-index: 1000; transition: width 0.2s ease; }
+
+/* Theme toggle */
+.theme-toggle { position: fixed; top: 16px; left: 16px; z-index: 999; background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 0.625rem; padding: 8px 12px; cursor: pointer; font-size: 1.1rem; box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14); }
+.theme-toggle:hover { border-color: var(--cp-accent); }
+
+/* XP counter */
+.xp-counter { position: fixed; top: 16px; right: 16px; z-index: 999; background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 0.625rem; padding: 8px 16px; font-weight: 600; font-size: 0.9rem; color: var(--cp-accent); box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14); }
+
+/* Toast */
+.toast { position: fixed; bottom: 24px; right: 24px; z-index: 1001; background: var(--cp-surface); border: 1px solid var(--cp-accent); border-radius: 0.625rem; padding: 12px 20px; box-shadow: var(--cp-shadow); transform: translateY(100px); opacity: 0; transition: all 0.3s ease; font-size: 0.9rem; }
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* Hero */
+.hero { text-align: center; padding: 100px 24px 40px; max-width: 860px; margin: 0 auto; }
+.hero h1 { font-size: 2.4rem; font-weight: 700; margin-bottom: 16px; }
+.hero .badge { display: inline-block; background: var(--cp-accent-soft); color: var(--cp-accent); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.hero .subtitle { font-size: 1.1rem; color: var(--cp-text-muted); max-width: 680px; margin: 16px auto 24px; }
+
+/* Tabs */
+.tab-bar { display: flex; justify-content: center; gap: 4px; margin: 0 auto; padding: 4px; background: var(--cp-surface-soft); border-radius: 0.625rem; max-width: 500px; }
+.tab-btn { padding: 10px 24px; border: none; background: transparent; border-radius: 0.5rem; cursor: pointer; font-size: 0.95rem; font-weight: 500; color: var(--cp-text-muted); transition: all 0.2s; font-family: inherit; }
+.tab-btn:hover { color: var(--cp-text); }
+.tab-btn.active { background: var(--cp-surface); color: var(--cp-accent); box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14); font-weight: 600; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Sections */
+section { padding: 56px 24px; max-width: 960px; margin: 0 auto; }
+section h2 { font-size: 1.6rem; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+section h2 .num { background: var(--cp-accent); color: var(--cp-accent-fg); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; flex-shrink: 0; }
+section p.desc { color: var(--cp-text-muted); margin-bottom: 24px; }
+
+/* Compare table */
+.compare-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid var(--cp-border); box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14); }
+table.compare { width: 100%; border-collapse: collapse; background: var(--cp-surface); font-size: 0.9rem; }
+table.compare th, table.compare td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--cp-border); }
+table.compare thead th { background: var(--cp-surface-soft); font-weight: 600; }
+table.compare th.dim { color: var(--cp-text-muted); font-weight: 600; white-space: nowrap; }
+table.compare td.bad { color: var(--cp-danger); }
+table.compare td.good { color: var(--cp-success); }
+table.compare tr:last-child td { border-bottom: none; }
+.col-loop { background: var(--cp-accent-soft); }
+
+/* Stage grid (anatomy) */
+.stage-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.stage-card { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; padding: 18px; cursor: pointer; transition: all 0.2s; box-shadow: 0 0 2px rgba(0,0,0,0.10); }
+.stage-card:hover { border-color: var(--cp-accent); transform: translateY(-2px); }
+.stage-card.open { border-color: var(--cp-accent); background: var(--cp-bg-elevated); }
+.stage-card .stage-top { display: flex; align-items: center; gap: 10px; }
+.stage-card .pnum { background: var(--cp-accent); color: var(--cp-accent-fg); font-weight: 700; font-size: 0.8rem; padding: 3px 9px; border-radius: 10px; flex-shrink: 0; }
+.stage-card .stage-title { font-weight: 600; font-size: 0.98rem; }
+.stage-card .stage-kind { margin-top: 8px; display: inline-block; font-size: 0.72rem; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: var(--cp-highlight); color: var(--cp-accent); }
+.stage-card .stage-body { font-size: 0.86rem; color: var(--cp-text-muted); margin-top: 10px; display: none; }
+.stage-card.open .stage-body { display: block; }
+.stage-card .impl { font-size: 0.76rem; color: var(--cp-text-soft); margin-top: 10px; display: none; }
+.stage-card.open .impl { display: block; }
+.stage-card .impl code { background: var(--cp-surface-soft); padding: 1px 5px; border-radius: 5px; font-size: 0.72rem; }
+.gate-pill { font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 8px; background: rgba(245,158,11,0.16); color: var(--cp-warning); margin-left: auto; }
+
+/* Timeline (worked example) */
+.timeline { position: relative; margin-top: 8px; }
+.tl-step { position: relative; padding: 0 0 8px 44px; }
+.tl-step::before { content: ""; position: absolute; left: 15px; top: 30px; bottom: -4px; width: 2px; background: var(--cp-border); }
+.tl-step:last-child::before { display: none; }
+.tl-dot { position: absolute; left: 0; top: 6px; width: 32px; height: 32px; border-radius: 50%; background: var(--cp-surface); border: 2px solid var(--cp-border); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; color: var(--cp-text-muted); z-index: 1; }
+.tl-step.gate .tl-dot { border-color: var(--cp-warning); color: var(--cp-warning); }
+.tl-card { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 14px; padding: 14px 18px; margin-bottom: 14px; cursor: pointer; transition: all 0.2s; }
+.tl-card:hover { border-color: var(--cp-accent); }
+.tl-card.open { border-color: var(--cp-accent); background: var(--cp-bg-elevated); }
+.tl-head { display: flex; align-items: center; gap: 10px; }
+.tl-head .tl-name { font-weight: 600; font-size: 0.95rem; }
+.tl-head .tl-gate { font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 8px; background: rgba(245,158,11,0.16); color: var(--cp-warning); }
+.tl-body { font-size: 0.88rem; color: var(--cp-text-muted); margin-top: 10px; display: none; }
+.tl-card.open .tl-body { display: block; }
+.tl-body code { background: var(--cp-surface-soft); padding: 1px 5px; border-radius: 5px; font-size: 0.8rem; }
+
+/* Cost callout */
+.callout { background: var(--cp-surface); border: 1px solid var(--cp-border); border-left: 4px solid var(--cp-accent); border-radius: 12px; padding: 18px 22px; margin-top: 20px; }
+.callout strong { color: var(--cp-accent); }
+
+/* Card grids (bounds / anti-patterns) */
+.mini-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+.mini-card { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; padding: 16px; }
+.mini-card .mc-icon { font-size: 1.4rem; margin-bottom: 6px; }
+.mini-card .mc-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
+.mini-card .mc-text { font-size: 0.82rem; color: var(--cp-text-muted); }
+.mini-card.warn { border-color: rgba(220,38,38,0.35); }
+.mini-card.warn .mc-title { color: var(--cp-danger); }
+
+/* Quiz */
+.quiz-card { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+.quiz-card h4 { margin-bottom: 12px; font-size: 1rem; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt { padding: 10px 16px; border: 1px solid var(--cp-border); border-radius: 0.625rem; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; background: var(--cp-surface-soft); }
+.quiz-opt:hover { border-color: var(--cp-accent); }
+.quiz-opt.correct { background: rgba(22, 163, 74, 0.12); border-color: var(--cp-success); color: var(--cp-success); }
+.quiz-opt.wrong { background: rgba(220, 38, 38, 0.12); border-color: var(--cp-danger); color: var(--cp-danger); }
+.quiz-opt.disabled { pointer-events: none; opacity: 0.7; }
+
+/* Achievements */
+.achievements-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.achievement { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; padding: 16px; text-align: center; opacity: 0.5; transition: all 0.3s; }
+.achievement.unlocked { opacity: 1; border-color: var(--cp-accent); }
+.achievement .ach-icon { font-size: 1.8rem; margin-bottom: 6px; }
+.achievement .ach-name { font-weight: 600; font-size: 0.85rem; }
+
+/* ---- TAB 2: PRIMITIVES TREE ---- */
+.repo-explorer { padding: 56px 24px; max-width: 1000px; margin: 0 auto; }
+.repo-explorer h2 { font-size: 1.6rem; margin-bottom: 8px; }
+.repo-explorer p.desc { color: var(--cp-text-muted); margin-bottom: 16px; }
+
+.filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.filter-btn { padding: 6px 14px; border-radius: 14px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: 1px solid var(--cp-border); background: var(--cp-surface-soft); color: var(--cp-text-muted); transition: all 0.2s; font-family: inherit; }
+.filter-btn:hover { border-color: var(--cp-accent); color: var(--cp-accent); }
+.filter-btn.active { background: var(--cp-accent-soft); border-color: var(--cp-accent); color: var(--cp-accent); }
+
+.tree-container { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; padding: 24px; font-family: Consolas, "Courier New", Courier, monospace; box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.14); }
+.tree-node .node-row { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 0.625rem; cursor: pointer; transition: all 0.15s; font-size: 0.9rem; }
+.tree-node .node-row:hover { background: var(--cp-accent-soft); }
+.tree-node .node-row.highlighted { background: var(--cp-highlight); border: 1px solid var(--cp-accent); }
+.tree-node .node-row .icon { flex-shrink: 0; font-size: 1rem; }
+.tree-node .node-row .name { font-weight: 500; }
+.tree-node .node-row .tag { margin-left: auto; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 600; font-family: "Segoe UI", sans-serif; }
+.tag.instructions, .prim-tag.instructions { background: rgba(99,102,241,0.14); color: #6366f1; }
+.tag.skill, .prim-tag.skill { background: rgba(22, 163, 74, 0.12); color: var(--cp-success); }
+.tag.template, .prim-tag.template { background: rgba(245, 158, 11, 0.12); color: var(--cp-warning); }
+.tag.workflow, .prim-tag.workflow { background: rgba(0, 120, 212, 0.12); color: var(--cp-link); }
+.tag.hook, .prim-tag.hook { background: rgba(147, 51, 234, 0.12); color: #9333ea; }
+.tag.mcp, .prim-tag.mcp { background: rgba(8, 145, 178, 0.12); color: #0891b2; }
+.tree-children { margin-left: 20px; border-left: 1px solid var(--cp-border); padding-left: 8px; }
+.tree-children.collapsed { display: none; }
+.tree-node .chevron { transition: transform 0.2s; font-size: 0.7rem; color: var(--cp-text-muted); }
+.tree-node.open > .node-row .chevron { transform: rotate(90deg); }
+
+.file-detail-panel { background: var(--cp-bg-elevated); border: 1px solid var(--cp-border); border-radius: 16px; padding: 24px; margin-top: 16px; display: none; animation: slideDown 0.2s ease; }
+.file-detail-panel.visible { display: block; }
+.file-detail-panel h3 { font-size: 1.1rem; margin-bottom: 4px; }
+.file-detail-panel .file-path { color: var(--cp-text-muted); font-size: 0.8rem; margin-bottom: 12px; font-family: Consolas, monospace; }
+.file-detail-panel .file-type-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-bottom: 8px; }
+.file-detail-panel .used-by { margin-bottom: 12px; }
+.file-detail-panel .used-by span { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 600; margin-right: 6px; background: var(--cp-accent-soft); color: var(--cp-accent); }
+.file-detail-panel .file-desc { font-size: 0.9rem; color: var(--cp-text-muted); margin-bottom: 16px; }
+.file-detail-panel pre { background: var(--cp-surface-soft); border: 1px solid var(--cp-border); border-radius: 0.625rem; padding: 16px; overflow-x: auto; font-size: 0.8rem; line-height: 1.5; max-height: 360px; overflow-y: auto; }
+
+/* Primitive tags (inline, in stage detail) */
+.prim-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.prim-tag { padding: 4px 11px; border-radius: 14px; font-size: 0.74rem; font-weight: 600; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+.prim-tag:hover { transform: scale(1.05); }
+
+@keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+footer { text-align: center; padding: 40px 24px; color: var(--cp-text-muted); font-size: 0.85rem; border-top: 1px solid var(--cp-border); }
+footer a { color: var(--cp-accent); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+.reveal { opacity: 0; transform: translateY(20px); transition: all 0.5s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌓</button>
+<div class="xp-counter" id="xpCounter">⚡ 0 XP</div>
+<div class="toast" id="toast"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="badge">Chapter 7</span>
+  <h1>Loop Engineering</h1>
+  <p class="subtitle">Stop operating the tool one prompt at a time. Design the loop that operates it for you — a self-running delivery engine that carries a feature from a filed issue to a governed merge, then ships the next one on the very same rails.</p>
+  <div class="tab-bar" style="margin-top: 24px;">
+    <button class="tab-btn active" onclick="switchTab('recap')">📖 The Loop</button>
+    <button class="tab-btn" onclick="switchTab('repo')">📂 Loop Primitives</button>
+  </div>
+</div>
+
+<!-- TAB 1: THE LOOP -->
+<div class="tab-content active" id="tab-recap">
+
+<!-- Section 1: prompt vs system -->
+<section class="reveal">
+  <h2><span class="num">1</span> From Prompting to Engineering the Loop</h2>
+  <p class="desc">Primitives are the vocabulary, RPI is the grammar, governance is the law — and the loop is the running program. The expensive part of agentic work isn't generating code; it's re-establishing context at every hand-off. A loop is a machine for making review and accountability cheap and consistent, because it builds them in rather than bolting them on.</p>
+  <div class="compare-wrap">
+    <table class="compare">
+      <thead>
+        <tr><th class="dim">Dimension</th><th>Prompt-centric</th><th class="col-loop">System-centric (loop)</th></tr>
+      </thead>
+      <tbody>
+        <tr><th class="dim">Unit of work</th><td>One chat turn</td><td class="col-loop">One issue → merged PR</td></tr>
+        <tr><th class="dim">Context</th><td>Re-pasted each step</td><td class="col-loop">Persisted in issue / PR thread</td></tr>
+        <tr><th class="dim">Verification</th><td class="bad">Manual, remembered</td><td class="col-loop good">Wired into the loop, non-negotiable</td></tr>
+        <tr><th class="dim">Who threads the steps</th><td>A human, live</td><td class="col-loop">The loop, autonomously</td></tr>
+        <tr><th class="dim">Repeatability</th><td>Depends on the operator</td><td class="col-loop">Committed to the repo</td></tr>
+        <tr><th class="dim">Scales to N streams</th><td class="bad">No</td><td class="col-loop good">Yes</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Section 2: anatomy -->
+<section class="reveal">
+  <h2><span class="num">2</span> Anatomy of a Delivery Loop</h2>
+  <p class="desc">Every delivery loop is made of the same eight stages, labeled P0–P8 so they can be referenced from primitives, dashboards, and audits. Each stage is really a primitive, an RPI phase, or a governance control wearing a different hat — and none of them mention the feature being built. Click a stage to open it.</p>
+  <div class="stage-grid" id="stageGrid"></div>
+  <p style="text-align:center; margin-top:16px; font-size:0.85rem; color:var(--cp-text-soft);">Issue-agnostic by design: build the loop once, and every future issue rides the same rails.</p>
+</section>
+
+<!-- Section 3: worked example -->
+<section class="reveal">
+  <h2><span class="num">3</span> Worked Example — A Trip Planner for an Airline</h2>
+  <p class="desc">Two worlds, kept clean: the <strong>passenger</strong> is the airline's customer who will one day chat on <code>/book</code> — they never see GitHub. The <strong>engineering team</strong> uses loop engineering to build that planner. The passenger's chat is the product; the loop is how the product gets made. Follow issue <strong>#2194</strong> end-to-end — click each stage.</p>
+  <div class="timeline" id="timeline"></div>
+  <div class="callout">
+    <p><strong>What it shipped:</strong> an accessible chat entry on <code>/book</code>, a slot-filling orchestrator wired to the itinerary + fares APIs, deterministic ranking with rationale, 30-minute persisted state, timeout fallbacks, analytics, and integration + contract tests.</p>
+    <p style="margin-top:10px;"><strong>What it cost you:</strong> approve the plan, click merge. Six build slices, a CI failure, and a review comment were all absorbed by the loop with unbroken context — and because no <code>.github</code> artifact mentions "trip planner," the same loop carries issue #2195 (seat selection) tomorrow, unchanged.</p>
+  </div>
+</section>
+
+<!-- Section 4: bounds & anti-patterns -->
+<section class="reveal">
+  <h2><span class="num">4</span> Bounding the Loop</h2>
+  <p class="desc">Autonomy without bounds is a liability, not a feature. A production loop must be governed exactly as Chapter 5 describes — with the controls encoded, not assumed.</p>
+  <div class="mini-grid">
+    <div class="mini-card"><div class="mc-icon">🧯</div><div class="mc-title">Continuation limits</div><div class="mc-text">Autopilot runs under a cap (<code>--max-autopilot-continues N</code>). A confused loop must never burn tokens indefinitely.</div></div>
+    <div class="mini-card"><div class="mc-icon">🚦</div><div class="mc-title">Dispatch throttling</div><div class="mc-text">Cap how many loops start per cycle (<code>MAX_STARTS</code>) so a backlog can't spawn dozens of concurrent agents.</div></div>
+    <div class="mini-card"><div class="mc-icon">🔒</div><div class="mc-title">Idempotent triggering</div><div class="mc-text">Mark an issue <code>loop-started</code> before dispatching, so overlapping cron runs never double-start work.</div></div>
+    <div class="mini-card"><div class="mc-icon">🔌</div><div class="mc-title">Least-privilege MCP</div><div class="mc-text">Read CI logs and write to the thread — never hold write access to secrets or production.</div></div>
+    <div class="mini-card"><div class="mc-icon">🛡️</div><div class="mc-title">Hard governance gates</div><div class="mc-text">Auth, payments, PII, production always require explicit human authorization, regardless of how green CI is.</div></div>
+    <div class="mini-card"><div class="mc-icon">📊</div><div class="mc-title">Observability</div><div class="mc-text">Instrument lead time, defect escape rate, rollback frequency, review load. Speed only counts when trust stays green.</div></div>
+  </div>
+
+  <h2 style="margin-top:44px;"><span class="num">5</span> Anti-Patterns</h2>
+  <p class="desc">A few failure modes recur often enough to name.</p>
+  <div class="mini-grid">
+    <div class="mini-card warn"><div class="mc-icon">❓</div><div class="mc-title">No done-condition</div><div class="mc-text">If "done" isn't machine-checkable, the loop stops too early or never stops. Wire criteria to a hard gate.</div></div>
+    <div class="mini-card warn"><div class="mc-icon">♾️</div><div class="mc-title">The unbounded loop</div><div class="mc-text">No continuation cap, no dispatch throttle. Works in a demo, bankrupts you at scale.</div></div>
+    <div class="mini-card warn"><div class="mc-icon">🌫️</div><div class="mc-title">The fuzzy issue</div><div class="mc-text">"Make the planner better" has no checkable contract. The issue template is a primitive, not a formality.</div></div>
+    <div class="mini-card warn"><div class="mc-icon">🧪</div><div class="mc-title">Verification as afterthought</div><div class="mc-text">If tests aren't part of the loop, quality depends on someone remembering to ask.</div></div>
+    <div class="mini-card warn"><div class="mc-icon">🔀</div><div class="mc-title">Product ≠ delivery loop</div><div class="mc-text">The passenger's chat is not a trigger for the build-time loop. Keep the two cleanly separated.</div></div>
+    <div class="mini-card warn"><div class="mc-icon">⚠️</div><div class="mc-title">Ungoverned autonomy</div><div class="mc-text">Letting the loop touch auth or payments without a gate trades speed for an incident. Bound it.</div></div>
+  </div>
+</section>
+
+<!-- Section 6: quiz -->
+<section class="reveal">
+  <h2><span class="num">6</span> Knowledge Check</h2>
+  <div class="quiz-card" id="quiz1">
+    <h4>Q1: What is the core shift that loop engineering demands?</h4>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkQuiz('quiz1', this, false)">Writing longer, more detailed prompts for each task</div>
+      <div class="quiz-opt" onclick="checkQuiz('quiz1', this, true)">Designing the loop that prompts the agent, instead of prompting the agent yourself</div>
+      <div class="quiz-opt" onclick="checkQuiz('quiz1', this, false)">Replacing all human review with automated approvals</div>
+    </div>
+  </div>
+  <div class="quiz-card" id="quiz2">
+    <h4>Q2: Why does the done-condition job refuse to pass while any <code>- [ ]</code> remains?</h4>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkQuiz('quiz2', this, false)">To slow the loop down so humans can catch up</div>
+      <div class="quiz-opt" onclick="checkQuiz('quiz2', this, true)">So the loop physically cannot declare itself finished before every acceptance criterion has evidence</div>
+      <div class="quiz-opt" onclick="checkQuiz('quiz2', this, false)">Because GitHub Actions requires all checkboxes to be checked</div>
+    </div>
+  </div>
+  <div class="quiz-card" id="quiz3">
+    <h4>Q3: In the loop, what is a red CI run or a review comment?</h4>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkQuiz('quiz3', this, false)">An interruption that requires a human to re-start the conversation</div>
+      <div class="quiz-opt" onclick="checkQuiz('quiz3', this, false)">A signal to abandon the branch and open a fresh issue</div>
+      <div class="quiz-opt" onclick="checkQuiz('quiz3', this, true)">The next input to the loop — the agent diagnoses, patches, and continues without a re-prompt</div>
+    </div>
+  </div>
+</section>
+
+<!-- Section 7: achievements -->
+<section class="reveal">
+  <h2><span class="num">7</span> Achievements</h2>
+  <div class="achievements-grid">
+    <div class="achievement" id="ach-explorer"><div class="ach-icon">🗺️</div><div class="ach-name">Explorer</div></div>
+    <div class="achievement" id="ach-stages"><div class="ach-icon">🔁</div><div class="ach-name">Loop Anatomist</div></div>
+    <div class="achievement" id="ach-example"><div class="ach-icon">✈️</div><div class="ach-name">Ran the Loop</div></div>
+    <div class="achievement" id="ach-quiz"><div class="ach-icon">🧠</div><div class="ach-name">Knowledge Check</div></div>
+    <div class="achievement" id="ach-repo"><div class="ach-icon">📂</div><div class="ach-name">Repo Explorer</div></div>
+    <div class="achievement" id="ach-master"><div class="ach-icon">👑</div><div class="ach-name">Chapter Master</div></div>
+  </div>
+</section>
+
+</div>
+
+<!-- TAB 2: LOOP PRIMITIVES -->
+<div class="tab-content" id="tab-repo">
+<div class="repo-explorer">
+  <h2>📂 Chapter 7 Loop Primitives</h2>
+  <p class="desc">A loop is only real when it is committed to the repo. Committed artifacts carry the policy (what "good" means, when to stop, what's forbidden); the agent runtime carries the autonomy (planning, execution, recovery). Filter by loop stage to see which primitive implements what, and click a file for its excerpt.</p>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterTree('all')">All</button>
+    <button class="filter-btn" onclick="filterTree('trigger')">🎯 Trigger (P0)</button>
+    <button class="filter-btn" onclick="filterTree('intent')">📝 Intent &amp; Plan (P1–P2)</button>
+    <button class="filter-btn" onclick="filterTree('verify')">✅ Verify &amp; Done (P4/P8)</button>
+    <button class="filter-btn" onclick="filterTree('guardrails')">🛡️ Guardrails (P5–P6)</button>
+  </div>
+
+  <div class="tree-container" id="repoTree"></div>
+  <div class="file-detail-panel" id="fileDetail"></div>
+</div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <p><a href="../chapter6/chapter6-landing.html">← Chapter 6: Use Cases</a> · Chapter 7: Loop Engineering · <a href="../chapter1/index.html">HVE Assessment →</a></p>
+  <p style="margin-top: 8px;">Agentic Development in Practice — Packt Publishing</p>
+</footer>
+
+<script>
+// ===== STATE =====
+let xp = 0, achievements = {}, quizCorrect = 0, filesViewed = 0;
+let stagesOpened = new Set(), stepsOpened = new Set();
+
+// ===== THEME =====
+function toggleTheme() {
+  const c = document.documentElement.getAttribute('data-theme');
+  document.documentElement.setAttribute('data-theme', c === 'dark' ? 'light' : 'dark');
+}
+
+// ===== TABS =====
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  if (tab === 'recap') { document.querySelectorAll('.tab-btn')[0].classList.add('active'); document.getElementById('tab-recap').classList.add('active'); }
+  else { document.querySelectorAll('.tab-btn')[1].classList.add('active'); document.getElementById('tab-repo').classList.add('active'); unlock('ach-repo'); }
+}
+
+// ===== XP & TOAST =====
+function addXP(n) { xp += n; document.getElementById('xpCounter').textContent = `⚡ ${xp} XP`; }
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
+function unlock(id) {
+  if (achievements[id]) return;
+  achievements[id] = true;
+  document.getElementById(id).classList.add('unlocked');
+  addXP(20);
+  const names = { 'ach-explorer':'Explorer', 'ach-stages':'Loop Anatomist', 'ach-example':'Ran the Loop', 'ach-quiz':'Knowledge Check', 'ach-repo':'Repo Explorer', 'ach-master':'Chapter Master' };
+  showToast(`🏆 Achievement: ${names[id]}!`);
+  if (Object.keys(achievements).length >= 5) unlock('ach-master');
+}
+
+// ===== PROGRESS =====
+window.addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  document.getElementById('progressBar').style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+  if (h > 0 && (window.scrollY / h) > 0.8) unlock('ach-explorer');
+});
+
+// ===== QUIZ =====
+function checkQuiz(id, el, correct) {
+  document.querySelectorAll(`#${id} .quiz-opt`).forEach(o => o.classList.add('disabled'));
+  el.classList.add(correct ? 'correct' : 'wrong');
+  if (correct) { addXP(15); quizCorrect++; if (quizCorrect >= 3) unlock('ach-quiz'); }
+}
+
+// ===== REVEAL =====
+const obs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// ===== LOOP STAGES (P0–P8) =====
+const STAGES = [
+  { p:'P0', title:'Trigger', kind:'Event', gate:false,
+    body:'The event that starts the loop. Not a human typing a command — an issue being assigned and labeled, a schedule firing, or a webhook arriving. The trigger turns a workflow from "something you run" into "something that runs."',
+    impl:'GitHub Actions (schedule + <code>issues: assigned</code>) → <code>loop-dispatch.yml</code>', file:'loop-dispatch' },
+  { p:'P1', title:'Normalize intent', kind:'RPI: Research', gate:false,
+    body:'Restate the raw issue as goals, constraints, and explicit acceptance checks. Surface assumptions and open questions before any code exists. A fuzzy request becomes a checkable contract.',
+    impl:'Custom instructions + Skill + Issue template → <code>copilot-instructions.md</code>, <code>deliver-feature/SKILL.md</code>, <code>feature-loop.yml</code>', file:'instructions' },
+  { p:'P2', title:'Plan behind a human gate', kind:'RPI: Plan + Governance', gate:true,
+    body:'Produce a reviewable spec — file-level change map, test strategy, rollout/rollback — and stop for approval. The single most important governance gate: humans steer here, cheaply, before anything expensive happens.',
+    impl:'Agent plan mode + approval (Copilot runtime)', file:null },
+  { p:'P3', title:'Implement in bounded slices', kind:'RPI: Implement', gate:false,
+    body:'Execute in small, coherent commits, each mapped to a plan step. Bounded slices keep diffs reviewable and keep autonomous execution from wandering.',
+    impl:'Autopilot; Fleet for independent slices (Copilot runtime)', file:null },
+  { p:'P4', title:'Verify continuously', kind:'Agentic DevOps', gate:false,
+    body:'After each slice, run lint, unit, integration, and contract checks. Every acceptance criterion maps to a concrete, machine-checkable signal. Verification is a stage of the loop, not an afterthought.',
+    impl:'CI workflow → <code>loop-verify.yml</code>', file:'loop-verify' },
+  { p:'P5', title:'Auto-recover', kind:'Runtime + MCP', gate:false,
+    body:'A red CI run or a review comment is not an interruption — it is the next input to the loop. The agent diagnoses, patches, re-runs, and continues without a human re-prompt. This is what makes the loop a loop.',
+    impl:'Coding agent reacting to CI / review; GitHub MCP → <code>.vscode/mcp.json</code>', file:'mcp' },
+  { p:'P6', title:'Human decision gates', kind:'Governance', gate:true,
+    body:'Autonomy is bounded to two moments that matter: approve the plan (P2) and authorize the merge (P8). Everything between runs unattended. Sensitive areas — auth, payments, PII — add gates.',
+    impl:'Plan + merge approvals; branch protection + hooks → <code>pre-pr.json</code>', file:'pre-pr' },
+  { p:'P7', title:'Persist loop memory', kind:'State', gate:false,
+    body:'State lives in the issue and PR thread: assumptions, decisions, status, unresolved questions. There is no separate database — the thread is the memory, and it lets context survive across steps and days.',
+    impl:'Issue / PR thread via GitHub MCP', file:'mcp' },
+  { p:'P8', title:'Enforce the done-condition', kind:'Governance', gate:true,
+    body:'The loop closes only when every acceptance criterion is checked with evidence and the pipeline is green. "PR opened" is not "done." The auditable definition of done, made into a hard gate.',
+    impl:'CI check + hooks + branch protection → <code>loop-verify.yml</code>, <code>pre-pr.json</code>', file:'loop-verify' }
+];
+
+function renderStages() {
+  const grid = document.getElementById('stageGrid');
+  STAGES.forEach((s, i) => {
+    const card = document.createElement('div');
+    card.className = 'stage-card';
+    const fileLink = s.file ? `<div class="prim-list"><span class="prim-tag ${FILES[s.file].tagClass}" onclick="event.stopPropagation(); highlightInTree('${s.file}')">📄 ${FILES[s.file].name}</span></div>` : '';
+    card.innerHTML = `
+      <div class="stage-top">
+        <span class="pnum">${s.p}</span>
+        <span class="stage-title">${s.title}</span>
+        ${s.gate ? '<span class="gate-pill">HUMAN GATE</span>' : ''}
+      </div>
+      <span class="stage-kind">${s.kind}</span>
+      <div class="stage-body">${s.body}</div>
+      <div class="impl">🔧 Implemented by: ${s.impl}</div>
+      ${s.file ? `<div class="stage-body">${fileLink}</div>` : ''}
+    `;
+    card.onclick = () => {
+      card.classList.toggle('open');
+      if (card.classList.contains('open')) { stagesOpened.add(i); addXP(5); if (stagesOpened.size >= 9) unlock('ach-stages'); }
+    };
+    grid.appendChild(card);
+  });
+}
+
+// ===== WORKED EXAMPLE TIMELINE =====
+const STEPS = [
+  { p:'P0', name:'Trigger', gate:'', body:'Nobody runs a command. The PM assigns <strong>#2194</strong> to the loop owner and adds the <code>loop</code> label. <code>loop-dispatch</code> — on a 15-minute cron and reacting to <code>issues: assigned</code> — marks it <code>loop-started</code> (so a retry never double-starts it), assigns the Copilot coding agent, and posts the kickoff comment. The loop is now running.' },
+  { p:'P1', name:'Normalize intent', gate:'', body:'Copilot loads <code>copilot-instructions.md</code> and the <code>deliver-feature</code> skill, then posts goals, constraints, acceptance checks — and assumptions: "reuse <code>FaresClient</code>; ranking weights price &gt; duration &gt; stops; budget is a soft filter." It flags one open question: "sold-out option — hidden or greyed-out?" The PM answers <em>"grey it out"</em>, and that becomes loop memory.' },
+  { p:'P2', name:'Plan (gate)', gate:'GATE 1', body:'Copilot posts a reviewable plan: <code>TripPlannerChat.tsx</code>, <code>plannerOrchestrator.ts</code>, <code>rankOptions.ts</code>, <code>conversationStore.ts</code>, plus test files with a criterion → test mapping and a rollback note. Then it <strong>stops</strong>. You skim and reply <em>plan approved</em>. Your first intervention — the highest-leverage minute you\'ll spend.' },
+  { p:'P3', name:'Implement in slices', gate:'', body:'Copilot works the plan as small commits on <code>feature/2194-trip-planner</code>: chat shell + accessibility → state + input validation → orchestration + API adapters → ranking + rationale → telemetry + fallback → tests. Each commit message states intent, so anyone reading the branch mid-flight follows the story.' },
+  { p:'P4', name:'Verify continuously', gate:'', body:'After each slice, <code>loop-verify</code> runs lint, unit, integration, and contract tests. The criterion mapping is live — including a <strong>fixture-locked ranking test</strong> that pins the exact ordering for a frozen input, turning "deterministic" from a hope into a wall the loop cannot climb over.' },
+  { p:'P5', name:'Auto-recover', gate:'', body:'The contract test against the fares API goes red: a null fare on sold-out legs wasn\'t handled. <strong>You are not pinged.</strong> Copilot reads the CI log through the GitHub MCP connector, patches <code>plannerOrchestrator.ts</code> to grey out sold-out legs (consistent with the PM\'s earlier answer, still in the thread), re-runs the suite, and goes green.' },
+  { p:'P6', name:'Human gate — review', gate:'', body:'You open the PR and comment: "Add a fallback message when the fares API times out, and tag telemetry <code>planner_timeout=true</code>." In a prompt-centric world that starts a new conversation. In the loop, the comment is simply the next iteration\'s input: Copilot makes a targeted commit, updates telemetry, replies inline, and CI re-runs.' },
+  { p:'P8', name:'Memory & done-condition', gate:'GATE 2', body:'The thread has accumulated the loop\'s memory. The PR body carries the acceptance checklist with evidence links. The done-condition job refuses to pass while any <code>- [ ]</code> remains, so the loop physically cannot finish early. All four criteria checked, CI green → you click <strong>merge</strong>. Your second and final intervention.' }
+];
+
+function renderTimeline() {
+  const tl = document.getElementById('timeline');
+  STEPS.forEach((s, i) => {
+    const step = document.createElement('div');
+    step.className = 'tl-step' + (s.gate ? ' gate' : '');
+    step.innerHTML = `
+      <div class="tl-dot">${s.p}</div>
+      <div class="tl-card">
+        <div class="tl-head">
+          <span class="tl-name">${s.name}</span>
+          ${s.gate ? `<span class="tl-gate">🚦 ${s.gate}</span>` : ''}
+        </div>
+        <div class="tl-body">${s.body}</div>
+      </div>`;
+    const card = step.querySelector('.tl-card');
+    card.onclick = () => {
+      card.classList.toggle('open');
+      if (card.classList.contains('open')) { stepsOpened.add(i); addXP(5); if (stepsOpened.size >= STEPS.length) unlock('ach-example'); }
+    };
+    tl.appendChild(step);
+  });
+}
+
+// ===== REPO TREE DATA =====
+const FILES = {
+  'instructions': {
+    name: 'copilot-instructions.md', path: '.github/copilot-instructions.md', tag: 'Instructions', tagClass: 'instructions',
+    usedBy: ['intent','guardrails'],
+    desc: 'The always-on rulebook. Encodes the loop (P0–P8) as policy: the RPI cadence, the plan gate, bounded slices, verification as non-negotiable, memory in the thread, the hard done-condition, and the two human gates. Sensitive areas (auth/payments/PII/prod) always add a gate.',
+    content: `# Copilot Instructions — The Delivery Loop\n\n> You do not prompt the agent. You design the\n> loop that prompts the agent.\n\n## RPI cadence\n- P1 Normalize intent (Research): goals, constraints,\n  machine-checkable acceptance criteria + assumptions.\n- P2 Plan behind a human gate: reviewable spec, then\n  STOP until a human replies \`plan approved\`.\n- P3 Implement in bounded slices: one slice = one diff.\n\n## Verification is a stage (P4)\nlint + unit + integration + contract after every slice.\nPin ranking/ordering with a fixture-locked test.\n\n## Human gates (P6): exactly two\n- approve the plan (P2)\n- authorize the merge (P8)\nSensitive areas ALWAYS add a hard gate:\nauth · payments · PII · production actions.\n\n## Memory (P7): the issue/PR thread IS the database.\n## Done (P8): "PR opened" is not "done" —\nevery box checked with evidence AND CI green.`
+  },
+  'deliver-feature': {
+    name: 'SKILL.md', path: '.github/skills/deliver-feature/SKILL.md', tag: 'Skill', tagClass: 'skill',
+    usedBy: ['intent'],
+    desc: 'The reusable "how we ship" capability — the loop protocol P1→P8 written once, issue-agnostic. Loaded at P1 so a well-formed feature issue runs the same rails every time: normalize, plan behind a gate, slice, verify, recover, gate, persist, enforce done.',
+    content: `---\nname: deliver-feature\ndescription: Run any well-formed feature issue\n  through the eight-stage delivery loop (P0–P8).\n---\n\n# Skill: Deliver a Feature Through the Loop\n\n## Decision flow\n1. Issue assigned & labeled \`loop\`? → start at P1.\n2. Plan not yet approved? → produce/refine, WAIT (P2).\n3. Plan approved? → next bounded slice (P3) + verify.\n4. Check red / review comment? → auto-recover (P5),\n   loop back to P4.\n5. All criteria checked + CI green? → merge gate (P8).\n\n"You build the loop once, and every future issue\n rides the same rails."`
+  },
+  'feature-loop': {
+    name: 'feature-loop.yml', path: '.github/ISSUE_TEMPLATE/feature-loop.yml', tag: 'Template', tagClass: 'template',
+    usedBy: ['intent'],
+    desc: 'The structured trigger input. A GitHub issue form that forces goals, requirements, non-functionals, and machine-checkable acceptance criteria (checkboxes), so the loop arrives with a checkable contract to close on. The issue template is a primitive, not a formality.',
+    content: `name: "🔁 Feature Loop"\nlabels: ["loop"]\nbody:\n  - type: input\n    id: goal\n    attributes: { label: "Goal (one sentence)" }\n  - type: textarea\n    id: requirements\n    attributes: { label: "Requirements" }\n  - type: checkboxes\n    id: acceptance\n    attributes:\n      label: "Acceptance criteria (machine-checkable)"\n      options:\n        - label: "Happy path works end-to-end in the UI"\n        - label: "Recovery path for invalid dates/airports"\n        - label: "Ranking deterministic for a fixed fixture"\n        - label: "CI green"\n  - type: dropdown\n    id: sensitive\n    attributes:\n      label: "Touches a sensitive area?"\n      options: ["No","auth","payments","PII","production"]`
+  },
+  'loop-dispatch': {
+    name: 'loop-dispatch.yml', path: '.github/workflows/loop-dispatch.yml', tag: 'Workflow', tagClass: 'workflow',
+    usedBy: ['trigger'],
+    desc: 'P0 — the trigger. Runs on a 15-minute cron backstop AND reacts to issues:assigned for a fast-path. Marks the issue loop-started before dispatching (idempotent), throttles how many loops start per cycle (MAX_STARTS), assigns Copilot, and posts the kickoff comment.',
+    content: `name: loop-dispatch\non:\n  schedule:\n    - cron: "*/15 * * * *"   # backstop\n  issues:\n    types: [assigned, labeled]   # fast-path\n\nenv:\n  MAX_STARTS: "3"   # dispatch throttle\n\njobs:\n  dispatch:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/github-script@v7\n        with:\n          script: |\n            // find open, labeled \`loop\`, assigned issues\n            // NOT already \`loop-started\`\n            // add \`loop-started\` BEFORE dispatch\n            //   (idempotent: no double-starts)\n            // stop after MAX_STARTS this cycle\n            // assign Copilot + post kickoff comment`
+  },
+  'loop-verify': {
+    name: 'loop-verify.yml', path: '.github/workflows/loop-verify.yml', tag: 'Workflow', tagClass: 'workflow',
+    usedBy: ['verify'],
+    desc: 'P4 + P8 as policy-as-code. The verify job runs lint, unit, integration, and contract tests plus a deterministic-ranking fixture. The done-condition job parses the PR body and FAILS while any acceptance checkbox is unchecked — the loop physically cannot declare itself finished early.',
+    content: `name: loop-verify\non:\n  pull_request: { types: [opened, synchronize, edited] }\n\njobs:\n  verify:            # P4\n    steps:\n      - run: lint / unit / integration / contract\n      - run: assert ranking == frozen fixture\n\n  done-condition:    # P8 — hard gate\n    steps:\n      - uses: actions/github-script@v7\n        with:\n          script: |\n            const body = pr.body || "";\n            const unchecked = (body.match(/- \\[ \\]/g)||[]).length;\n            if (unchecked > 0) core.setFailed(\n              '"PR opened" is not "done": ' +\n              unchecked + ' criteria unchecked.');`
+  },
+  'pre-pr': {
+    name: 'pre-pr.json', path: '.github/hooks/pre-pr.json', tag: 'Hook', tagClass: 'hook',
+    usedBy: ['guardrails'],
+    desc: 'A fast, fail-safe PreToolUse guard that runs in the agent\'s path before a push or PR. Guardrails belong in code, not reminders: it blocks direct pushes to main and any attempt to bypass required checks (--no-verify, --force). Hooks must stay quick (< a few seconds) and fail safe.',
+    content: `{\n  "hooks": {\n    "PreToolUse": [\n      {\n        "matcher": "shell",\n        "type": "command",\n        "command": "python .github/hooks/scripts/pre_pr_check.py",\n        "timeout": 5\n      }\n    ]\n  }\n}\n\n// pre_pr_check.py blocks (exit 2):\n//   1. git push origin main   (use a PR)\n//   2. --force on main\n//   3. --no-verify (defeats verification)\n// Unknown commands are allowed (fail safe).`
+  },
+  'mcp': {
+    name: 'mcp.json', path: '.vscode/mcp.json', tag: 'MCP', tagClass: 'mcp',
+    usedBy: ['guardrails','verify'],
+    desc: 'The least-privilege connector powering P5 (read CI logs to auto-recover) and P7 (write status back to the thread). Treat MCP like a production dependency: read-mostly, scoped tokens, logging on. It can read CI and write to the thread — never hold write access to secrets or production.',
+    content: `{\n  "servers": {\n    "github": {\n      "command": "npx",\n      "args": ["-y", "@modelcontextprotocol/server-github"],\n      "$scopes": [\n        "issues:read", "issues:write",\n        "pull_requests:read", "pull_requests:write",\n        "actions:read"          // read CI logs (P5)\n      ],\n      "$denied": [\n        "secrets:*",\n        "contents:write:main",\n        "deployments:*",\n        "environments:production"\n      ]\n    }\n  }\n}`
+  }
+};
+
+const treeData = {
+  name: 'chapter7/', icon: '📁', type: 'folder', children: [
+    { name: '.github/', icon: '📁', type: 'folder', children: [
+      { name: 'copilot-instructions.md', icon: '📜', type: 'file', fileId: 'instructions' },
+      { name: 'ISSUE_TEMPLATE/', icon: '📁', type: 'folder', children: [
+        { name: 'feature-loop.yml', icon: '📋', type: 'file', fileId: 'feature-loop' }
+      ]},
+      { name: 'skills/', icon: '📁', type: 'folder', children: [
+        { name: 'deliver-feature/', icon: '📁', type: 'folder', children: [
+          { name: 'SKILL.md', icon: '⚡', type: 'file', fileId: 'deliver-feature' }
+        ]}
+      ]},
+      { name: 'workflows/', icon: '📁', type: 'folder', children: [
+        { name: 'loop-dispatch.yml', icon: '🎯', type: 'file', fileId: 'loop-dispatch' },
+        { name: 'loop-verify.yml', icon: '✅', type: 'file', fileId: 'loop-verify' }
+      ]},
+      { name: 'hooks/', icon: '📁', type: 'folder', children: [
+        { name: 'pre-pr.json', icon: '🛡️', type: 'file', fileId: 'pre-pr' },
+        { name: 'scripts/', icon: '📁', type: 'folder', children: [
+          { name: 'pre_pr_check.py', icon: '🔒', type: 'file', fileId: 'pre-pr' }
+        ]}
+      ]}
+    ]},
+    { name: '.vscode/', icon: '📁', type: 'folder', children: [
+      { name: 'mcp.json', icon: '🔌', type: 'file', fileId: 'mcp' }
+    ]}
+  ]
+};
+
+// ===== TREE BUILDING =====
+let activeFilter = 'all';
+
+function buildTree(node, container) {
+  const el = document.createElement('div');
+  el.className = 'tree-node';
+
+  const row = document.createElement('div');
+  row.className = 'node-row';
+  if (node.fileId && FILES[node.fileId]) {
+    el.dataset.fileId = node.fileId;
+    const f = FILES[node.fileId];
+    if (f.usedBy) el.dataset.usedBy = JSON.stringify(f.usedBy);
+  }
+
+  if (node.type === 'folder') {
+    row.innerHTML = `<span class="chevron">▶</span><span class="icon">${node.icon}</span><span class="name">${node.name}</span>`;
+    row.onclick = (e) => { e.stopPropagation(); el.classList.toggle('open'); const ch = el.querySelector('.tree-children'); if (ch) ch.classList.toggle('collapsed'); };
+  } else {
+    let tagHtml = '';
+    if (node.fileId && FILES[node.fileId]) {
+      const f = FILES[node.fileId];
+      tagHtml = `<span class="tag ${f.tagClass}">${f.tag}</span>`;
+    } else if (node.label) {
+      tagHtml = `<span style="margin-left:auto;font-size:0.75rem;color:var(--cp-text-muted);font-family:'Segoe UI',sans-serif;">${node.label}</span>`;
+    }
+    row.innerHTML = `<span class="icon">${node.icon}</span><span class="name">${node.name}</span>${tagHtml}`;
+    row.onclick = (e) => { e.stopPropagation(); if (node.fileId && FILES[node.fileId]) showFileDetail(node.fileId); };
+  }
+
+  el.appendChild(row);
+  if (node.children) {
+    const childC = document.createElement('div');
+    childC.className = 'tree-children collapsed';
+    node.children.forEach(c => buildTree(c, childC));
+    el.appendChild(childC);
+  }
+  container.appendChild(el);
+}
+
+function showFileDetail(fileId) {
+  filesViewed++;
+  if (filesViewed >= 3) unlock('ach-repo');
+  addXP(5);
+  const f = FILES[fileId];
+  const panel = document.getElementById('fileDetail');
+  const labels = { trigger: '🎯 Trigger (P0)', intent: '📝 Intent & Plan', verify: '✅ Verify & Done', guardrails: '🛡️ Guardrails' };
+  const usedByHtml = f.usedBy.map(u => `<span>${labels[u]}</span>`).join('');
+  panel.innerHTML = `
+    <h3>${f.name}</h3>
+    <div class="file-path">${f.path}</div>
+    <div class="file-type-badge tag ${f.tagClass}">${f.tag}</div>
+    <div class="used-by">Loop stage: ${usedByHtml}</div>
+    <div class="file-desc">${f.desc}</div>
+    <pre><code>${escapeHtml(f.content)}</code></pre>
+  `;
+  panel.classList.add('visible');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function filterTree(filter) {
+  activeFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  document.querySelectorAll('.tree-node').forEach(node => {
+    const row = node.querySelector(':scope > .node-row');
+    row.classList.remove('highlighted');
+    if (filter === 'all') return;
+    const usedBy = node.dataset.usedBy;
+    if (usedBy) {
+      const arr = JSON.parse(usedBy);
+      if (arr.includes(filter)) {
+        row.classList.add('highlighted');
+        let parent = node.parentElement;
+        while (parent) {
+          if (parent.classList.contains('tree-children')) parent.classList.remove('collapsed');
+          if (parent.classList.contains('tree-node')) parent.classList.add('open');
+          parent = parent.parentElement;
+        }
+      }
+    }
+  });
+}
+
+function highlightInTree(fileId) {
+  switchTab('repo');
+  setTimeout(() => {
+    const node = document.querySelector(`[data-file-id="${fileId}"]`);
+    if (node) {
+      let parent = node.parentElement;
+      while (parent) {
+        if (parent.classList.contains('tree-children')) parent.classList.remove('collapsed');
+        if (parent.classList.contains('tree-node')) parent.classList.add('open');
+        parent = parent.parentElement;
+      }
+      const row = node.querySelector(':scope > .node-row');
+      row.classList.add('highlighted');
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => row.classList.remove('highlighted'), 3000);
+      showFileDetail(fileId);
+    }
+  }, 120);
+}
+
+function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ===== INIT =====
+renderStages();
+renderTimeline();
+const treeEl = document.getElementById('repoTree');
+buildTree(treeData, treeEl);
+treeEl.querySelector('.tree-node').classList.add('open');
+treeEl.querySelector('.tree-children').classList.remove('collapsed');
+</script>
+</body>
+</html>
