@@ -1,9 +1,9 @@
-name: loop-verify
+name: verify
 
-# P4 — Verify continuously, and P8 — Enforce the done-condition.
+# Capability 4 (Verify & Recover) and Capability 5 (Complete).
 # Verification is a stage of the loop, not an afterthought. Every acceptance
 # criterion maps to a concrete, machine-checkable signal, and the loop physically
-# cannot declare itself finished while any checkbox remains unchecked.
+# cannot declare itself Complete while any acceptance box remains unchecked.
 on:
   pull_request:
     types: [opened, synchronize, reopened, edited]
@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   verify:
-    name: P4 — lint, unit, integration, contract
+    name: Verify — lint, unit, integration, contract, a11y
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,22 +30,21 @@ jobs:
       - name: Integration tests
         # criterion → check mapping is live:
         #   happy path            → integration scenario A
-        #   invalid-date recovery → integration scenario B
+        #   invalid-input recovery → integration scenario B
         run: echo "→ run integration scenarios A + B"
 
       - name: Contract tests
-        # Guards external adapters (e.g. the fares API): a null fare on a
-        # sold-out leg must be handled, not crash the orchestrator.
+        # Guards external adapters: a null/edge response must be handled, not crash.
         run: echo "→ run contract tests against external adapters"
 
-      - name: Deterministic-ranking fixture
-        # Ranking is exactly where AI-built features quietly drift between runs.
-        # A fixture-locked test pins the exact ordering for a frozen input, turning
-        # "deterministic" from a hope into a wall the loop cannot climb over.
-        run: echo "→ assert ranking output == frozen fixture"
+      - name: Deterministic fixture
+        # Ranking/layout is exactly where AI-built features quietly drift between runs.
+        # A fixture-locked test pins the exact output for a frozen input, turning
+        # "correct" from a hope into a wall the loop cannot climb over.
+        run: echo "→ assert output == frozen fixture"
 
   done-condition:
-    name: P8 — done-condition (hard gate)
+    name: Complete — done-condition (hard gate)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:

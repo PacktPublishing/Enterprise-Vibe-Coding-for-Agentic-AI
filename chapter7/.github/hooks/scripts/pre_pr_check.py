@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""P6 / bounds guard — keep autonomous execution inside the governance boundary.
+"""Execute guardrail — keep autonomous execution inside the governance boundary.
 
 Runs as a PreToolUse hook before the agent executes a shell command. It is a fast,
 fail-safe fuse, not a full policy engine: it catches the two failure modes that most

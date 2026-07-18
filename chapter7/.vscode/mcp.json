@@ -1,6 +1,6 @@
 {
   "$comment": [
-    "P5 / P7 — least-privilege MCP connector. The loop's runtime capability for",
+    "Verify & Recover connector — the loop's least-privilege runtime capability for",
     "reading CI logs and writing status back to the issue/PR thread. Treat MCP",
     "connectors like production dependencies: read-only first, scoped tokens,",
     "logging on. The loop should be able to read CI logs and write to the thread —",
