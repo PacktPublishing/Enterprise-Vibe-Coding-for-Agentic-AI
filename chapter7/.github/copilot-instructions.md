@@ -1,10 +1,10 @@
-# AGENTS.md — Repository conventions for the delivery loop
+# Copilot Instructions — The Delivery Loop
 
-These are the always-on conventions every agent working in this repo must respect. They are
-deliberately short: the **delivery protocol** itself lives in the `deliver-feature` skill
-(`.github/skills/deliver-feature/SKILL.md`), which is the single source of truth for how a
-feature is shipped. This file carries only the repo-specific facts the loop needs during the
-**Discover** capability.
+These instructions are **auto-loaded on every turn** in this repository. They are the
+always-on *law* of the delivery loop: the cadence, the two human gates, and the guardrails
+that hold for every feature. They are deliberately short — the detailed *playbook* lives in
+the `deliver-feature` skill (`.github/skills/deliver-feature/SKILL.md`), and the per-tick
+*engine* is `.github/prompts/deliver-feature.loop.md`, scheduled by `/loop`.
 
 ## The one idea
 
@@ -25,7 +25,7 @@ Everything between runs unattended. See the `deliver-feature` skill for the full
   back to it. When a human answers an open question, that answer is durable state for every
   later capability.
 
-## Conventions
+## Conventions and bounds
 
 - **Branches:** work on `feature/<issue-number>-<slug>`. Never push directly to `main`; never
   bypass required checks. The `pre-pr` hook (`.github/hooks/pre-pr.json`) enforces this.

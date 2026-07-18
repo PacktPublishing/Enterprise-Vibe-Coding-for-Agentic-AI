@@ -21,7 +21,7 @@ the loop. Run it with:
 
 ## What to do on each tick
 
-1. **Load policy.** Read `AGENTS.md` (repo conventions) and run the `deliver-feature`
+1. **Load policy.** Read `.github/copilot-instructions.md` (always-on rules) and run the `deliver-feature`
    skill — that skill is the source of truth for the five capabilities and the two gates.
 2. **Reconstruct state.** Identify the target loop issue (the number passed to this prompt,
    or the open issue labeled `loop`). Read the issue **and** any open PR that references it

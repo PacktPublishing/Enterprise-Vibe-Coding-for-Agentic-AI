@@ -34,14 +34,15 @@ capabilities**. Every iteration passes through them:
 ## Six primitives that steer it
 
 The capabilities are the *behaviour*; the **primitives** are what make that behaviour happen
-without you prompting for it. There are six, and none of them mentions the feature being built —
-that is why you build the loop once and every future issue rides the same rails.
+without you prompting for it. Three of them form the loop's **brain** — the always-on law, the
+playbook, and the engine — and three more **enforce and support** it. None of them mentions the
+feature being built, which is why you build the loop once and every future issue rides the same rails.
 
 | Primitive | File | The capability it steers |
 |---|---|---|
-| **The engine** | `.github/prompts/deliver-feature.loop.md` | What `/loop` runs. One tick advances **one** capability, then stops at the gates. |
-| **The protocol** | `.github/skills/deliver-feature/SKILL.md` | The single source of truth for the five capabilities and the two gates; the engine invokes it every tick. |
-| **The conventions** | `AGENTS.md` | Always-on repo facts the loop loads during **Discover**. |
+| **The instructions** *(brain)* | `.github/copilot-instructions.md` | The always-on *law* — the five-capability cadence, the two gates, the guardrails. **Auto-loaded on every tick.** |
+| **The protocol** *(brain)* | `.github/skills/deliver-feature/SKILL.md` | The *playbook* — the single source of truth for what to do inside each capability; the engine invokes it every tick. |
+| **The engine** *(brain)* | `.github/prompts/deliver-feature.loop.md` | What `/loop` runs. One tick advances **one** capability, then stops at the gates. |
 | **The contract** | `.github/ISSUE_TEMPLATE/feature-loop.yml` | Forces a machine-checkable acceptance checklist — the objective **Discover** reads and **Complete** closes on. |
 | **The verifier** | `.github/workflows/verify.yml` | Runs on every push (**Verify & Recover**) and gates **Complete**: it refuses to pass while any acceptance box is unchecked. |
 | **The guardrails** | `.github/hooks/pre-pr.json`, `.vscode/mcp.json` | Keep **Execute** off `main`; give **Verify & Recover** least-privilege read-CI / write-thread access. |
@@ -63,11 +64,35 @@ machine-checkable acceptance boxes, and we drive it from the terminal:
 
 Each tick advances the loop by exactly one capability, then stops. Watch it move.
 
+### What happens the instant you press enter
+
+The `/loop` command does not build anything itself — it **registers the engine prompt with the
+session scheduler** and fires the first tick. From that moment, every tick is the same short chain
+of three brain-primitives:
+
+1. **`.github/copilot-instructions.md` loads first — automatically.** Copilot reads it on every
+   turn, so the *law* (five capabilities, two gates, never-push-to-`main`) is in force before a
+   single word of the prompt is considered. You did not have to reference it; that is the point of
+   the instructions taxonomy.
+2. **The engine prompt runs.** `.github/prompts/deliver-feature.loop.md` — the thing `/loop`
+   scheduled — tells Copilot to do exactly one thing this tick: *reconstruct state from the thread,
+   invoke the skill, advance one capability, stop.*
+3. **The skill supplies the how.** The engine invokes `deliver-feature/SKILL.md`, the *playbook*
+   that defines what each capability actually does and, crucially, the decision rule for **which**
+   capability is next given what the thread already shows.
+4. **Memory is read, not assumed.** The skill's first move every tick is to read the issue and any
+   open PR through the GitHub MCP connector. The thread *is* the state; the tick simply continues
+   from wherever the last one left off.
+
+So a single tick = *instructions (law) → prompt (engine) → skill (playbook) → thread (memory)* →
+one capability advanced. Repeat that chain on the interval and the five capabilities below unfold,
+pausing only at the two human gates.
+
 ### 1. Discover
-The first tick fires. The engine loads `AGENTS.md` and the `deliver-feature` skill, reads the
-issue through the GitHub MCP connector, and posts its understanding straight to the thread —
-goals, constraints, the acceptance criteria *restated as checkable tests*, and, crucially, its
-**assumptions** made explicit:
+The first tick fires. Copilot has already auto-loaded `.github/copilot-instructions.md`; the engine
+prompt now invokes the `deliver-feature` skill, which reads the issue through the GitHub MCP
+connector and posts its understanding straight to the thread — goals, constraints, the acceptance
+criteria *restated as checkable tests*, and, crucially, its **assumptions** made explicit:
 
 > *"A single self-contained `index.html` with inline CSS and no build step. Cover is a placeholder
 > `<img>` with descriptive `alt` until real art lands. System font stack so nothing loads over the
@@ -81,17 +106,20 @@ memory: every later capability reads it. Nothing has been built.
 ### 2. Plan — **GATE 1**
 The next tick posts a reviewable plan: a file-level change map (`index.html`, plus a small
 `tests/` folder for the checks), a criterion → test mapping, the verification approach, and a
-rollback note. Then it **stops.** No file written. You skim the plan and reply **`plan approved`**
-in the terminal. This is your **first intervention, and the highest-leverage minute you will spend
-on the feature** — you are reviewing *thinking, not typing*. Correcting direction here costs a
-sentence; correcting it after a full page is built costs an afternoon.
+rollback note. Then it **stops** — because both the instructions and the skill carry the same hard
+rule: *do not write code until a human replies `plan approved`.* No file written. You skim the plan
+and reply **`plan approved`** in the terminal. This is your **first intervention, and the
+highest-leverage minute you will spend on the feature** — you are reviewing *thinking, not typing*.
+Correcting direction here costs a sentence; correcting it after a full page is built costs an afternoon.
 
 ### 3. Execute
-With the plan approved, the loop becomes autonomous. It works `feature/4-launch-page` as small,
-intent-named commits — one reviewable diff per plan step: semantic page skeleton + `<h1>` and
-landmarks → hero (title, subtitle, author, blurb, cover) → "What you'll learn" list + CTA →
-responsive styles → the accessibility and responsive tests. Each tick does one slice, states its
-intent, and writes what it did back to the thread. You are no longer driving the implementation.
+With the plan approved, the loop becomes autonomous. Guided by the skill's slice discipline, it
+works `feature/4-launch-page` as small, intent-named commits — one reviewable diff per plan step:
+semantic page skeleton + `<h1>` and landmarks → hero (title, subtitle, author, blurb, cover) →
+"What you'll learn" list + CTA → responsive styles → the accessibility and responsive tests. Each
+tick does one slice, states its intent, and writes what it did back to the thread. The `pre-pr`
+hook sits in the path the whole time, silently refusing any push to `main`. You are no longer
+driving the implementation.
 
 ### 4. Verify & Recover
 After each slice, `verify` runs lint and the checks. The criterion mapping stays live — including

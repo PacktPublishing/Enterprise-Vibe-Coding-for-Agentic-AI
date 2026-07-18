@@ -37,7 +37,8 @@ memory: on every tick, reconstruct where you are from the thread — never from 
 
 ## The five capabilities
 
-Every iteration of the loop passes through these. Read `AGENTS.md` first — it carries the
+Every iteration of the loop passes through these. Read `.github/copilot-instructions.md` first —
+it carries the
 repository conventions every capability must respect.
 
 ### 1. Discover
@@ -47,7 +48,7 @@ Turn an informal request into an executable objective.
 1. Identify the target loop issue (the number the prompt was invoked with, or the open
    issue labeled `loop`). Read the issue **and** any open PR that references it through the
    GitHub MCP connector.
-2. Load `AGENTS.md` (repo conventions) and this skill.
+2. Load `.github/copilot-instructions.md` (always-on rules) and this skill.
 3. Restate the request as **goals**, **constraints**, and the **acceptance checklist
    rephrased as checkable tests**.
 4. Make every **assumption** explicit, and raise **open questions** that would change

@@ -28,7 +28,7 @@ GitHub Copilot CLI with `/loop`.
 
 | Capability | What it does | Steered by |
 |---|---|---|
-| **1. Discover** | Read the issue, load repo conventions, turn a fuzzy request into an executable objective. Ambiguity disappears; nothing is built yet | `deliver-feature.loop.md`, `AGENTS.md`, `deliver-feature/SKILL.md`, `feature-loop.yml` |
+| **1. Discover** | Read the issue, load repo conventions, turn a fuzzy request into an executable objective. Ambiguity disappears; nothing is built yet | `deliver-feature.loop.md`, `copilot-instructions.md`, `deliver-feature/SKILL.md`, `feature-loop.yml` |
 | **2. Plan** *(gate)* | Produce a reviewable plan (files, strategy, tests, assumptions), then **stop** for approval — you review thinking, not typing | `deliver-feature/SKILL.md` |
 | **3. Execute** | Once approved, the loop autonomously works in small, intent-named slices | `deliver-feature.loop.md` (one slice/tick), `pre-pr.json` |
 | **4. Verify & Recover** | Every iteration self-validates; a red check becomes the next iteration's input, not an interruption | `verify.yml`, `.vscode/mcp.json` |
@@ -62,7 +62,7 @@ Six primitives, each with one job:
 |---|---|---|
 | The engine | `.github/prompts/deliver-feature.loop.md` | What `/loop` runs — one tick, one capability |
 | The protocol | `.github/skills/deliver-feature/SKILL.md` | Single source of truth for the five capabilities + two gates |
-| The conventions | `AGENTS.md` | Always-on repo facts loaded during **Discover** |
+| The conventions | `.github/copilot-instructions.md` | Always-on law (cadence, gates, guardrails), auto-loaded every turn |
 | The contract | `.github/ISSUE_TEMPLATE/feature-loop.yml` | Machine-checkable acceptance checklist |
 | The verifier | `.github/workflows/verify.yml` | **Verify & Recover** on every push + gates **Complete** |
 | The guardrails | `.github/hooks/pre-pr.json` + `.vscode/mcp.json` | Keep **Execute** off `main`; least-privilege connector |
@@ -84,7 +84,7 @@ echo '{"tool_input":{"command":"git push origin feature/4-launch-page"}}' | pyth
 
 - [chapter7-landing.html](chapter7-landing.html) — Interactive landing page
 - [worked-example.md](worked-example.md) — The worked example as a real, reproducible run (companion test repo)
-- [AGENTS.md](AGENTS.md) — Repository conventions loaded during Discover
+- [.github/copilot-instructions.md](.github/copilot-instructions.md) — Always-on law (cadence, gates, guardrails), auto-loaded every turn
 - [.github/skills/deliver-feature/SKILL.md](.github/skills/deliver-feature/SKILL.md) — The loop protocol as a skill (single source of truth)
 - [.github/prompts/deliver-feature.loop.md](.github/prompts/deliver-feature.loop.md) — The engine `/loop` runs (schedulable prompt)
 - [.github/ISSUE_TEMPLATE/feature-loop.yml](.github/ISSUE_TEMPLATE/feature-loop.yml) — Loop-ready issue form (the contract)
