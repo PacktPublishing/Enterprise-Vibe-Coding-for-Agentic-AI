@@ -281,19 +281,19 @@ footer a:hover { text-decoration: underline; }
 <!-- Section 2: anatomy -->
 <section class="reveal">
   <h2><span class="num">2</span> Anatomy of a Delivery Loop</h2>
-  <p class="desc">Every delivery loop is made of the same eight stages, labeled P0–P8 so they can be referenced from primitives, dashboards, and audits. Each stage is really a primitive, an RPI phase, or a governance control wearing a different hat — and none of them mention the feature being built. Click a stage to open it.</p>
+  <p class="desc">Forget eight phases. Every delivery loop — whatever it ships — runs the same <strong>five recurring capabilities</strong>. Each is really a primitive, an RPI phase, or a governance control wearing a different hat, and none of them mention the feature being built. Two of the five are human gates. Click a capability to open it.</p>
   <div class="stage-grid" id="stageGrid"></div>
   <p style="text-align:center; margin-top:16px; font-size:0.85rem; color:var(--cp-text-soft);">Issue-agnostic by design: build the loop once, and every future issue rides the same rails.</p>
 </section>
 
 <!-- Section 3: worked example -->
 <section class="reveal">
-  <h2><span class="num">3</span> Worked Example — A Trip Planner for an Airline</h2>
-  <p class="desc">Two worlds, kept clean: the <strong>passenger</strong> is the airline's customer who will one day chat on <code>/book</code> — they never see GitHub. The <strong>engineering team</strong> uses loop engineering to build that planner. The passenger's chat is the product; the loop is how the product gets made. Follow issue <strong>#2194</strong> end-to-end — click each stage.</p>
+  <h2><span class="num">3</span> Worked Example — A Landing Page for This Book's Launch</h2>
+  <p class="desc">The team at Packt is asked to build a simple landing page to announce this book's launch. It starts as one ordinary GitHub issue — <strong>#4</strong> — and the loop drives it from a filed issue to a merge-ready PR, entirely from the CLI with a single <code>/loop</code> command. Follow the five capabilities end-to-end — click each one.</p>
   <div class="timeline" id="timeline"></div>
   <div class="callout">
-    <p><strong>What it shipped:</strong> an accessible chat entry on <code>/book</code>, a slot-filling orchestrator wired to the itinerary + fares APIs, deterministic ranking with rationale, 30-minute persisted state, timeout fallbacks, analytics, and integration + contract tests.</p>
-    <p style="margin-top:10px;"><strong>What it cost you:</strong> approve the plan, click merge. Six build slices, a CI failure, and a review comment were all absorbed by the loop with unbroken context — and because no <code>.github</code> artifact mentions "trip planner," the same loop carries issue #2195 (seat selection) tomorrow, unchanged.</p>
+    <p><strong>What it shipped:</strong> a single self-contained <code>index.html</code> launch page — hero with title, subtitle, author and blurb, a cover placeholder with proper <code>alt</code> text, a "What you'll learn" list, and a "Get the book" CTA — responsive with no overflow at mobile or desktop widths, accessible, and behind a green pipeline.</p>
+    <p style="margin-top:10px;"><strong>What it cost you:</strong> approve the plan, click merge. Two interventions. The build slices, a red accessibility check, and its recovery were all absorbed by the loop with unbroken memory in the thread — and because no primitive mentions "landing page," the very same loop carries tomorrow's issue, unchanged.</p>
   </div>
 </section>
 
@@ -315,9 +315,9 @@ footer a:hover { text-decoration: underline; }
   <div class="mini-grid">
     <div class="mini-card warn"><div class="mc-icon">❓</div><div class="mc-title">No done-condition</div><div class="mc-text">If "done" isn't machine-checkable, the loop stops too early or never stops. Wire criteria to a hard gate.</div></div>
     <div class="mini-card warn"><div class="mc-icon">♾️</div><div class="mc-title">The unbounded loop</div><div class="mc-text">No continuation cap, no dispatch throttle. Works in a demo, bankrupts you at scale.</div></div>
-    <div class="mini-card warn"><div class="mc-icon">🌫️</div><div class="mc-title">The fuzzy issue</div><div class="mc-text">"Make the planner better" has no checkable contract. The issue template is a primitive, not a formality.</div></div>
+    <div class="mini-card warn"><div class="mc-icon">🌫️</div><div class="mc-title">The fuzzy issue</div><div class="mc-text">"Make the landing page nicer" has no checkable contract. The issue template is a primitive, not a formality.</div></div>
     <div class="mini-card warn"><div class="mc-icon">🧪</div><div class="mc-title">Verification as afterthought</div><div class="mc-text">If tests aren't part of the loop, quality depends on someone remembering to ask.</div></div>
-    <div class="mini-card warn"><div class="mc-icon">🔀</div><div class="mc-title">Product ≠ delivery loop</div><div class="mc-text">The passenger's chat is not a trigger for the build-time loop. Keep the two cleanly separated.</div></div>
+    <div class="mini-card warn"><div class="mc-icon">🔀</div><div class="mc-title">Product ≠ delivery loop</div><div class="mc-text">A product's own AI features are not the build-time delivery loop. Keep the thing you ship separate from the loop that ships it.</div></div>
     <div class="mini-card warn"><div class="mc-icon">⚠️</div><div class="mc-title">Ungoverned autonomy</div><div class="mc-text">Letting the loop touch auth or payments without a gate trades speed for an incident. Bound it.</div></div>
   </div>
 </section>
@@ -357,7 +357,7 @@ footer a:hover { text-decoration: underline; }
   <div class="achievements-grid">
     <div class="achievement" id="ach-explorer"><div class="ach-icon">🗺️</div><div class="ach-name">Explorer</div></div>
     <div class="achievement" id="ach-stages"><div class="ach-icon">🔁</div><div class="ach-name">Loop Anatomist</div></div>
-    <div class="achievement" id="ach-example"><div class="ach-icon">✈️</div><div class="ach-name">Ran the Loop</div></div>
+    <div class="achievement" id="ach-example"><div class="ach-icon">🚀</div><div class="ach-name">Ran the Loop</div></div>
     <div class="achievement" id="ach-quiz"><div class="ach-icon">🧠</div><div class="ach-name">Knowledge Check</div></div>
     <div class="achievement" id="ach-repo"><div class="ach-icon">📂</div><div class="ach-name">Repo Explorer</div></div>
     <div class="achievement" id="ach-master"><div class="ach-icon">👑</div><div class="ach-name">Chapter Master</div></div>
@@ -370,14 +370,14 @@ footer a:hover { text-decoration: underline; }
 <div class="tab-content" id="tab-repo">
 <div class="repo-explorer">
   <h2>📂 Chapter 7 Loop Primitives</h2>
-  <p class="desc">A loop is only real when it is committed to the repo. Committed artifacts carry the policy (what "good" means, when to stop, what's forbidden); the agent runtime carries the autonomy (planning, execution, recovery). Filter by loop stage to see which primitive implements what, and click a file for its excerpt.</p>
+  <p class="desc">A loop is only real when it is committed to the repo. Committed artifacts carry the policy (what "good" means, when to stop, what's forbidden); the agent runtime carries the autonomy (planning, execution, recovery). Filter by primitive role to see which file does what, and click a file for its excerpt.</p>
 
   <div class="filter-bar">
     <button class="filter-btn active" onclick="filterTree('all')">All</button>
-    <button class="filter-btn" onclick="filterTree('trigger')">🎯 Trigger (P0)</button>
-    <button class="filter-btn" onclick="filterTree('intent')">📝 Intent &amp; Plan (P1–P2)</button>
-    <button class="filter-btn" onclick="filterTree('verify')">✅ Verify &amp; Done (P4/P8)</button>
-    <button class="filter-btn" onclick="filterTree('guardrails')">🛡️ Guardrails (P5–P6)</button>
+    <button class="filter-btn" onclick="filterTree('brain')">🧠 Brain (law · playbook · engine)</button>
+    <button class="filter-btn" onclick="filterTree('contract')">📋 Contract</button>
+    <button class="filter-btn" onclick="filterTree('verify')">✅ Verify &amp; Complete</button>
+    <button class="filter-btn" onclick="filterTree('guardrails')">🛡️ Guardrails</button>
   </div>
 
   <div class="tree-container" id="repoTree"></div>
@@ -441,35 +441,23 @@ function checkQuiz(id, el, correct) {
 const obs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.1 });
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-// ===== LOOP STAGES (P0–P8) =====
+// ===== FIVE LOOP CAPABILITIES =====
 const STAGES = [
-  { p:'P0', title:'Trigger', kind:'Event', gate:false,
-    body:'The event that starts the loop. Not a human typing a command — an issue being assigned and labeled, a schedule firing, or a webhook arriving. The trigger turns a workflow from "something you run" into "something that runs."',
-    impl:'GitHub Actions (schedule + <code>issues: assigned</code>) → <code>loop-dispatch.yml</code>', file:'loop-dispatch' },
-  { p:'P1', title:'Normalize intent', kind:'RPI: Research', gate:false,
-    body:'Restate the raw issue as goals, constraints, and explicit acceptance checks. Surface assumptions and open questions before any code exists. A fuzzy request becomes a checkable contract.',
-    impl:'Custom instructions + Skill + Issue template → <code>copilot-instructions.md</code>, <code>deliver-feature/SKILL.md</code>, <code>feature-loop.yml</code>', file:'instructions' },
-  { p:'P2', title:'Plan behind a human gate', kind:'RPI: Plan + Governance', gate:true,
-    body:'Produce a reviewable spec — file-level change map, test strategy, rollout/rollback — and stop for approval. The single most important governance gate: humans steer here, cheaply, before anything expensive happens.',
-    impl:'Agent plan mode + approval (Copilot runtime)', file:null },
-  { p:'P3', title:'Implement in bounded slices', kind:'RPI: Implement', gate:false,
-    body:'Execute in small, coherent commits, each mapped to a plan step. Bounded slices keep diffs reviewable and keep autonomous execution from wandering.',
-    impl:'Autopilot; Fleet for independent slices (Copilot runtime)', file:null },
-  { p:'P4', title:'Verify continuously', kind:'Agentic DevOps', gate:false,
-    body:'After each slice, run lint, unit, integration, and contract checks. Every acceptance criterion maps to a concrete, machine-checkable signal. Verification is a stage of the loop, not an afterthought.',
-    impl:'CI workflow → <code>loop-verify.yml</code>', file:'loop-verify' },
-  { p:'P5', title:'Auto-recover', kind:'Runtime + MCP', gate:false,
-    body:'A red CI run or a review comment is not an interruption — it is the next input to the loop. The agent diagnoses, patches, re-runs, and continues without a human re-prompt. This is what makes the loop a loop.',
-    impl:'Coding agent reacting to CI / review; GitHub MCP → <code>.vscode/mcp.json</code>', file:'mcp' },
-  { p:'P6', title:'Human decision gates', kind:'Governance', gate:true,
-    body:'Autonomy is bounded to two moments that matter: approve the plan (P2) and authorize the merge (P8). Everything between runs unattended. Sensitive areas — auth, payments, PII — add gates.',
-    impl:'Plan + merge approvals; branch protection + hooks → <code>pre-pr.json</code>', file:'pre-pr' },
-  { p:'P7', title:'Persist loop memory', kind:'State', gate:false,
-    body:'State lives in the issue and PR thread: assumptions, decisions, status, unresolved questions. There is no separate database — the thread is the memory, and it lets context survive across steps and days.',
-    impl:'Issue / PR thread via GitHub MCP', file:'mcp' },
-  { p:'P8', title:'Enforce the done-condition', kind:'Governance', gate:true,
-    body:'The loop closes only when every acceptance criterion is checked with evidence and the pipeline is green. "PR opened" is not "done." The auditable definition of done, made into a hard gate.',
-    impl:'CI check + hooks + branch protection → <code>loop-verify.yml</code>, <code>pre-pr.json</code>', file:'loop-verify' }
+  { p:'1', title:'Discover', kind:'RPI: Research', gate:false,
+    body:'The loop finds and understands the work on its own: it reads the issue, loads the repo conventions, and turns an informal request into an executable objective — goals, constraints, acceptance checks, and explicit assumptions — before any code exists. Ambiguity disappears; nothing is built yet.',
+    impl:'Instructions + Skill + Prompt + Issue template → <code>copilot-instructions.md</code>, <code>SKILL.md</code>, <code>deliver-feature.loop.md</code>, <code>feature-loop.yml</code>', file:'instructions' },
+  { p:'2', title:'Plan', kind:'RPI: Plan + Governance', gate:true,
+    body:'The loop asks the agent for a delivery plan — a file-level change map, a criterion → test mapping, the verification approach, and a rollback note — then STOPS. You review thinking, not typing, and reply <code>plan approved</code>. Correcting direction here costs a sentence; correcting it after a full build costs an afternoon.',
+    impl:'The playbook, behind a human gate → <code>deliver-feature/SKILL.md</code>', file:'deliver-feature' },
+  { p:'3', title:'Execute', kind:'RPI: Implement', gate:false,
+    body:'After approval the loop becomes autonomous, working the plan as small, intent-named slices — one reviewable diff per plan step, one slice per tick. The engineer no longer orchestrates individual prompts; the loop does. The pre-pr hook sits in the path the whole time, refusing any push to main.',
+    impl:'The engine (one slice/tick) + guardrail → <code>deliver-feature.loop.md</code>, <code>pre-pr.json</code>', file:'prompt' },
+  { p:'4', title:'Verify & Recover', kind:'Agentic DevOps + MCP', gate:false,
+    body:'Every iteration self-validates: lint, tests, accessibility, and policy run on each push. A red check is not an interruption — it becomes the next iteration\'s input. The agent reads the failing check through the MCP connector, patches, and re-verifies. Recovery is part of the loop; you never copy an error into a prompt.',
+    impl:'CI verifier + least-privilege connector → <code>verify.yml</code>, <code>.vscode/mcp.json</code>', file:'verify' },
+  { p:'5', title:'Complete', kind:'Governance: Done-condition', gate:true,
+    body:'The loop closes only when every acceptance box is checked with evidence AND CI is green — the done-condition job refuses to pass otherwise, so the loop physically cannot finish early. It assembles the evidence, announces readiness, and stops. "PR opened" is not "done." You click merge — your second and final intervention.',
+    impl:'CI done-condition (hard gate) → <code>verify.yml</code>', file:'verify' }
 ];
 
 function renderStages() {
@@ -491,7 +479,7 @@ function renderStages() {
     `;
     card.onclick = () => {
       card.classList.toggle('open');
-      if (card.classList.contains('open')) { stagesOpened.add(i); addXP(5); if (stagesOpened.size >= 9) unlock('ach-stages'); }
+      if (card.classList.contains('open')) { stagesOpened.add(i); addXP(5); if (stagesOpened.size >= STAGES.length) unlock('ach-stages'); }
     };
     grid.appendChild(card);
   });
@@ -499,14 +487,11 @@ function renderStages() {
 
 // ===== WORKED EXAMPLE TIMELINE =====
 const STEPS = [
-  { p:'P0', name:'Trigger', gate:'', body:'Nobody runs a command. The PM assigns <strong>#2194</strong> to the loop owner and adds the <code>loop</code> label. <code>loop-dispatch</code> — on a 15-minute cron and reacting to <code>issues: assigned</code> — marks it <code>loop-started</code> (so a retry never double-starts it), assigns the Copilot coding agent, and posts the kickoff comment. The loop is now running.' },
-  { p:'P1', name:'Normalize intent', gate:'', body:'Copilot loads <code>copilot-instructions.md</code> and the <code>deliver-feature</code> skill, then posts goals, constraints, acceptance checks — and assumptions: "reuse <code>FaresClient</code>; ranking weights price &gt; duration &gt; stops; budget is a soft filter." It flags one open question: "sold-out option — hidden or greyed-out?" The PM answers <em>"grey it out"</em>, and that becomes loop memory.' },
-  { p:'P2', name:'Plan (gate)', gate:'GATE 1', body:'Copilot posts a reviewable plan: <code>TripPlannerChat.tsx</code>, <code>plannerOrchestrator.ts</code>, <code>rankOptions.ts</code>, <code>conversationStore.ts</code>, plus test files with a criterion → test mapping and a rollback note. Then it <strong>stops</strong>. You skim and reply <em>plan approved</em>. Your first intervention — the highest-leverage minute you\'ll spend.' },
-  { p:'P3', name:'Implement in slices', gate:'', body:'Copilot works the plan as small commits on <code>feature/2194-trip-planner</code>: chat shell + accessibility → state + input validation → orchestration + API adapters → ranking + rationale → telemetry + fallback → tests. Each commit message states intent, so anyone reading the branch mid-flight follows the story.' },
-  { p:'P4', name:'Verify continuously', gate:'', body:'After each slice, <code>loop-verify</code> runs lint, unit, integration, and contract tests. The criterion mapping is live — including a <strong>fixture-locked ranking test</strong> that pins the exact ordering for a frozen input, turning "deterministic" from a hope into a wall the loop cannot climb over.' },
-  { p:'P5', name:'Auto-recover', gate:'', body:'The contract test against the fares API goes red: a null fare on sold-out legs wasn\'t handled. <strong>You are not pinged.</strong> Copilot reads the CI log through the GitHub MCP connector, patches <code>plannerOrchestrator.ts</code> to grey out sold-out legs (consistent with the PM\'s earlier answer, still in the thread), re-runs the suite, and goes green.' },
-  { p:'P6', name:'Human gate — review', gate:'', body:'You open the PR and comment: "Add a fallback message when the fares API times out, and tag telemetry <code>planner_timeout=true</code>." In a prompt-centric world that starts a new conversation. In the loop, the comment is simply the next iteration\'s input: Copilot makes a targeted commit, updates telemetry, replies inline, and CI re-runs.' },
-  { p:'P8', name:'Memory & done-condition', gate:'GATE 2', body:'The thread has accumulated the loop\'s memory. The PR body carries the acceptance checklist with evidence links. The done-condition job refuses to pass while any <code>- [ ]</code> remains, so the loop physically cannot finish early. All four criteria checked, CI green → you click <strong>merge</strong>. Your second and final intervention.' }
+  { p:'1', name:'Discover', gate:'', body:'Nobody runs a build. Issue <strong>#4</strong> carries the <code>loop</code> label; you type one command — <code>/loop 15m advance the delivery loop for issue #4 using @.github/prompts/deliver-feature.loop.md</code>. The first tick auto-loads <code>copilot-instructions.md</code>, invokes the <code>deliver-feature</code> skill, reads the issue via the GitHub MCP connector, and posts its understanding: a self-contained <code>index.html</code>, a placeholder cover with <code>alt</code> text, a system font stack, a configurable CTA URL — plus open questions ("real cover now or placeholder?"). Nothing is built yet.' },
+  { p:'2', name:'Plan', gate:'GATE 1', body:'The next tick posts a reviewable plan: a change map (<code>index.html</code> + a small <code>tests/</code> folder), a criterion → test mapping, and a rollback note. Then it <strong>stops</strong> — both the instructions and the skill carry the same rule: no code until a human replies <code>plan approved</code>. You skim and approve. Your first intervention, and the highest-leverage minute you\'ll spend.' },
+  { p:'3', name:'Execute', gate:'', body:'With the plan approved, the loop works <code>feature/4-launch-page</code> as small, intent-named commits: semantic skeleton with <code>&lt;h1&gt;</code> and landmarks → hero (title, subtitle, author, blurb, cover) → "What you\'ll learn" + CTA → responsive styles → the accessibility and responsive tests. One slice per tick, each written back to the thread. The <code>pre-pr</code> hook silently refuses any push to <code>main</code>.' },
+  { p:'4', name:'Verify & Recover', gate:'', body:'After each slice, <code>verify</code> runs lint and the checks — including a <strong>fixture-locked layout test</strong> asserting no horizontal overflow at 375px and 1280px. An accessibility check goes red: the CTA button\'s contrast is too low. <strong>You are not pinged.</strong> The next tick reads the failing check through the MCP connector, darkens the button to clear the bar, re-runs, and goes green. Recovery is just another iteration.' },
+  { p:'5', name:'Complete', gate:'GATE 2', body:'The PR body carries the four acceptance boxes, each linking to evidence. The done-condition job refuses to pass while any <code>- [ ]</code> remains, so the loop cannot finish early. All four checked, CI green → the loop posts that it is ready and stops. You inspect the branch and click <strong>merge</strong>. Your second and final intervention.' }
 ];
 
 function renderTimeline() {
@@ -536,45 +521,45 @@ function renderTimeline() {
 const FILES = {
   'instructions': {
     name: 'copilot-instructions.md', path: '.github/copilot-instructions.md', tag: 'Instructions', tagClass: 'instructions',
-    usedBy: ['intent','guardrails'],
-    desc: 'The always-on rulebook. Encodes the loop (P0–P8) as policy: the RPI cadence, the plan gate, bounded slices, verification as non-negotiable, memory in the thread, the hard done-condition, and the two human gates. Sensitive areas (auth/payments/PII/prod) always add a gate.',
-    content: `# Copilot Instructions — The Delivery Loop\n\n> You do not prompt the agent. You design the\n> loop that prompts the agent.\n\n## RPI cadence\n- P1 Normalize intent (Research): goals, constraints,\n  machine-checkable acceptance criteria + assumptions.\n- P2 Plan behind a human gate: reviewable spec, then\n  STOP until a human replies \`plan approved\`.\n- P3 Implement in bounded slices: one slice = one diff.\n\n## Verification is a stage (P4)\nlint + unit + integration + contract after every slice.\nPin ranking/ordering with a fixture-locked test.\n\n## Human gates (P6): exactly two\n- approve the plan (P2)\n- authorize the merge (P8)\nSensitive areas ALWAYS add a hard gate:\nauth · payments · PII · production actions.\n\n## Memory (P7): the issue/PR thread IS the database.\n## Done (P8): "PR opened" is not "done" —\nevery box checked with evidence AND CI green.`
+    usedBy: ['brain'],
+    desc: 'The always-on law — auto-loaded on every tick. Encodes the five-capability cadence and the two human gates as policy: the issue/PR thread is the only memory, branch discipline, verification as a stage, the hard done-condition, and the sensitive-area gates (auth/payments/PII/prod). The detailed playbook lives in the skill; this file is the standing law.',
+    content: `# Copilot Instructions — The Delivery Loop\n\n> You do not prompt the agent. You design the\n> loop that prompts the agent.\n\nFive capabilities, two gates:\n  Discover -> Plan (GATE) -> Execute\n    -> Verify & Recover -> Complete (GATE)\n\n## The law (auto-loaded every tick)\n- The issue/PR thread is the only memory —\n  reconstruct state from it, never assume.\n- After Plan, STOP until a human replies\n  \`plan approved\`. After Complete, the human merges.\n- Work on feature/<issue>-<slug>; never push to main.\n- Verification is a stage: every criterion maps to a\n  machine-checkable signal; pin layout/ranking with a\n  fixture-locked test.\n- Sensitive areas ALWAYS add a hard gate:\n  auth · payments · PII · production actions.`
   },
   'deliver-feature': {
     name: 'SKILL.md', path: '.github/skills/deliver-feature/SKILL.md', tag: 'Skill', tagClass: 'skill',
-    usedBy: ['intent'],
-    desc: 'The reusable "how we ship" capability — the loop protocol P1→P8 written once, issue-agnostic. Loaded at P1 so a well-formed feature issue runs the same rails every time: normalize, plan behind a gate, slice, verify, recover, gate, persist, enforce done.',
-    content: `---\nname: deliver-feature\ndescription: Run any well-formed feature issue\n  through the eight-stage delivery loop (P0–P8).\n---\n\n# Skill: Deliver a Feature Through the Loop\n\n## Decision flow\n1. Issue assigned & labeled \`loop\`? → start at P1.\n2. Plan not yet approved? → produce/refine, WAIT (P2).\n3. Plan approved? → next bounded slice (P3) + verify.\n4. Check red / review comment? → auto-recover (P5),\n   loop back to P4.\n5. All criteria checked + CI green? → merge gate (P8).\n\n"You build the loop once, and every future issue\n rides the same rails."`
+    usedBy: ['brain'],
+    desc: 'The playbook — the single source of truth for what to do inside each of the five capabilities, and the decision rule for which capability is next given what the thread shows. Issue-agnostic: you build the loop once, and every future issue rides the same rails. The engine prompt invokes it on every tick.',
+    content: `---\nname: deliver-feature\ndescription: Ship a loop-labelled feature issue\n  through the five capabilities.\n---\n\n# Deliver a Feature Through the Loop\n\n## Decision flow (which capability this tick)\n1. No understanding on the thread? -> Discover.\n2. Understood, no plan? -> Plan, then WAIT.\n3. Plan not yet \`plan approved\`? -> stop (gate 1).\n4. Approved, work left? -> next Execute slice + Verify.\n5. Check red / comment? -> Verify & Recover.\n6. All boxes checked + CI green? -> Complete (gate 2).\n\nAdvance exactly ONE capability per tick, then stop.`
+  },
+  'prompt': {
+    name: 'deliver-feature.loop.md', path: '.github/prompts/deliver-feature.loop.md', tag: 'Prompt', tagClass: 'template',
+    usedBy: ['brain'],
+    desc: 'The engine — what /loop schedules. On each tick it loads the instructions, invokes the skill, reconstructs state from the issue/PR thread, advances exactly one capability, and stops. It respects both gates: it will not Execute without plan approved, and it will not merge.',
+    content: `---\nname: deliver-feature-loop\ndescription: Advance the delivery loop by one\n  capability per tick.\nargument-hint: "issue number, e.g. 4"\n---\n\n# Advance the loop by one capability\n1. Load copilot-instructions.md; run the\n   deliver-feature skill.\n2. Find the target \`loop\` issue + any open PR;\n   reconstruct the current capability from the thread.\n3. Do EXACTLY ONE capability, then STOP.\n4. Gates: no Execute without \`plan approved\`;\n   never merge.\n5. Write everything back to the thread.\n\n# run it from the CLI:\n# /loop 15m advance the delivery loop for issue #4\n#   using @.github/prompts/deliver-feature.loop.md`
   },
   'feature-loop': {
-    name: 'feature-loop.yml', path: '.github/ISSUE_TEMPLATE/feature-loop.yml', tag: 'Template', tagClass: 'template',
-    usedBy: ['intent'],
-    desc: 'The structured trigger input. A GitHub issue form that forces goals, requirements, non-functionals, and machine-checkable acceptance criteria (checkboxes), so the loop arrives with a checkable contract to close on. The issue template is a primitive, not a formality.',
-    content: `name: "🔁 Feature Loop"\nlabels: ["loop"]\nbody:\n  - type: input\n    id: goal\n    attributes: { label: "Goal (one sentence)" }\n  - type: textarea\n    id: requirements\n    attributes: { label: "Requirements" }\n  - type: checkboxes\n    id: acceptance\n    attributes:\n      label: "Acceptance criteria (machine-checkable)"\n      options:\n        - label: "Happy path works end-to-end in the UI"\n        - label: "Recovery path for invalid dates/airports"\n        - label: "Ranking deterministic for a fixed fixture"\n        - label: "CI green"\n  - type: dropdown\n    id: sensitive\n    attributes:\n      label: "Touches a sensitive area?"\n      options: ["No","auth","payments","PII","production"]`
+    name: 'feature-loop.yml', path: '.github/ISSUE_TEMPLATE/feature-loop.yml', tag: 'Template', tagClass: 'workflow',
+    usedBy: ['contract'],
+    desc: 'The contract — a GitHub issue form that forces a one-sentence goal, requirements, and machine-checkable acceptance criteria (checkboxes), so the loop starts Discover with a checkable objective and Complete has an unambiguous done-condition to close on. The issue template is a primitive, not a formality.',
+    content: `name: "🔁 Feature Loop"\nlabels: ["loop"]\nbody:\n  - type: input\n    id: goal\n    attributes: { label: "Goal (one sentence)" }\n  - type: textarea\n    id: requirements\n    attributes: { label: "Requirements" }\n  - type: checkboxes\n    id: acceptance\n    attributes:\n      label: "Acceptance criteria (machine-checkable)"\n      options:\n        - label: "Landing page renders from a single index.html"\n        - label: "Cover image has descriptive alt text"\n        - label: "No horizontal overflow at 375px and 1280px"\n        - label: "CI green"\n  - type: dropdown\n    id: sensitive\n    attributes:\n      label: "Touches a sensitive area?"\n      options: ["No","auth","payments","PII","production"]`
   },
-  'loop-dispatch': {
-    name: 'loop-dispatch.yml', path: '.github/workflows/loop-dispatch.yml', tag: 'Workflow', tagClass: 'workflow',
-    usedBy: ['trigger'],
-    desc: 'P0 — the trigger. Runs on a 15-minute cron backstop AND reacts to issues:assigned for a fast-path. Marks the issue loop-started before dispatching (idempotent), throttles how many loops start per cycle (MAX_STARTS), assigns Copilot, and posts the kickoff comment.',
-    content: `name: loop-dispatch\non:\n  schedule:\n    - cron: "*/15 * * * *"   # backstop\n  issues:\n    types: [assigned, labeled]   # fast-path\n\nenv:\n  MAX_STARTS: "3"   # dispatch throttle\n\njobs:\n  dispatch:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/github-script@v7\n        with:\n          script: |\n            // find open, labeled \`loop\`, assigned issues\n            // NOT already \`loop-started\`\n            // add \`loop-started\` BEFORE dispatch\n            //   (idempotent: no double-starts)\n            // stop after MAX_STARTS this cycle\n            // assign Copilot + post kickoff comment`
-  },
-  'loop-verify': {
-    name: 'loop-verify.yml', path: '.github/workflows/loop-verify.yml', tag: 'Workflow', tagClass: 'workflow',
+  'verify': {
+    name: 'verify.yml', path: '.github/workflows/verify.yml', tag: 'Workflow', tagClass: 'workflow',
     usedBy: ['verify'],
-    desc: 'P4 + P8 as policy-as-code. The verify job runs lint, unit, integration, and contract tests plus a deterministic-ranking fixture. The done-condition job parses the PR body and FAILS while any acceptance checkbox is unchecked — the loop physically cannot declare itself finished early.',
-    content: `name: loop-verify\non:\n  pull_request: { types: [opened, synchronize, edited] }\n\njobs:\n  verify:            # P4\n    steps:\n      - run: lint / unit / integration / contract\n      - run: assert ranking == frozen fixture\n\n  done-condition:    # P8 — hard gate\n    steps:\n      - uses: actions/github-script@v7\n        with:\n          script: |\n            const body = pr.body || "";\n            const unchecked = (body.match(/- \\[ \\]/g)||[]).length;\n            if (unchecked > 0) core.setFailed(\n              '"PR opened" is not "done": ' +\n              unchecked + ' criteria unchecked.');`
+    desc: 'Verify & Recover + Complete as policy-as-code. The verify job runs lint, tests, and a fixture-locked layout check on every push. The done-condition job parses the PR body and FAILS while any acceptance checkbox is unchecked — so the loop physically cannot declare itself finished early.',
+    content: `name: verify\non:\n  pull_request: { types: [opened, synchronize, edited] }\n\njobs:\n  verify:            # Verify & Recover\n    steps:\n      - run: lint / tests / accessibility\n      - run: assert no overflow at 375px & 1280px\n\n  done-condition:    # Complete — hard gate\n    steps:\n      - uses: actions/github-script@v7\n        with:\n          script: |\n            const body = pr.body || "";\n            const unchecked = (body.match(/- \\[ \\]/g)||[]).length;\n            if (unchecked > 0) core.setFailed(\n              '"PR opened" is not "done": ' +\n              unchecked + ' criteria unchecked.');`
   },
   'pre-pr': {
     name: 'pre-pr.json', path: '.github/hooks/pre-pr.json', tag: 'Hook', tagClass: 'hook',
     usedBy: ['guardrails'],
-    desc: 'A fast, fail-safe PreToolUse guard that runs in the agent\'s path before a push or PR. Guardrails belong in code, not reminders: it blocks direct pushes to main and any attempt to bypass required checks (--no-verify, --force). Hooks must stay quick (< a few seconds) and fail safe.',
+    desc: 'A fast, fail-safe PreToolUse guard that runs in the agent\'s path during Execute, before any push or PR. Guardrails belong in code, not reminders: it blocks direct pushes to main and any attempt to bypass required checks (--no-verify, --force). Hooks must stay quick (< a few seconds) and fail safe.',
     content: `{\n  "hooks": {\n    "PreToolUse": [\n      {\n        "matcher": "shell",\n        "type": "command",\n        "command": "python .github/hooks/scripts/pre_pr_check.py",\n        "timeout": 5\n      }\n    ]\n  }\n}\n\n// pre_pr_check.py blocks (exit 2):\n//   1. git push origin main   (use a PR)\n//   2. --force on main\n//   3. --no-verify (defeats verification)\n// Unknown commands are allowed (fail safe).`
   },
   'mcp': {
     name: 'mcp.json', path: '.vscode/mcp.json', tag: 'MCP', tagClass: 'mcp',
     usedBy: ['guardrails','verify'],
-    desc: 'The least-privilege connector powering P5 (read CI logs to auto-recover) and P7 (write status back to the thread). Treat MCP like a production dependency: read-mostly, scoped tokens, logging on. It can read CI and write to the thread — never hold write access to secrets or production.',
-    content: `{\n  "servers": {\n    "github": {\n      "command": "npx",\n      "args": ["-y", "@modelcontextprotocol/server-github"],\n      "$scopes": [\n        "issues:read", "issues:write",\n        "pull_requests:read", "pull_requests:write",\n        "actions:read"          // read CI logs (P5)\n      ],\n      "$denied": [\n        "secrets:*",\n        "contents:write:main",\n        "deployments:*",\n        "environments:production"\n      ]\n    }\n  }\n}`
+    desc: 'The least-privilege connector the loop reads and writes through: read CI logs to recover in Verify & Recover, and write status back to the thread (the loop\'s memory). Treat MCP like a production dependency: read-mostly, scoped tokens, logging on — never hold write access to secrets or production.',
+    content: `{\n  "servers": {\n    "github": {\n      "command": "npx",\n      "args": ["-y", "@modelcontextprotocol/server-github"],\n      "$scopes": [\n        "issues:read", "issues:write",\n        "pull_requests:read", "pull_requests:write",\n        "actions:read"          // read CI logs to recover\n      ],\n      "$denied": [\n        "secrets:*",\n        "contents:write:main",\n        "deployments:*",\n        "environments:production"\n      ]\n    }\n  }\n}`
   }
 };
 
@@ -585,14 +570,16 @@ const treeData = {
       { name: 'ISSUE_TEMPLATE/', icon: '📁', type: 'folder', children: [
         { name: 'feature-loop.yml', icon: '📋', type: 'file', fileId: 'feature-loop' }
       ]},
+      { name: 'prompts/', icon: '📁', type: 'folder', children: [
+        { name: 'deliver-feature.loop.md', icon: '🧭', type: 'file', fileId: 'prompt' }
+      ]},
       { name: 'skills/', icon: '📁', type: 'folder', children: [
         { name: 'deliver-feature/', icon: '📁', type: 'folder', children: [
           { name: 'SKILL.md', icon: '⚡', type: 'file', fileId: 'deliver-feature' }
         ]}
       ]},
       { name: 'workflows/', icon: '📁', type: 'folder', children: [
-        { name: 'loop-dispatch.yml', icon: '🎯', type: 'file', fileId: 'loop-dispatch' },
-        { name: 'loop-verify.yml', icon: '✅', type: 'file', fileId: 'loop-verify' }
+        { name: 'verify.yml', icon: '✅', type: 'file', fileId: 'verify' }
       ]},
       { name: 'hooks/', icon: '📁', type: 'folder', children: [
         { name: 'pre-pr.json', icon: '🛡️', type: 'file', fileId: 'pre-pr' },
@@ -653,13 +640,13 @@ function showFileDetail(fileId) {
   addXP(5);
   const f = FILES[fileId];
   const panel = document.getElementById('fileDetail');
-  const labels = { trigger: '🎯 Trigger (P0)', intent: '📝 Intent & Plan', verify: '✅ Verify & Done', guardrails: '🛡️ Guardrails' };
+  const labels = { brain: '🧠 Brain', contract: '📋 Contract', verify: '✅ Verify & Complete', guardrails: '🛡️ Guardrails' };
   const usedByHtml = f.usedBy.map(u => `<span>${labels[u]}</span>`).join('');
   panel.innerHTML = `
     <h3>${f.name}</h3>
     <div class="file-path">${f.path}</div>
     <div class="file-type-badge tag ${f.tagClass}">${f.tag}</div>
-    <div class="used-by">Loop stage: ${usedByHtml}</div>
+    <div class="used-by">Primitive role: ${usedByHtml}</div>
     <div class="file-desc">${f.desc}</div>
     <pre><code>${escapeHtml(f.content)}</code></pre>
   `;
