@@ -15,15 +15,17 @@ import threading
 
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from agent_framework.openai import OpenAIChatClient
+from dotenv import load_dotenv
 from openai import OpenAI
+
+load_dotenv()
 
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-AZURE_OPENAI_ENDPOINT = os.environ.get(
-    "AZURE_OPENAI_ENDPOINT",
-    "https://RESOURCE_NAME.openai.azure.com",
-)
+AZURE_OPENAI_ENDPOINT = os.environ.get("AZURE_OPENAI_ENDPOINT")
+if not AZURE_OPENAI_ENDPOINT:
+    raise RuntimeError("AZURE_OPENAI_ENDPOINT must be set in the environment.")
 # `azure_endpoint` MUST be the bare resource URL; strip any trailing
 # `/openai/v1` (or `/openai`) so the SDK doesn't double-append and 404.
 _endpoint = AZURE_OPENAI_ENDPOINT.rstrip("/")

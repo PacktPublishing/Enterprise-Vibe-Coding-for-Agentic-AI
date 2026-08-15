@@ -16,10 +16,9 @@ except ImportError:
     pass
 
 # Configuration
-AZURE_OPENAI_ENDPOINT = os.environ.get(
-    "AZURE_OPENAI_ENDPOINT",
-    "https://RESOURCE_NAME.openai.azure.com",
-)
+AZURE_OPENAI_ENDPOINT = os.environ.get("AZURE_OPENAI_ENDPOINT")
+if not AZURE_OPENAI_ENDPOINT:
+    raise RuntimeError("AZURE_OPENAI_ENDPOINT must be set in the environment.")
 # Defensive normalization — strip trailing /openai/v1 if present
 _endpoint = AZURE_OPENAI_ENDPOINT.rstrip("/")
 for _suffix in ("/openai/v1", "/openai"):
@@ -30,16 +29,17 @@ AZURE_OPENAI_ENDPOINT = _endpoint
 
 DEPLOYMENT_NAME = os.environ.get("AZURE_OPENAI_DEPLOYMENT", "gpt-4o")
 
-AZURE_TENANT_ID = os.environ.get(
-    "AZURE_TENANT_ID",
-    "00000000-0000-0000-0000-000000000000",
-)
+AZURE_TENANT_ID = os.environ.get("AZURE_TENANT_ID")
 
 # AviationStack API key (free tier)
 AVIATIONSTACK_API_KEY = os.environ.get("AVIATIONSTACK_API_KEY", "")
 
 # Credential
-credential = AzureCliCredential(tenant_id=AZURE_TENANT_ID)
+credential = (
+    AzureCliCredential(tenant_id=AZURE_TENANT_ID)
+    if AZURE_TENANT_ID
+    else AzureCliCredential()
+)
 
 # Client
 client = OpenAIChatClient(

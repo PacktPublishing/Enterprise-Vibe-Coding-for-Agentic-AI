@@ -4,3 +4,4 @@ agent-framework>=1.2
 fpdf2
 requests
 openai
+python-dotenv

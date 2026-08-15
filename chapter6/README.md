@@ -52,6 +52,16 @@ A two-tab gamified landing page:
 | Hook | `catalog-schema-guard.json` + `catalog_schema_check.py` | 🛍️ Shopping |
 | MCP | `.vscode/mcp.json` | All |
 
+## Local Configuration
+
+Each runnable prototype reads deployment-specific settings from a local `.env` file. Copy the relevant `.env.example`, fill in your own values, and keep `.env` untracked:
+
+```text
+copy .env.example .env
+```
+
+The repository-wide `.gitignore` excludes `.env` and `.env.*` while retaining `.env.example`. Chapter 6 MCP configuration contains no embedded credentials; add authentication only through environment variables or password-masked MCP inputs.
+
 ## Files
 
 - [chapter6-landing.html](chapter6-landing.html) — Interactive landing page with video demos and primitives explorer

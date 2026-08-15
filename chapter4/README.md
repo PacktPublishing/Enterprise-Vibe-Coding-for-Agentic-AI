@@ -32,7 +32,7 @@ A two-tab gamified landing page:
 | Prompt | `spec-to-architecture-diagram.prompt.md` | Spec → Mermaid architecture diagrams |
 | Prompt | `spec-to-test-plan.prompt.md` | User story → 7-case test plan (RPI gate) |
 | Hook | `secrets-scanner/` | Gitleaks secret scan on release-captain actions |
-| MCP | `.vscode/mcp.json` | Mermaid + Azure DevOps MCP server config |
+| MCP | `.vscode/mcp.json` | Mermaid + Azure DevOps MCP server config; sensitive values use password-masked inputs |
 
 ## Files
 

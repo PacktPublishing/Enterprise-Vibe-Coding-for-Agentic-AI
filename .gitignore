@@ -1,1 +1,10 @@
 chapter6/cmo-marketing-campaign/assets/Screen Recording 2026-05-30 160610.mp4
+
+# Local environment files and secrets
+.env
+.env.*
+!.env.example
+
+# Generated Python artifacts
+__pycache__/
+*.py[cod]

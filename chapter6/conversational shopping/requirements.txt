@@ -2,3 +2,4 @@ flask
 azure-identity
 agent-framework
 openai
+python-dotenv
