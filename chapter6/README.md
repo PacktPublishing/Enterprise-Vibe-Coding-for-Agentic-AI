@@ -1,6 +1,6 @@
 # Chapter 6 — Use Cases: Building Agentic Solutions with the HVE Primitives
 
-Companion assets for **Chapter 6: Use Cases** from *Agentic Development in Practice*.
+Companion assets for **Chapter 6: Use Cases** from *From Vibe Coding to Enterprise Agentic Development*.
 
 Chapter 6 presents three complete agentic products built in different domains, demonstrating how HVE primitives come together to deliver enterprise-grade solutions:
 
@@ -15,7 +15,7 @@ A two-tab gamified landing page:
 1. **Use Cases** — Explore all three use cases with business context, orchestration patterns, embedded video demos, and clickable primitives.
 2. **Primitives Repo** — An interactive repository tree with use-case filters. Highlight which primitives are used by each project. Click to see descriptions and key code excerpts.
 
-➡️ **[Launch the Chapter 6 Interactive Experience](https://valentinaalto.github.io/agentic-development-in-practice/code-and-assets/chapter6/chapter6-landing.html)**
+➡️ **[Launch the Chapter 6 Interactive Experience](https://valentina-alto.github.io/Enterprise-Vibe-Coding-for-Agentic-AI/chapter6/chapter6-landing.html)**
 
 ## Projects in This Chapter
 

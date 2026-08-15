@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 8 — From Steered Delivery to Agent Experience</title>
+<script>
+  (() => {
+    const param = new URLSearchParams(window.location.search).get("scoutTheme");
+    const theme =
+      param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  })();
+</script>
+<style>
+:root {
+  color-scheme: light;
+  --cp-bg: #f7f4ef;
+  --cp-bg-elevated: #fcfbf8;
+  --cp-surface: #ffffff;
+  --cp-surface-soft: #f5f5f5;
+  --cp-border: #dedede;
+  --cp-border-strong: #919191;
+  --cp-text: #242424;
+  --cp-text-muted: #5c5c5c;
+  --cp-text-soft: #6f6f6f;
+  --cp-accent: #b11f4b;
+  --cp-accent-hover: #9a1a41;
+  --cp-accent-soft: rgba(177, 31, 75, 0.08);
+  --cp-accent-fg: #ffffff;
+  --cp-success: #16a34a;
+  --cp-danger: #dc2626;
+  --cp-warning: #f59e0b;
+  --cp-link: #0078d4;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+  --cp-overlay: rgba(255, 255, 255, 0.8);
+  --cp-panel: rgba(255, 255, 255, 0.86);
+  --cp-panel-strong: rgba(255, 255, 255, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.55);
+  --cp-highlight: rgba(177, 31, 75, 0.12);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --cp-bg: #3d3b3a;
+  --cp-bg-elevated: #343231;
+  --cp-surface: #292929;
+  --cp-surface-soft: #2e2e2e;
+  --cp-border: #474747;
+  --cp-border-strong: #5f5f5f;
+  --cp-text: #dedede;
+  --cp-text-muted: #919191;
+  --cp-text-soft: #b0b0b0;
+  --cp-accent: #fd8ea1;
+  --cp-accent-hover: #fb7b91;
+  --cp-accent-soft: rgba(253, 142, 161, 0.14);
+  --cp-accent-fg: #1a1a1a;
+  --cp-success: #4ade80;
+  --cp-danger: #f87171;
+  --cp-warning: #fbbf24;
+  --cp-link: #4da6ff;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+  --cp-overlay: rgba(41, 41, 41, 0.88);
+  --cp-panel: rgba(41, 41, 41, 0.72);
+  --cp-panel-strong: rgba(41, 41, 41, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.04);
+  --cp-highlight: rgba(253, 142, 161, 0.12);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--cp-bg);
+  color: var(--cp-text);
+  font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+}
+button { font: inherit; }
+a { color: var(--cp-link); }
+.progress { position: fixed; inset: 0 auto auto 0; width: 0; height: 4px; background: var(--cp-accent); z-index: 10; }
+.theme {
+  position: fixed; top: 16px; left: 16px; z-index: 11;
+  border: 1px solid var(--cp-border); background: var(--cp-surface); color: var(--cp-text);
+  border-radius: 0.625rem; padding: 8px 12px; cursor: pointer;
+}
+.hero { max-width: 900px; margin: 0 auto; padding: 96px 24px 48px; text-align: center; }
+.eyebrow { color: var(--cp-accent); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; font-size: .8rem; }
+h1 { font-size: clamp(2rem, 6vw, 3.5rem); line-height: 1.1; margin: 12px 0 20px; }
+.subtitle { max-width: 720px; margin: auto; color: var(--cp-text-muted); font-size: 1.1rem; }
+.hero-links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
+.button {
+  display: inline-block; text-decoration: none; border-radius: 0.625rem; padding: 10px 16px;
+  border: 1px solid var(--cp-accent); background: var(--cp-accent); color: var(--cp-accent-fg); font-weight: 700;
+}
+.button.secondary { background: var(--cp-surface); color: var(--cp-accent); }
+main { max-width: 1040px; margin: auto; padding: 0 24px 64px; }
+section { margin: 56px 0; }
+h2 { font-size: 1.7rem; margin-bottom: 8px; }
+.lead { color: var(--cp-text-muted); max-width: 760px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(235px, 1fr)); gap: 16px; margin-top: 24px; }
+.card {
+  border: 1px solid var(--cp-border); background: var(--cp-surface); border-radius: 16px; padding: 20px;
+  box-shadow: 0 1px 0 var(--cp-border); transition: transform .2s, border-color .2s;
+}
+.card:hover { transform: translateY(-2px); border-color: var(--cp-accent); }
+.card-toggle { cursor: pointer; display: block; }
+.chapter { color: var(--cp-accent); font-size: .78rem; font-weight: 700; text-transform: uppercase; }
+.card h3 { margin: 6px 0 8px; font-size: 1.05rem; }
+.card p { margin: 0; color: var(--cp-text-muted); font-size: .9rem; }
+.detail { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--cp-border); }
+.card.open .detail { display: block; }
+.ax-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-top: 20px; }
+.ax {
+  border-left: 4px solid var(--cp-accent); background: var(--cp-surface); border-radius: 0.625rem;
+  padding: 16px; border-top: 1px solid var(--cp-border); border-right: 1px solid var(--cp-border); border-bottom: 1px solid var(--cp-border);
+}
+.ax strong { display: block; margin-bottom: 4px; }
+.ax span { color: var(--cp-text-muted); font-size: .9rem; }
+.roadmap { counter-reset: steps; display: grid; gap: 12px; margin-top: 20px; }
+.step { display: grid; grid-template-columns: 40px 1fr; gap: 12px; align-items: start; background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; padding: 16px; }
+.step::before {
+  counter-increment: steps; content: counter(steps); width: 32px; height: 32px; display: grid; place-items: center;
+  border-radius: 50%; background: var(--cp-accent); color: var(--cp-accent-fg); font-weight: 700;
+}
+.step h3, .step p { margin: 0; }
+.step p { color: var(--cp-text-muted); }
+.callout { background: var(--cp-accent-soft); border: 1px solid var(--cp-accent); border-radius: 16px; padding: 22px; margin-top: 24px; }
+.quiz-options { display: grid; gap: 10px; margin-top: 16px; }
+.quiz-options button {
+  text-align: left; border: 1px solid var(--cp-border); border-radius: 0.625rem; padding: 12px;
+  background: var(--cp-surface); color: var(--cp-text); cursor: pointer;
+}
+.quiz-options button:hover { border-color: var(--cp-accent); }
+.quiz-options button.correct { border-color: var(--cp-success); color: var(--cp-success); }
+.quiz-options button.wrong { border-color: var(--cp-danger); color: var(--cp-danger); }
+footer { border-top: 1px solid var(--cp-border); padding: 32px 24px; text-align: center; color: var(--cp-text-muted); }
+footer p { margin: 6px 0; }
+@media (max-width: 560px) { .theme { position: absolute; } .hero { padding-top: 80px; } }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<button class="theme" id="theme" aria-label="Toggle theme">◐ Theme</button>
+<header class="hero">
+  <div class="eyebrow">Chapter 8 · Interactive Playbook</div>
+  <h1>From Steered Delivery to Agent Experience</h1>
+  <p class="subtitle">The operating model is complete. The next frontier is designing repositories, tools, and organisations so agents can work safely, legibly, and effectively as first-class users.</p>
+  <div class="hero-links">
+    <a class="button" href="#journey">Retrace the journey</a>
+    <a class="button secondary" href="#ax">Explore AX</a>
+  </div>
+</header>
+<main>
+  <section id="journey">
+    <h2>One operating model, built chapter by chapter</h2>
+    <p class="lead">HVE is not a toolchain. It is a connected system for turning cheap generation into high-confidence delivery. Select a card to reveal the contribution each chapter makes.</p>
+    <div class="grid">
+      <article class="card"><div class="card-toggle" role="button" tabindex="0" aria-expanded="false"><span class="chapter">Chapter 1</span><h3>The challenge</h3><p>Vibe coding reveals the speed; enterprise delivery exposes the risk.</p><div class="detail">Humans move from typing every line to steering intent, constraints, and accountability.</div></div></article>
+      <article class="card"><div class="card-toggle" role="button" tabindex="0" aria-expanded="false"><span class="chapter">Chapter 2</span><h3>The paradigm</h3><p>Specialized agents plan, act, verify, and escalate through one surface.</p><div class="detail">The human-agent contract makes roles, checkpoints, and risk ownership explicit.</div></div></article>
+      <article class="card"><div class="card-toggle" role="button" tabindex="0" aria-expanded="false"><span class="chapter">Chapter 3</span><h3>The primitives</h3><p>Instructions, prompts, agents, skills, hooks, and MCP become reusable assets.</p><div class="detail">The repo gains an executable context layer instead of relying on one-off prompts.</div></div></article>
+      <article class="card"><div class="card-toggle" role="button" tabindex="0" aria-expanded="false"><span class="chapter">Chapter 4</span><h3>The cadence</h3><p>Research, Plan, Implement runs through every phase of the SDLC.</p><div class="detail">Agentic DevOps makes evidence, tests, and automation part of the flow.</div></div></article>
+      <article class="card"><div class="card-toggle" role="button" tabindex="0" aria-expanded="false"><span class="chapter">Chapter 5</span><h3>The controls</h3><p>Governance becomes encoded boundaries, enforcement, and auditability.</p><div class="detail">Consequential actions move toward deterministic controls and explicit approval.</div></div></article>
+      <article class="card"><div class="card-toggle" role="button" tabindex="0" aria-expanded="false"><span class="chapter">Chapter 6</span><h3>The proof</h3><p>Three real applications demonstrate that the pieces compose.</p><div class="detail">Handoffs, commerce boundaries, and campaign governance show evolvability in practice.</div></div></article>
+      <article class="card"><div class="card-toggle" role="button" tabindex="0" aria-expanded="false"><span class="chapter">Chapter 7</span><h3>The loop</h3><p>The system repeatedly dispatches, verifies, recovers, and stops at human gates.</p><div class="detail">The loop specification makes autonomy bounded, reviewable, and cost-aware.</div></div></article>
+    </div>
+  </section>
+
+  <section>
+    <h2>When does agentic development become a discipline?</h2>
+    <p class="lead">A discipline has named components, repeatable methods, measurable outcomes, encoded controls, and a way to learn from every run. HVE connects all five.</p>
+    <div class="callout"><strong>The convergence:</strong> independent industry practices increasingly point to the same conclusion — context must be engineered, autonomy bounded, verification continuous, and humans accountable for consequential decisions.</div>
+  </section>
+
+  <section id="ax">
+    <h2>The new frontier: Agent Experience (AX)</h2>
+    <p class="lead">Developer Experience asks whether humans can understand and change a system. Agent Experience asks the same question for agents without weakening security, traceability, or human control.</p>
+    <div class="ax-grid">
+      <div class="ax"><strong>Context</strong><span>Can the agent find current architecture, conventions, ownership, and intent without guessing?</span></div>
+      <div class="ax"><strong>Tools</strong><span>Are capabilities discoverable, typed, least-privileged, and staged from read-only to write?</span></div>
+      <div class="ax"><strong>Feedback</strong><span>Do tests, policies, and observability provide fast machine-readable signals?</span></div>
+      <div class="ax"><strong>Boundaries</strong><span>Are allowed actions, approval gates, cost limits, and sensitive areas explicit?</span></div>
+      <div class="ax"><strong>Recovery</strong><span>Can the agent diagnose failure, retry safely, roll back, or escalate with evidence?</span></div>
+      <div class="ax"><strong>Memory</strong><span>Are durable decisions versioned in the repo or work thread instead of hidden in chat history?</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What to build next</h2>
+    <div class="roadmap">
+      <div class="step"><div><h3>Choose one bounded workflow</h3><p>Prefer a frequent task with visible pain, testable outcomes, and low production risk.</p></div></div>
+      <div class="step"><div><h3>Package the primitive stack</h3><p>Version the instructions, task prompt, specialist role, skill, enforcement hook, and required connector.</p></div></div>
+      <div class="step"><div><h3>Run an RPI cycle</h3><p>Confirm assumptions, approve the plan, implement in slices, and collect evidence.</p></div></div>
+      <div class="step"><div><h3>Encode governance</h3><p>Turn review expectations into machine-checkable policies and explicit approval boundaries.</p></div></div>
+      <div class="step"><div><h3>Specify the loop</h3><p>Define trigger, state, verification, recovery, budgets, checkpoints, and the done-condition.</p></div></div>
+      <div class="step"><div><h3>Measure trust with speed</h3><p>Track lead time alongside escaped defects, security findings, rollback frequency, and human review load.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Knowledge check</h2>
+    <p class="lead">Which change best improves Agent Experience without surrendering control?</p>
+    <div class="quiz-options" id="quiz">
+      <button data-correct="false">Give every agent broad production write access so it never gets blocked.</button>
+      <button data-correct="true">Expose typed, least-privileged tools with fast feedback and explicit escalation paths.</button>
+      <button data-correct="false">Keep architecture decisions in private chat history to reduce repository noise.</button>
+    </div>
+  </section>
+</main>
+<footer>
+  <p><a href="../chapter7/chapter7-landing.html">← Chapter 7: Loop Engineering</a> · <a href="../before%20you%20start/before-you-start.html">Journey Map</a> · <a href="../chapter1/chapter1-landing.html">Restart at Chapter 1 →</a></p>
+  <p>From Vibe Coding to Enterprise Agentic Development</p>
+</footer>
+<script>
+const themeButton = document.getElementById("theme");
+themeButton.addEventListener("click", () => {
+  const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+});
+window.addEventListener("scroll", () => {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  document.getElementById("progress").style.width = `${max ? (window.scrollY / max) * 100 : 0}%`;
+});
+document.querySelectorAll(".card-toggle").forEach(toggle => {
+  const activate = () => {
+    const card = toggle.closest(".card");
+    card.classList.toggle("open");
+    toggle.setAttribute("aria-expanded", card.classList.contains("open"));
+  };
+  toggle.addEventListener("click", activate);
+  toggle.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      activate();
+    }
+  });
+});
+document.querySelectorAll("#quiz button").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll("#quiz button").forEach(option => option.disabled = true);
+    button.classList.add(button.dataset.correct === "true" ? "correct" : "wrong");
+    if (button.dataset.correct !== "true") {
+      document.querySelector('#quiz button[data-correct="true"]').classList.add("correct");
+    }
+  });
+});
+</script>
+</body>
+</html>

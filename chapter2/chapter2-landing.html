@@ -6,7 +6,7 @@
     <title>Chapter 2 — Agentic AI and the New Way We Work</title>
     <script>
       (() => {
-        const param = new URLSearchParams(window.location.search).get("clawpilotTheme");
+        const param = new URLSearchParams(window.location.search).get("scoutTheme");
         const theme =
           param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
         document.documentElement.setAttribute("data-theme", theme);
@@ -798,54 +798,64 @@ body {
             </div>
         </section>
 
-        <!-- SECTION 5: Three Phases -->
+        <!-- SECTION 5: Four Phases -->
         <section class="section" data-section="5">
             <div class="section-header">
                 <div class="section-number">5</div>
-                <h2 class="section-title">Three Phases of Human-Agent Collaboration</h2>
+                <h2 class="section-title">Four Phases of Human-Agent Collaboration</h2>
             </div>
             <p style="color: var(--cp-text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
-                AI agents first <strong>speed it up</strong>, then <strong>make it cheaper</strong>, then <strong>change the operating model</strong>. Click each phase:
+                Collaboration progresses from AI-assisted typing to AI-first execution with explicit human checkpoints. Click each phase:
             </p>
             <div class="phases-container">
                 <div class="phase-card" onclick="togglePhase(this)">
                     <div class="phase-header">
                         <div class="phase-num">1</div>
-                        <div class="phase-title">Human-First</div>
-                        <div class="phase-subtitle">Efficiency play</div>
+                        <div class="phase-title">AI as Autocomplete</div>
+                        <div class="phase-subtitle">Human executes</div>
                     </div>
                     <div class="phase-body">
-                        <p>The person does almost all the work. AI assists at the edges — accelerating analysis, surfacing recommendations. <strong>In dev:</strong> the developer types code, AI completes the line. Same cost per decision, ~30-40% time saved.</p>
+                        <p>The person owns every step while AI accelerates local tasks. <strong>In development:</strong> the developer writes the code and AI completes or explains small fragments.</p>
                     </div>
                 </div>
                 <div class="phase-card" onclick="togglePhase(this)">
                     <div class="phase-header">
                         <div class="phase-num">2</div>
-                        <div class="phase-title">Agent-Led, Human-Supervised</div>
-                        <div class="phase-subtitle">Productivity play</div>
+                        <div class="phase-title">AI as Copilot</div>
+                        <div class="phase-subtitle">Human leads</div>
                     </div>
                     <div class="phase-body">
-                        <p>Agents take over well-defined decisions end-to-end. Humans supervise exceptions and approve edge cases. <strong>In dev:</strong> agents handle tests, scans, docs; developer reviews. Cost per decision drops 60-70%, throughput per person rises 3-4×.</p>
+                        <p>The human frames the task and works interactively with AI on larger artifacts. <strong>In development:</strong> AI drafts functions, tests, plans, and reviews while the developer remains the active operator.</p>
                     </div>
                 </div>
                 <div class="phase-card" onclick="togglePhase(this)">
                     <div class="phase-header">
                         <div class="phase-num">3</div>
-                        <div class="phase-title">Autonomous Agents, Human-Governed</div>
-                        <div class="phase-subtitle">Operating-model play</div>
+                        <div class="phase-title">Agent-Led Delivery</div>
+                        <div class="phase-subtitle">Human supervises</div>
                     </div>
                     <div class="phase-body">
-                        <p>Agents run entire streams within policy guardrails. Humans govern outcomes, set rules, intervene only on flags. <strong>In dev:</strong> multiple delivery streams run in parallel; the developer watches a portfolio view. Structural cost reduction.</p>
+                        <p>Agents execute bounded tasks end to end and return evidence for review. <strong>In development:</strong> agents implement, test, scan, and document while humans approve exceptions and consequential changes.</p>
+                    </div>
+                </div>
+                <div class="phase-card" onclick="togglePhase(this)">
+                    <div class="phase-header">
+                        <div class="phase-num">4</div>
+                        <div class="phase-title">AI-First, Human-Governed</div>
+                        <div class="phase-subtitle">Human sets checkpoints</div>
+                    </div>
+                    <div class="phase-body">
+                        <p>Specialized agents run multiple delivery streams inside encoded constraints. Humans define intent, risk tolerance, and checkpoints for scope, architecture, merge, release, and production actions.</p>
                     </div>
                 </div>
             </div>
 
             <div class="quiz-box" id="quiz3">
-                <div class="quiz-question">🧠 In Phase 2, what does the human primarily do?</div>
+                <div class="quiz-question">🧠 What distinguishes Phase 4?</div>
                 <div class="quiz-options">
-                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this, 'quiz3')">Write all the code manually</div>
-                    <div class="quiz-option" data-correct="true" onclick="answerQuiz(this, 'quiz3')">Supervise exceptions and approve edge cases</div>
-                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this, 'quiz3')">Set policies and watch KPIs at portfolio level</div>
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this, 'quiz3')">AI only completes individual lines of code</div>
+                    <div class="quiz-option" data-correct="false" onclick="answerQuiz(this, 'quiz3')">The human remains the active operator for every step</div>
+                    <div class="quiz-option" data-correct="true" onclick="answerQuiz(this, 'quiz3')">Agents run bounded streams while humans govern intent, risk, and checkpoints</div>
                 </div>
                 <div class="quiz-feedback" id="quiz3-feedback"></div>
             </div>
@@ -898,7 +908,7 @@ body {
                 <div class="achievement" id="ach-arch" title="Explored all architecture blocks">
                     <span class="badge-icon">🏗️</span> Architect
                 </div>
-                <div class="achievement" id="ach-phases" title="Expanded all three phases">
+                <div class="achievement" id="ach-phases" title="Expanded all four phases">
                     <span class="badge-icon">📊</span> Phase Master
                 </div>
                 <div class="achievement" id="ach-all" title="Earned all achievements">
@@ -910,7 +920,8 @@ body {
         <!-- Footer -->
         <div class="footer-nav">
             <a href="../chapter1/chapter1-landing.html">← Chapter 1</a>
-            <a href="../chapter1/index.html">HVE Maturity Assessment →</a>
+            <a href="../before%20you%20start/before-you-start.html">Journey Map</a>
+            <a href="../chapter3/chapter3-landing.html">Chapter 3 →</a>
         </div>
     </div>
 
@@ -1012,7 +1023,7 @@ body {
             if (!phasesExpanded.has(idx)) {
                 phasesExpanded.add(idx);
                 if (phasesExpanded.size === 1) addXP(5, 'Exploring phases');
-                if (phasesExpanded.size === 3) {
+                if (phasesExpanded.size === 4) {
                     addXP(15, 'All phases explored!');
                     document.getElementById('ach-phases').classList.add('unlocked');
                 }

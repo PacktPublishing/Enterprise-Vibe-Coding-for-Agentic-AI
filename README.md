@@ -1,33 +1,39 @@
-# Enterprise Vibe Coding for Agentic AI
+# From Vibe Coding to Enterprise Agentic Development
 
-Companion code and assets for the book **"Agentic Development in Practice: A Hypervelocity Engineering Playbook"** (Packt Publishing).
+Companion code, interactive playbooks, templates, and prototypes for **_From Vibe Coding to Enterprise Agentic Development: A Practical Playbook for Shipping AI-Assisted Software_**.
 
-## About the Book
+## Start Here
 
-This book introduces **Hypervelocity Engineering (HVE)** — a methodology for small, expert teams leveraging AI to ship production-grade software at unprecedented speed without sacrificing quality, security, or scalability. It bridges the gap between experimental "vibe coding" and disciplined, enterprise-ready agentic development.
+➡️ **[Open the Before You Start interactive guide](https://valentina-alto.github.io/Enterprise-Vibe-Coding-for-Agentic-AI/before%20you%20start/before-you-start.html)**
 
-## Repository Structure
+The guide explains the eight-chapter journey, how the repository is organised, which assets run directly in a browser, and which examples require a local runtime.
 
-| Folder | Topic |
-|--------|-------|
-| `chapter1/` | The HVE Manifesto — primitives, methodology, and the RPI development loop |
-| `chapter2/` | Intelligent Risk & Compliance Monitoring (Financial Services) |
-| `chapter3/` | Clinical Documentation Intelligence (Healthcare) |
-| `chapter4/` | Supply Chain Decision Intelligence (Retail & Logistics) |
-| `chapter5/` | Governance — From Stochastic to Deterministic Agentic Development |
-| `chapter6/` | Multi-Agent Applications with Microsoft Agent Framework |
-| `chapter7/` | Loop Engineering — a self-running delivery loop (trigger → governed merge) |
+## Eight-Chapter Journey
+
+| Chapter | Focus | Practical outcome |
+|---|---|---|
+| [1](chapter1/) | The impact of AI: from vibe coding to steered agentic development | Maturity self-assessment and top risks |
+| [2](chapter2/) | Agentic AI and the new way we work | Human-agent operating model and checkpoints |
+| [3](chapter3/) | The six agentic-development primitives | Repo-ready primitive stack |
+| [4](chapter4/) | Agentic DevOps and the RPI cadence across the SDLC | RPI checklist and phase map |
+| [5](chapter5/) | Governance from stochastic to deterministic | Encoded controls and decision boundaries |
+| [6](chapter6/) | Three end-to-end HVE use cases | Travel, shopping, and marketing blueprints |
+| [7](chapter7/) | Loop engineering | Bounded, verifiable delivery-loop specification |
+| [8](chapter8/) | From steered delivery to Agent Experience | Forward-looking AX design checklist |
+
+## Repository Conventions
+
+- Each `chapterN/README.md` explains that chapter's assets and links to its interactive playbook.
+- Each `chapterN/chapterN-landing.html` is a self-contained GitHub Pages experience.
+- `.github/` and `.vscode/` folders contain repo-native primitives such as instructions, prompts, agents, skills, hooks, workflows, and MCP configuration.
+- Chapter 6 application folders are runnable prototypes; their HTML templates are not standalone demos.
+- Never commit real credentials. Treat checked-in `.env` files as local-only material and replace any exposed values before sharing or deploying.
 
 ## Who This Is For
 
-- **Technology Leaders** looking for a structured methodology to scale AI-assisted development across their organisations.
-- **Senior Engineers and Technical Leads** who want to move beyond ad-hoc AI usage toward repeatable, auditable agentic workflows.
-
-## Key Concepts
-
-- **HVE Primitive Stack** — Instructions, Agents, Prompts, Skills, and Hooks that codify engineering standards into the repository itself.
-- **RPI Loop** — Research → Plan → Implement: a repeatable cycle that keeps humans accountable for decisions while AI operates at full speed.
-- **Business Value Assessment** — A first-class artefact for measuring and communicating the impact of agentic capabilities.
+- Technology leaders adopting agentic AI as an operating model rather than a collection of demos.
+- Senior engineers and technical leads seeking speed without losing ownership, testability, or security.
+- Platform and governance teams encoding guardrails that preserve delivery flow.
 
 ## License
 

@@ -6,7 +6,7 @@
     <title>HVE Maturity Assessment — Hypervelocity Engineering Readiness</title>
     <script>
       (() => {
-        const param = new URLSearchParams(window.location.search).get("clawpilotTheme");
+        const param = new URLSearchParams(window.location.search).get("scoutTheme");
         const theme =
           param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
         document.documentElement.setAttribute("data-theme", theme);
@@ -572,7 +572,7 @@
 
     <!-- HEADER -->
     <header>
-        <div class="badge">From the book: Agentic Development in Practice</div>
+        <div class="badge">From the book: From Vibe Coding to Enterprise Agentic Development</div>
         <h1>HVE Maturity Assessment</h1>
         <p>Discover where your organisation sits on the journey from traditional development to Hypervelocity Engineering — and what to do next.</p>
     </header>
@@ -655,7 +655,7 @@
     </section>
 
     <footer>
-        <p>Companion resource for <em>Agentic Development in Practice: A Hypervelocity Engineering Playbook</em><br>
+        <p>Companion resource for <em>From Vibe Coding to Enterprise Agentic Development: A Practical Playbook for Shipping AI-Assisted Software</em><br>
         &copy; 2026 &mdash; Chapter 1: The HVE Manifesto</p>
     </footer>
 </div>
@@ -986,7 +986,7 @@ function showResults() {
 
     // Build the LLM prompt
     const dimLines = scores.map(r => `  - ${r.dim.title}: ${r.score}/5`).join('\n');
-    const prompt = `I just completed the Hypervelocity Engineering (HVE) Maturity Assessment from the book "Agentic Development in Practice: A Hypervelocity Engineering Playbook."
+    const prompt = `I just completed the Hypervelocity Engineering (HVE) Maturity Assessment from the book "From Vibe Coding to Enterprise Agentic Development: A Practical Playbook for Shipping AI-Assisted Software."
 
 Here are my results:
 

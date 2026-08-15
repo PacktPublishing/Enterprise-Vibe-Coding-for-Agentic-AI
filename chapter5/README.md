@@ -1,6 +1,6 @@
 # Chapter 5 — Governance: From Stochastic to Deterministic Agentic Development
 
-Companion assets for **Chapter 5: Governance** from *Agentic Development in Practice*.
+Companion assets for **Chapter 5: Governance** from *From Vibe Coding to Enterprise Agentic Development*.
 
 Chapter 5 treats governance as **engineering, not policy**. The moment an agent writes production code, three questions follow: *who is accountable, what can the agent actually do, and how do we prove what happened?* The chapter answers them by moving the agentic stack along a spectrum from **stochastic to deterministic**, using an instruction hierarchy, hooks, policy-as-code, deterministic parallel coordination, and a tamper-evident audit trail — anchored to external frameworks (NIST AI RMF, ISO/IEC 42001, the EU AI Act, the Microsoft Responsible AI Standard, OWASP/MITRE).
 
@@ -14,9 +14,9 @@ A single-view, gamified landing page (XP, achievements, progress tracking, light
 - **External Frameworks** — how the five layers map onto NIST, ISO 42001, the EU AI Act, the Microsoft RAI Standard, and OWASP/MITRE.
 - **Knowledge Check & Achievements** — quizzes and unlockables to reinforce the concepts.
 
-➡️ **[Launch the Chapter 5 Interactive Experience](https://valentinaalto.github.io/agentic-development-in-practice/code-and-assets/chapter5/chapter5-landing.html)**
+➡️ **[Launch the Chapter 5 Interactive Experience](https://valentina-alto.github.io/Enterprise-Vibe-Coding-for-Agentic-AI/chapter5/chapter5-landing.html)**
 
-> If the link above is not yet live, enable GitHub Pages on this repository (Settings → Pages → deploy from the `main` branch, root) and the page will be served from `code-and-assets/chapter5/`.
+> If the link above is not yet live, enable GitHub Pages on this repository (Settings → Pages → deploy from the `main` branch, root) and the page will be served from `chapter5/`.
 
 ## Concepts in This Chapter
 

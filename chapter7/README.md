@@ -1,13 +1,13 @@
 # Chapter 7 — Loop Engineering
 
-Companion assets for **Chapter 7: Loop Engineering** from *Agentic Development in Practice*.
+Companion assets for **Chapter 7: Loop Engineering** from *From Vibe Coding to Enterprise Agentic Development*.
 
 Loop engineering is the discipline of not prompting an agent, but designing the **loop that
 prompts the agent** — a recurring, verifiable workflow that carries context from a filed issue
 to a governed merge, then repeats. You show up at exactly two gates: **approve the plan** and
 **authorize the merge**.
 
-➡️ **[Launch the Chapter 7 interactive experience](https://valentinaalto.github.io/agentic-development-in-practice/code-and-assets/chapter7/chapter7-landing.html)** — a gamified, two-tab tour of the loop and its primitives.
+➡️ **[Launch the Chapter 7 interactive experience](https://valentina-alto.github.io/Enterprise-Vibe-Coding-for-Agentic-AI/chapter7/chapter7-landing.html)** — a gamified, two-tab tour of the loop and its primitives.
 
 ## The loop — five capabilities
 
