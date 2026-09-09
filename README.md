@@ -35,6 +35,19 @@ The guide explains the eight-chapter journey, how the repository is organised, w
 - Senior engineers and technical leads seeking speed without losing ownership, testability, or security.
 - Platform and governance teams encoding guardrails that preserve delivery flow.
 
+## Assessment
+
+For the assessment, you can refer to the following QR code or click the link below:
+
+<p align="center">
+  <a href="https://valentina-alto.github.io/Enterprise-Vibe-Coding-for-Agentic-AI/chapter1/index.html">
+   <img width="300" height="300" alt="image" src="https://github.com/user-attachments/assets/d4e43686-8104-4bad-ba77-60d533fa2437" />
+   <br>
+  <a href="https://valentina-alto.github.io/Enterprise-Vibe-Coding-for-Agentic-AI/chapter1/index.html">
+    Assessment Link
+  </a>
+</p>
+
 ## License
 
 Please refer to the book's terms and conditions for usage of this material.
